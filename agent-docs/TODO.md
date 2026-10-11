@@ -14,7 +14,7 @@ remove a row here when you add or remove an entry.
 
 ## Ready to take
 
-| Item                                                                   | Area      | First move                                                                        |
-| ---------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------- |
-| [Improve the jbrowse integration](todo/jbrowse-graph-display.md)       | jbrowse   | Find where the integration mounts the graph as a view and switch it to a display. |
-| [BandageJS genes and help docs](todo/bandagejs-genes-and-help-docs.md) | bandagejs | Draw one gene track under the graph from a GFF3 file.                             |
+| Item                                                             | Area      | First move                                                                          |
+| ---------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
+| [Improve the jbrowse integration](todo/jbrowse-graph-display.md) | jbrowse   | Emit one linear view with the lanes track as a LinearGraphDisplay in graphViewLink. |
+| [BandageJS help docs](todo/bandagejs-genes-and-help-docs.md)     | bandagejs | Write docs/layouts.md from the README layout and Haplotypes sections.               |

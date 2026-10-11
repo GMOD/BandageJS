@@ -1,15 +1,19 @@
 ---
 name: bandagejs-genes-and-help-docs
 description:
-  Let BandageJS itself show genes, and add more help docs under docs/.
+  More help docs under docs/. Genes already show in BandageJS and docs/genes.md
+  covers them.
 metadata:
   category: ready
   area: bandagejs
-  first_move: 'Draw one gene track under the graph from a GFF3 file.'
+  first_move:
+    'Write docs/layouts.md from the README layout and Haplotypes sections.'
   order: 2
 ---
 
-# BandageJS genes and help docs
+# BandageJS help docs
 
-BandageJS itself should also allow showing genes, and have more help docs in
-docs/ folder.
+BandageJS draws genes (`src/genes.ts`, `docs/genes.md`). `docs/` holds only
+`genes.md` and `developing.md`, while the README carries the rest of the user
+guide. Move the longer README sections (layouts, haplotypes, links, figures)
+into their own files under `docs/` and link them from the README.
