@@ -16,13 +16,13 @@
     "test:e2e": "playwright test --project=e2e"
   },
   "devDependencies": {
-    "@gmod/tabix": "^3.9.1",
-    "@jbrowse/bandage-core": "^10.0.0",
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.4",
+    "@gmod/tabix": "^3.10.1",
+    "@jbrowse/bandage-core": "^10.2.1",
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.5",
     "esbuild": "^0.28.2",
     "generic-filehandle2": "^2.5.0",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "typescript": "^7.0.2"
   }
 }
