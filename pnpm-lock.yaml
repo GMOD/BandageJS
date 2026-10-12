@@ -12,8 +12,8 @@ importers:
         specifier: ^3.10.1
         version: 3.10.1
       '@jbrowse/bandage-core':
-        specifier: ^10.2.2
-        version: 10.2.2
+        specifier: ^10.2.3
+        version: 10.2.3
       '@jbrowse/graph-walks':
         specifier: ^1.0.0
         version: 1.0.0
@@ -207,10 +207,14 @@ packages:
   '@gmod/tabix@3.10.1':
     resolution: {integrity: sha512-bynf5MGr50O6Re2asEbt3kEfULUhXb2J87dqFK/78xXfJIWWrKfuQCA+ADSp3QJtdODvTf7ftWiTnc8yLQ0Yrw==}
 
-  '@jbrowse/bandage-core@10.2.2':
-    resolution: {integrity: sha512-rsBlfdbQsReIJDXT4TAbHX33OZ76tRvqpJUXCvt+cPXioqhL7Gsq1gcllhl/YNPh179Z1tHf25tJfhejvcQ+Og==}
+  '@jbrowse/bandage-core@10.2.3':
+    resolution: {integrity: sha512-RPK+0h3Z08haxpTPwZHFvHH9PO89yIGg9LDaTMCvzsvenbKvYCoJ+JsRRtOuTtpeJpXN+UbPRMW57Avnexsvww==}
     engines: {node: '>=20'}
     hasBin: true
+
+  '@jbrowse/graph-fmmm-layout@1.0.2':
+    resolution: {integrity: sha512-/wIO50DsK87me7qTlo1D6h65Onjk2LMxaWSP19jk220kJp8bic8hL6ITz1+NTi+CttKm0CyzNWJ/eDwgSayGJw==}
+    engines: {node: '>=20'}
 
   '@jbrowse/graph-stress-layout@1.0.0':
     resolution: {integrity: sha512-Yw0aMopfOIvHftmHnTP+jPL0uINCt+fdWxHQvrGeektL5KOAvrMBrUyBB1FcNizQZCSnAtYplIoXCL5K0qN7og==}
@@ -487,12 +491,15 @@ snapshots:
       '@jbrowse/quick-lru': 8.0.0
       generic-filehandle2: 2.5.0
 
-  '@jbrowse/bandage-core@10.2.2':
+  '@jbrowse/bandage-core@10.2.3':
     dependencies:
       '@gmod/gbz-base': 7.4.0
       '@gmod/tabix': 3.10.1
+      '@jbrowse/graph-fmmm-layout': 1.0.2
       '@jbrowse/graph-stress-layout': 1.0.0
       '@jbrowse/tubemap-core': 1.1.0
+
+  '@jbrowse/graph-fmmm-layout@1.0.2': {}
 
   '@jbrowse/graph-stress-layout@1.0.0': {}
 
