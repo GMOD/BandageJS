@@ -12,8 +12,8 @@ importers:
         specifier: ^3.10.1
         version: 3.10.1
       '@jbrowse/bandage-core':
-        specifier: ^10.2.1
-        version: 10.2.1
+        specifier: ^10.2.2
+        version: 10.2.2
       '@playwright/test':
         specifier: ^1.64.0
         version: 1.64.0
@@ -204,8 +204,8 @@ packages:
   '@gmod/tabix@3.10.1':
     resolution: {integrity: sha512-bynf5MGr50O6Re2asEbt3kEfULUhXb2J87dqFK/78xXfJIWWrKfuQCA+ADSp3QJtdODvTf7ftWiTnc8yLQ0Yrw==}
 
-  '@jbrowse/bandage-core@10.2.1':
-    resolution: {integrity: sha512-2znMe0leiseBSSs9jjLqZSY7tb3YSLCDFAUlYgxydxKs9IjLwC8EhjioWJPxRxxkjFpdKl7NgBa+T2FoMkO2eg==}
+  '@jbrowse/bandage-core@10.2.2':
+    resolution: {integrity: sha512-rsBlfdbQsReIJDXT4TAbHX33OZ76tRvqpJUXCvt+cPXioqhL7Gsq1gcllhl/YNPh179Z1tHf25tJfhejvcQ+Og==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -217,8 +217,8 @@ packages:
     resolution: {integrity: sha512-zToC0THd94TGr4cWMp9eOCRB8eeN004ncajZzVOoM8WEWV90YMTX5SX9zY6Nk1hhY7ASKWnfOmguXt7SoXaLzw==}
     engines: {node: '>=22'}
 
-  '@jbrowse/tubemap-core@1.0.0':
-    resolution: {integrity: sha512-6mkKyeq2onugbvptWeq49gCy26cYjLki8YRGXgBVSdg/uFUdL7+qoiu1vMWTa+9YOOBhs21QBG+9oan+iQJvtw==}
+  '@jbrowse/tubemap-core@1.1.0':
+    resolution: {integrity: sha512-7x08COgIJJaSbThSJ2kq5khv92snriLbpvCigyVYRIGt8CK0n9fmtF2tKtWoCHnkkjL7KuMwpjvHqxvJ4pV/XQ==}
 
   '@playwright/test@1.64.0':
     resolution: {integrity: sha512-oTN9FNYuN6bqQMwiho6jJKLCG2/QOYCixGXuCjRmzOq23eODeukuY2XiAVoVpAECbuezMt1MHQjAiQxK8F+Y+g==}
@@ -480,18 +480,18 @@ snapshots:
       '@jbrowse/quick-lru': 8.0.0
       generic-filehandle2: 2.5.0
 
-  '@jbrowse/bandage-core@10.2.1':
+  '@jbrowse/bandage-core@10.2.2':
     dependencies:
       '@gmod/gbz-base': 7.4.0
       '@gmod/tabix': 3.10.1
       '@jbrowse/graph-stress-layout': 1.0.0
-      '@jbrowse/tubemap-core': 1.0.0
+      '@jbrowse/tubemap-core': 1.1.0
 
   '@jbrowse/graph-stress-layout@1.0.0': {}
 
   '@jbrowse/quick-lru@8.0.0': {}
 
-  '@jbrowse/tubemap-core@1.0.0': {}
+  '@jbrowse/tubemap-core@1.1.0': {}
 
   '@playwright/test@1.64.0':
     dependencies:
