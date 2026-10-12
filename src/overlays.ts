@@ -224,21 +224,6 @@ function geneLabels(p: Pane) {
 
 function chips(p: Pane) {
   const genes = geneLabels(p)
-  const routes = p.labels.routes.map(
-    ({ item: { halo: h, route }, x, y, w, text }) =>
-      chip({
-        x,
-        y,
-        w,
-        text,
-        color: BUBBLE_KIND_COLORS[h.kind],
-        small: true,
-        dimmed:
-          p.highlight !== undefined &&
-          !route.route.walks.some(w => p.highlight!.names.has(w)),
-        title: `${route.route.walks.length} walk(s): ${route.route.walks.join(', ')}`,
-      }),
-  )
   const bubbles = p.labels.bubbles.map(({ item: h, x, y, w, text }) =>
     chip({
       x,
@@ -254,7 +239,7 @@ function chips(p: Pane) {
         : `data-halo="${p.halos.indexOf(h)}"`,
     }),
   )
-  return genes.join('') + routes.join('') + bubbles.join('')
+  return genes.join('') + bubbles.join('')
 }
 
 // Walk rows as core's element tree, so they read the same here, in the plugin

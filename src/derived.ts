@@ -152,12 +152,7 @@ export const drawnExtras = memo(
     return {
       halos:
         showBubbles && onNodes && graph && positions
-          ? bubbleHalos(
-              graph,
-              bubblesOf(graph, span),
-              positions,
-              name => f.walkLabels.get(name) ?? name,
-            )
+          ? bubbleHalos(graph, bubblesOf(graph, span), positions)
           : [],
       genePins:
         showGenes && onNodes && graph && positions && genes
