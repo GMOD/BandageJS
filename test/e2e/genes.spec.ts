@@ -161,9 +161,9 @@ test("walk rows draw each haplotype's genes from its own assembly", async ({
   await waitForDrawing(page, '4 nodes')
   const rowGenes = page.locator('#overlay-svg .row-gene')
   await expect(rowGenes.locator('title')).toHaveText(['LPA', 'HAPGENE'])
-  await expect(page.locator('#legends')).toContainText(
-    "genes, each row's own annotation",
-  )
+  await expect(
+    page.locator('#legends').getByText('gene', { exact: true }),
+  ).toBeVisible()
   await menuButton(page, 'File').click()
   const download = page.waitForEvent('download')
   await page
@@ -175,7 +175,7 @@ test("walk rows draw each haplotype's genes from its own assembly", async ({
   ).join('')
   expect(svg.match(/<g class="row-gene"/g)).toHaveLength(2)
   expect(svg).toContain('>HAPGENE</text>')
-  expect(svg).toContain('>genes, each row')
+  expect(svg).toContain('>gene<')
 
   const box = (await rowGenes.last().boundingBox())!
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
@@ -214,9 +214,9 @@ test("walk rows under the graph box each haplotype's genes", async ({
   await page.keyboard.press('Escape')
   const rowGenes = page.locator('#strip-bars .row-gene')
   await expect(rowGenes.locator('title')).toHaveText(['LPA', 'HAPGENE'])
-  await expect(page.locator('#strip-key')).toContainText(
-    "genes, each row's own annotation",
-  )
+  await expect(
+    page.locator('#strip-key').getByText('gene', { exact: true }),
+  ).toBeVisible()
   await menuButton(page, 'File').click()
   const download = page.waitForEvent('download')
   await page
