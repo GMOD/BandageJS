@@ -1,8 +1,8 @@
 # Walk files
 
 [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) `--walks` indexes every
-haplotype's path by reference chunk. A cut reads only the chunks under the
-window, and needs no haplotype index.
+haplotype's path by reference chunk. A cut reads the chunks under the window
+and needs no haplotype index.
 
 ```console
 vg convert -f graph.gbz > graph.gfa
