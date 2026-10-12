@@ -1,6 +1,11 @@
 # BandageJS
 
-View GFA graphs in the browser at https://jbrowse.org/demos/bandagejs/
+Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
+
+- **Built for:** pangenomes. Haplotype walks, bubbles, genes and regions cut
+  from a GBZ are first-class
+- **Also opens:** de novo assembly graphs, as
+  [Bandage](https://github.com/rrwick/Bandage) does
 
 ![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
 
