@@ -30,7 +30,7 @@ test('a layout the graph cannot draw falls back to force-directed with halos', a
   await waitForDrawing(page, /nodes/)
   await expect(
     (await openMenu(page, 'Layout')).getByRole('menuitemradio', {
-      name: 'Force-directed',
+      name: 'Force-directed (FMMM)',
     }),
   ).toHaveAttribute('aria-checked', 'true')
   await page.keyboard.press('Escape')

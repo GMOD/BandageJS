@@ -232,3 +232,20 @@ test('a narrow screen folds the menus into one, each a submenu', async ({
   await bubbles.click()
   await expect(bubbles).not.toHaveAttribute('aria-checked', before!)
 })
+
+test('the Layout menu offers force-directed with each engine', async ({
+  page,
+}) => {
+  const popup = await openMenu(page, 'Layout')
+  await expect(
+    popup.getByRole('menuitemradio', { name: 'Force-directed (FMMM)' }),
+  ).toHaveAttribute('aria-checked', 'true')
+  await popup
+    .getByRole('menuitemradio', { name: 'Force-directed (stress)' })
+    .click()
+  await waitForDrawing(page, /nodes/)
+  const again = await openMenu(page, 'Layout')
+  await expect(
+    again.getByRole('menuitemradio', { name: 'Force-directed (stress)' }),
+  ).toHaveAttribute('aria-checked', 'true')
+})

@@ -266,7 +266,7 @@ test('the strip reads its genes for a layout picked from walk rows, and keeps th
     '&layout=walkrows',
   )
   await waitForDrawing(page, '5 nodes')
-  await chooseLayout(page, /^Force/)
+  await chooseLayout(page, /^Force-directed \(FMMM\)/)
   const rowGenes = page.locator('#strip-bars .row-gene')
   await expect(rowGenes.locator('title')).toHaveText(['LPA', 'HAPGENE'])
 

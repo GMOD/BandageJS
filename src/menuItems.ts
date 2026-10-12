@@ -24,6 +24,7 @@ import { drawnMode, facts, saveSettings, settings, state, tube } from './state'
 import { rebuild, scheduleDraw } from './view'
 import { liftWalks, setFacet, toggleWalk } from './walks'
 
+import type { LayoutEngineKind, LayoutModeValue } from '@jbrowse/bandage-core'
 import type { MenuItem } from './menus'
 import type { Example } from './sources'
 import type { ColorScheme, Graph } from '@jbrowse/bandage-core'
@@ -75,28 +76,50 @@ function toggle(
   }
 }
 
-// The layouts the graph can take, where it can take more than one
+const ENGINE_NAMES: readonly (readonly [LayoutEngineKind, string])[] = [
+  ['fmmm', 'FMMM'],
+  ['stress', 'stress'],
+]
+
+// The layouts the graph can take; force-directed comes once per engine
 export function layoutItems(): MenuItem[] {
   const graph = state.graph
   const modes = LAYOUT_MODES.filter(
     m => !graph || facts().drawable.has(m.value),
   )
+  const drawn = drawnMode().value
+  const choose = (mode: LayoutModeValue, engine?: LayoutEngineKind) => {
+    settings.mode = mode
+    if (engine) {
+      settings.engine = engine
+    }
+    state.modeOverride = undefined
+    loadGenes()
+    applySettings('layout')
+  }
   return [
-    ...(modes.length > 1
-      ? [
-          ...radio(
-            modes.map(m => ({ value: m.value, label: layoutName(m.label) })),
-            drawnMode().value,
-            v => {
-              settings.mode = v
-              state.modeOverride = undefined
-              loadGenes()
+    ...modes.flatMap((m): MenuItem[] =>
+      m.value === 'force'
+        ? ENGINE_NAMES.map(([engine, name]) => ({
+            label: `${layoutName(m.label)} (${name})`,
+            radio: true,
+            checked: drawn === m.value && settings.engine === engine,
+            onClick: () => {
+              choose(m.value, engine)
             },
-            'layout',
-          ),
-          { divider: true } as const,
-        ]
-      : []),
+          }))
+        : [
+            {
+              label: layoutName(m.label),
+              radio: true,
+              checked: drawn === m.value,
+              onClick: () => {
+                choose(m.value)
+              },
+            },
+          ],
+    ),
+    { divider: true },
     { label: 'Rerun layout', onClick: rerunLayout, disabled: !graph },
     { label: 'Layout settings…', onClick: showLayoutDialog },
   ]
