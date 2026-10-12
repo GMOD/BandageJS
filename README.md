@@ -84,6 +84,11 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 - Each file is cut along the reference it was written for, and a region is on
   that reference: `chr6:160,614,798-160,647,758`. `ref=` can be left out, or has
   to name that reference
+- HPRC release 2 has a hosted file, which the "LPA KIV-2, 8 samples (walk
+  files)" example reads:
+  `?gbz=https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f2.GRCh38.walks.bed.gz&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`
+- For that example's 8 samples the cut takes the same 17 walks as the gbz-base
+  cut
 
 ## Links
 
