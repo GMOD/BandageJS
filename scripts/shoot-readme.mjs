@@ -33,6 +33,18 @@ const FIGURES = {
     ].join('&'),
     size: [1400, 800],
   },
+  kiv2_overlay: {
+    query: [
+      'gbz=hprc',
+      'loc=chr6:160,614,798-160,647,758',
+      'haps=HG00097,HG00133',
+      'walk=GRCh38%230%23chr6',
+      'walk=HG00097%231%23JBIRDD010000043.1',
+      'walk=HG00133%231%23CM090050.1',
+      'layout=force',
+    ].join('&'),
+    size: [1400, 800],
+  },
   amy1_rows: {
     query: [
       'gbz=hprc',

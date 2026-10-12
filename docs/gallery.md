@@ -7,6 +7,12 @@ the strip above the graph shares the genome coordinates:
 
 ![The KIV-2 graph as a JBrowse 2 track under gene and annotation tracks](../img/jbrowse_kiv2.png)
 
+Three walks overlaid on the KIV-2 repeat, one colour each. GRCh38 is charcoal,
+HG00097#1 blue (22 kb longer) and HG00133#1 orange (116 kb longer). Only
+HG00133#1 runs the large loop:
+
+![GRCh38, HG00097#1 and HG00133#1 overlaid on the KIV-2 graph](../img/kiv2_overlay.png)
+
 CFH and its CFHR genes in three HPRC samples. An 84.7 kb deletion edge skips
 CFHR3 and CFHR1. HG02055 and HG01123 take it, and HG00097 does not:
 
