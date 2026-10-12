@@ -12,7 +12,7 @@ CFHR3 and CFHR1. HG02055 and HG01123 take it, and HG00097 does not:
 
 ![The CFH locus in three HPRC samples, force-directed with genes](../img/cfh_force.png)
 
-The same CFH cut faceted, one panel per walk. GRCh38 and HG00097#1 take the loop
+CFH faceted in BandageJS, one panel per walk. GRCh38 and HG00097#1 take the loop
 through CFHR3 and CFHR1. HG02055#1 takes the 84.5 kb deletion edge instead:
 
 ![GRCh38, HG00097#1 and HG02055#1 through CFH, one panel each](../img/cfh_facet.png)
