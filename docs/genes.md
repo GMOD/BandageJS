@@ -25,8 +25,8 @@ that walk's assembly.
 ## Walk rows
 
 Each bar is boxed with genes from the assembly named for its haplotype
-(`HG00097#1`), if the hub has one. The HPRC portal has them for every release 2 haplotype.
-Click a bar for a link to that span in JBrowse.
+(`HG00097#1`), if the hub has one. The HPRC portal has them for every release 2
+haplotype. Click a bar for a link to that span in JBrowse.
 
 ## Your own genes
 

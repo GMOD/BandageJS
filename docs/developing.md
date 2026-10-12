@@ -13,8 +13,8 @@ pnpm run deploy # needs aws credentials for the jbrowse.org bucket
 
 ## Layout
 
-The page imports `@jbrowse/bandage-core` for parsing, layouts, rendering and
-the gbz-base cut. `build.mjs` fails if the core pulls in JBrowse's host, mobx or
+The page imports `@jbrowse/bandage-core` for parsing, layouts, rendering and the
+gbz-base cut. `build.mjs` fails if the core pulls in JBrowse's host, mobx or
 React.
 
 - `src/main.ts`: menu bar, opens the graph the address names
@@ -24,8 +24,8 @@ React.
   plugin's React overlays, pointer and keyboard
 - `layout.ts`, `engine.ts`, `layoutWorker.ts`: layouts and the force-directed
   worker
-- `sources.ts`, `gbz.ts`, `walkFiles.ts`, `read.ts`: opening GFA files, gbz
-  cuts and walk files
+- `sources.ts`, `gbz.ts`, `walkFiles.ts`, `read.ts`: opening GFA files, gbz cuts
+  and walk files
 - `walks.ts`, `walkStrip.ts`, `bubbles.ts`, `details.ts`, `find.ts`: haplotype
   highlighting, walk rows, bubbles, node details, node search
 - `reference.ts`, `hubs.ts`, `genes.ts`: reference assembly and genes; see
@@ -68,5 +68,5 @@ pnpm's own command.
 ## Examples
 
 `examples/index.json` lists the Examples menu. A `file` entry is a GFA in
-`examples/`. A `gbz: "hprc"` entry is cut live from the HPRC release 2
-`.gbz.db` on S3.
+`examples/`. A `gbz: "hprc"` entry is cut live from the HPRC release 2 `.gbz.db`
+on S3.

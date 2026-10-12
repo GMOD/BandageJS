@@ -3,8 +3,8 @@
 The Haplotypes menu highlights walks, and the rest of the graph fades to grey.
 
 - One walk shades light to dark along the walk
-- Several walks, with **None** selected, overlay in one drawing: each walk gets a
-  flat colour and a lane
+- Several walks, with **None** selected, overlay in one drawing: each walk gets
+  a flat colour and a lane
 - **A panel per walk** draws one panel per walk on a shared gradient, yellow at
   the start and red at the end
 - **A row per sample** puts each sample in a row and each haplotype in a column

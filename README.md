@@ -21,8 +21,8 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
   `?gbz=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`. Paste a
   `.gbz.db` or [walk file](docs/walk-files.md) url to cut your own
 - **Go to:** type a region, position or gene name in the location box (`g`)
-- **Inspect:** click a node, or find it by name, for its links, walks, bubble and
-  genes
+- **Inspect:** click a node, or find it by name, for its links, walks, bubble
+  and genes
 - **Haplotypes:** highlight walks as lanes or side by side
   ([details](docs/haplotypes.md))
 - **Layout:** the Layout menu picks force-directed, anchored, ordered, walk rows
@@ -60,5 +60,6 @@ More: [genes](docs/genes.md), [gallery](docs/gallery.md),
 
 GPL-3.0-or-later, building on [BandageNG](https://github.com/asl/BandageNG) and
 [OGDF](https://www.ogdf.uni-osnabrueck.de/). The earlier BandageNG fork is on
-the [`bandage-layout-js`](https://github.com/cmdcolin/BandageJS/tree/bandage-layout-js)
+the
+[`bandage-layout-js`](https://github.com/cmdcolin/BandageJS/tree/bandage-layout-js)
 branch.
