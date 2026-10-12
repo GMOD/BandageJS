@@ -1,6 +1,6 @@
 # Gallery
 
-The same graphs open in JBrowse 2 through
+Pangenome graphs also open in JBrowse 2 through
 [jbrowse-plugin-graphgenomeviewer](https://github.com/GMOD/jbrowse-plugin-graphgenomeviewer).
 Here the KIV-2 repeat sits under the RefSeq genes and a curated annotation, and
 the strip above the graph shares the genome coordinates:
