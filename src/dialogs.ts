@@ -2,7 +2,7 @@ import { haplotypeIndexBeside } from '@jbrowse/bandage-core/gbzCut'
 
 import { recentDetail } from './describe'
 import { fail } from './feedback'
-import { HPRC, openDb, parseRegion } from './gbz'
+import { HPRC, isWalksUrl, parseRegion, referenceSamplesAt } from './gbz'
 import { esc } from './overlays'
 import { gbzFromQuery } from './query'
 import { forget, pickFile, readHandle, recentList } from './recent'
@@ -99,13 +99,13 @@ ui.file.addEventListener('change', () => {
 
 const GBZ_DB = /\.db$/i
 
-// A pasted gbz-base url goes to the cut dialog, filled in
+// A pasted gbz-base or walk file url goes to the cut dialog, filled in
 ui.openDialog.addEventListener('close', () => {
   const url = ui.url.value.trim()
   if (ui.openDialog.returnValue !== 'url' || !url) {
     return
   }
-  if (GBZ_DB.test(url)) {
+  if (GBZ_DB.test(url) || isWalksUrl(url)) {
     showGbzDialog({ db: url, index: haplotypeIndexBeside(url) })
   } else {
     void openUrl(url, { remember: true })
@@ -155,8 +155,8 @@ function showGbzDialog(preset?: Partial<GbzSource>) {
 let probes = 0
 let probed = ''
 
-// Opens the database named in the dialog to say what it holds: its reference
-// samples, offered for the reference field. A haplotype index that can't be
+// Opens the database or walk files named in the dialog to say what they
+// hold: the reference samples, offered for the reference field. A haplotype index that can't be
 // read is dropped, with a note, where the database alone opens.
 async function probe() {
   const db = ui.gbzDb.value.trim()
@@ -177,12 +177,10 @@ async function probe() {
   let note = ''
   let samples: string[] | undefined
   try {
-    ;({ referenceSamples: samples } = await openDb(db, index))
+    samples = await referenceSamplesAt(db, index)
   } catch (e) {
     if (index) {
-      ;({ referenceSamples: samples } = await openDb(db).catch(() => ({
-        referenceSamples: undefined,
-      })))
+      samples = await referenceSamplesAt(db).catch(() => undefined)
       note = `No haplotype index could be read at ${index}, so walks go unnamed. `
     }
     if (!samples) {

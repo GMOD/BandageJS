@@ -414,7 +414,7 @@ export type Example = {
   layout?: LayoutModeValue
 } & (
   | { file: string; region?: string }
-  | { gbz: 'hprc'; region: string; haplotypes?: string[] }
+  | { gbz: string; region: string; haplotypes?: string[] }
 )
 
 export let examples: Example[] = []
@@ -437,7 +437,11 @@ export function openExample(x: Example) {
     })
   } else {
     void openGbz(
-      { ...HPRC, region: x.region, haplotypes: x.haplotypes },
+      {
+        ...(x.gbz === 'hprc' ? HPRC : { db: x.gbz }),
+        region: x.region,
+        haplotypes: x.haplotypes,
+      },
       x.description,
     )
   }

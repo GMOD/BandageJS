@@ -36,10 +36,23 @@ const HUB_FILES: Record<string, string> = {
   // gbwt-rs's 46-sample HPRC slice over MICB and KIR3DL1, as gbz-base builds
   // it, from the plugin's test data
   'https://gbz.test/micb-kir3dl1.gbz.db': 'micb-kir3dl1.gbz.db',
+  // gfa-to-tabix --walks --refs GRCh38 of the HPRC chrM graph
+  ...Object.fromEntries(
+    [
+      'walks.bed.gz',
+      'walks.bed.gz.tbi',
+      'nodes.bed.gz',
+      'nodes.bed.gz.tbi',
+    ].map(kind => [
+      `https://gbz.test/hprc-chrM.GRCh38.${kind}`,
+      `hprc-chrM.GRCh38.${kind}`,
+    ]),
+  ),
 }
 
 export const K12_HUB = `${K12}config.json`
 export const MICB_DB = 'https://gbz.test/micb-kir3dl1.gbz.db'
+export const CHRM_WALKS = 'https://gbz.test/hprc-chrM.GRCh38.walks.bed.gz'
 
 const GENE_FILE = /\.(gff|bed)\.gz(\.csi|\.tbi)?$/
 

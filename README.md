@@ -34,6 +34,9 @@ View GFA graphs in the browser: https://jbrowse.org/demos/bandagejs/
   `?gbz=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`. Paste any
   `.gbz.db` url to cut from your own; the location box then moves the window,
   cutting afresh outside it
+- Cut the same way from a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix)
+  walk file set: paste its `.walks.bed.gz` url, or give it as `gbz=`. See
+  [Walk files](#walk-files)
 - The address keeps everything on screen, so File → **Copy link** shares the
   view as it is; see [Links](#links)
 
@@ -62,26 +65,48 @@ A link states the walks and the facet, which the page keeps in its address as
 they change:
 `?gbz=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133&walk=GRCh38%230%23chr6&walk=HG00133%231%23CM090050.1&facet=walk&columns=2`
 
+## Walk files
+
+`gfa-to-tabix --walks` files every haplotype's path under fixed chunks of a
+reference, so a cut costs a read of two files over the chunks under the window
+and names every walk without a haplotype index:
+
+```console
+vg convert -f graph.gbz > graph.gfa
+gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
+```
+
+- Host `graph.GRCh38.walks.bed.gz` with `graph.GRCh38.nodes.bed.gz` and both
+  `.tbi` files beside it; the page finds them by name
+- Each set is cut along the reference it was written for, and a region is on
+  that reference: `chr6:160,614,798-160,647,758`. `ref=` can be left out, or has
+  to name that reference
+- HPRC release 2 has a hosted set, which the "LPA KIV-2, 8 samples (walk files)"
+  example reads:
+  `?gbz=https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38.GRCh38.walks.bed.gz&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`
+- For that example's 8 samples the cut takes the same 17 walks as the gbz-base
+  cut, in about 1 s from a cold start against 6 s
+
 ## Links
 
 The page rewrites its address as the view changes, so the address is always a
 link to what is on screen, and File → **Copy link** copies it. A graph opened
 from this computer has no address to link to. The parameters:
 
-| Parameter                                              | What it states                                                                                                                               |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gfa`                                                  | The GFA's url                                                                                                                                |
-| `gbz`, `index`, `loc`, `ref`, `haps`                   | A gbz-base cut: the `.gbz.db` url or `hprc`, its haplotype index, the region, the reference sample, and the haplotypes kept, comma separated |
-| `hub`, `assembly`, `contigs`                           | JBrowse configs to read genes from, the assembly the reference is on, and `graph:assembly` contig names where they differ                    |
-| `along`                                                | The walk a walk-anchored graph draws x along                                                                                                 |
-| `walk`                                                 | A highlighted walk, once per walk                                                                                                            |
-| `node`                                                 | The selected node                                                                                                                            |
-| `view`                                                 | The layout point at the pane's centre and the zoom, `x,y,scale`; absent while the graph is fitted to the window                              |
-| `layout`                                               | `force`, `anchored`, `ordered`, `samplerows`, `walkrows`, `tubemap` or `tubemapref`                                                          |
-| `color`, `width`, `thickness`                          | The colour scheme, whether depth widens nodes (`depth` or `uniform`), and a node's width in px                                               |
-| `bubbles`, `deletions`, `genes`, `paths`, `bars`       | What is drawn, `1` or `0`: bubble labels, deletion edges, genes, every haplotype in colour, and haplotype bars under the graph               |
-| `facet`, `columns`                                     | How highlighted walks are drawn, `none`, `walk` or `sample`, and how many panels go across                                                   |
-| `engine`, `quality`, `spacing`, `separation`, `spread` | The force layout's engine, quality, spacing, component separation and bubble spread, as Layout settings… offers them                         |
+| Parameter                                              | What it states                                                                                                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `gfa`                                                  | The GFA's url                                                                                                                                          |
+| `gbz`, `index`, `loc`, `ref`, `haps`                   | A cut: the `.gbz.db` or `.walks.bed.gz` url or `hprc`, its haplotype index, the region, the reference sample, and the haplotypes kept, comma separated |
+| `hub`, `assembly`, `contigs`                           | JBrowse configs to read genes from, the assembly the reference is on, and `graph:assembly` contig names where they differ                              |
+| `along`                                                | The walk a walk-anchored graph draws x along                                                                                                           |
+| `walk`                                                 | A highlighted walk, once per walk                                                                                                                      |
+| `node`                                                 | The selected node                                                                                                                                      |
+| `view`                                                 | The layout point at the pane's centre and the zoom, `x,y,scale`; absent while the graph is fitted to the window                                        |
+| `layout`                                               | `force`, `anchored`, `ordered`, `samplerows`, `walkrows`, `tubemap` or `tubemapref`                                                                    |
+| `color`, `width`, `thickness`                          | The colour scheme, whether depth widens nodes (`depth` or `uniform`), and a node's width in px                                                         |
+| `bubbles`, `deletions`, `genes`, `paths`, `bars`       | What is drawn, `1` or `0`: bubble labels, deletion edges, genes, every haplotype in colour, and haplotype bars under the graph                         |
+| `facet`, `columns`                                     | How highlighted walks are drawn, `none`, `walk` or `sample`, and how many panels go across                                                             |
+| `engine`, `quality`, `spacing`, `separation`, `spread` | The force layout's engine, quality, spacing, component separation and bubble spread, as Layout settings… offers them                                   |
 
 Settings appear only where they differ from the defaults, the layout aside, so a
 changed default reaches a link's reader. A link's settings hold for the visit.
