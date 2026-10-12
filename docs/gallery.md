@@ -12,7 +12,7 @@ GRCh38) and four at 318 kb. Charcoal marks a stretch off GRCh38's path:
 ![The amylase locus in four HPRC samples, as walk rows with their genes](../img/amy1_rows.png)
 
 The complement C4 region in four HPRC samples. HG02055#2 is 33 kb short, and
-two haplotypes lose 6.4 kb. Where C4A and C4B swap, the bars change colour:
+two haplotypes lose 6.4 kb. Charcoal marks sequence off GRCh38's path:
 
 ![The C4 region in four HPRC samples, as walk rows with their genes](../img/c4_rows.png)
 
