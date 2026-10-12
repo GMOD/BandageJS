@@ -1,6 +1,6 @@
 # BandageJS
 
-View GFA graphs in the browser: https://jbrowse.org/demos/bandagejs/
+View GFA graphs in the browser at https://jbrowse.org/demos/bandagejs/
 
 ![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
 
@@ -17,8 +17,8 @@ View GFA graphs in the browser: https://jbrowse.org/demos/bandagejs/
   `.gbz.db` url, or a [walk file](docs/walk-files.md), to cut from your own
 - **Move around:** type a region (`chr6:160,614,798-160,647,758`), a position or
   a gene name in the location box (`g`). ‹ › step half a window
-- **Inspect:** click a node, or find it by name, for its details beside the
-  drawing: the nodes at each end, the walks through it, its bubble and genes
+- **Inspect:** click a node, or find it by name, to list beside the drawing the
+  nodes at each end, the walks through it, its bubble and its genes
 - **Highlight haplotypes:** the Haplotypes menu, as lanes or side by side. See
   [docs/haplotypes.md](docs/haplotypes.md)
 - **Change the layout:** the Layout menu picks force-directed, anchored, ordered,
@@ -45,12 +45,28 @@ View GFA graphs in the browser: https://jbrowse.org/demos/bandagejs/
 
 ## See also
 
-- [jbrowse-plugin-graphgenomeviewer](https://github.com/GMOD/jbrowse-plugin-graphgenomeviewer):
-  JBrowse 2 plugin that browses these graphs by locus
-- [@jbrowse/bandage-core](https://github.com/GMOD/bandage-core): the layout and
-  drawing engine this builds on
+- [jbrowse-plugin-graphgenomeviewer](https://github.com/GMOD/jbrowse-plugin-graphgenomeviewer),
+  the JBrowse 2 plugin that browses these graphs by locus
 - [HPRC tutorial](https://jbrowse.org/jb2/docs/tutorials/pangenome_hprc/) on
   jbrowse.org
+
+### Programmatic usage
+
+- [@jbrowse/bandage-core](https://github.com/GMOD/bandage-core) (npm): the
+  layout and drawing engine this page uses. Its `bandage-figure` command makes
+  an SVG from a [figure spec](docs/figures.md) with no browser
+- [@jbrowse/graph-stress-layout](https://github.com/GMOD/graph-stress-layout)
+  (npm): the stress layout that keeps the reference straight
+- [@gmod/gbz-base](https://github.com/GMOD/gbz-base-js) (npm): range-request
+  reader for `.gbz.db` databases
+- [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) (npm): reader for
+  [walk files](docs/walk-files.md)
+- [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix): writes walk files from
+  a GFA
+- [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index): lists the
+  walks in a gbz-base cut
+- [ggbandage](https://github.com/GMOD/ggbandage) (R): Bandage-style graph
+  figures as ggplot2 layers
 
 ## License
 

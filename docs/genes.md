@@ -1,138 +1,69 @@
-# Genes and reference assemblies
+# Genes
 
-BandageJS pins genes along a graph's reference path: each gene's exons are dark
-stretches of the reference nodes, with its name beside them. Hover a name for
-the gene's span and strand. Genes show in the force-directed, anchored, ordered
-and sample-row layouts, and on each bar of walk rows.
+Genes are drawn along the reference nodes, exons dark, name beside them. Hover a
+name for the span and strand. They appear in the force-directed, anchored,
+ordered and sample-row layouts, and on walk rows.
 
-## Which assembly a graph is on
+## Which assembly
 
-A graph names the sample its reference comes from, not the assembly:
-`GRCh38#0#chr6` says sample GRCh38, haplotype 0, contig chr6. The page reads
-genes only once it knows the assembly, because contig names alone are ambiguous.
-`chr6` exists in hg38, CHM13 and every other human assembly, at coordinates up
-to hundreds of kilobases apart.
+A graph names a reference sample (`GRCh38#0#chr6`), and `chr6` exists in every
+human assembly. The page matches the sample to an assembly in its JBrowse hubs
+by name or alias, then reads that assembly's gene track. Most graphs need
+nothing more.
 
-Most graphs need nothing from you. The page finds the assembly in its hubs, the
-JBrowse configs it knows, by the reference's PanSN sample (`GRCh38`) or
-haplotype (`HG00097#1`). An assembly matches by its name, by an alias in its
-hub, by a name the site's config gives it, or by the sample UCSC's name stands
-for: hg38 is GRCh38, and hs1 is CHM13.
+When nothing matches, File → Choose reference genome… lets you:
 
-When nothing matches, the page narrows the choice down and asks once:
+- Pick from the assemblies whose sequence names fit the reference
+- Search every genome on genomes.jbrowse.org by name (`thale cress`), GenArk
+  accession (`GCF_000005845.2`) or UCSC name (`mm39`)
 
-- **Bare contig names** (`SN:Z:chr6`) name no sample. The page offers the
-  assemblies whose sequence names include every contig of the reference, hg38
-  and hs1 for `chr6`, in a notice where one click binds this graph, and in File
-  → Choose reference genome….
-- **A sample no hub knows** (`Kay12`) gets the assemblies whose names mention
-  it, if any, and File → Choose reference genome… opens a search. Type a name
-  (`thale cress`), a GenArk accession (`GCF_000005845.2`) or a UCSC genome
-  (`mm39`), which it looks up among every genome on genomes.jbrowse.org, and it
-  reads that genome's hub from there. Where the graph names a sequence
-  differently from the assembly, the dialog asks which sequence it is, and picks
-  the only one where there's one.
+The browser remembers the choice for that sample. Pick Automatic to forget it.
 
-A choice for a sample applies to every graph whose reference names that sample,
-and the browser remembers it; untick "Use it for every graph" to choose for this
-graph alone. Pick Automatic in the dialog to forget a choice.
-
-Haplotypes → Reference haplotype moves the reference to another walk, and the
-binding follows it. Draw a CHM13 cut along its GRCh38 walk and the page reads
-hg38's genes. Draw it back and it reads CHM13's again. The page's address keeps
-the walk as `along=`, so a link draws along it too.
+Haplotypes → Reference haplotype draws along another walk, and the genes follow
+that walk's assembly.
 
 ## Walk rows
 
-Walk rows box each row's genes on its bar, read from that haplotype's own
-assembly: the page looks for an assembly named by the row's PanSN haplotype
-(`HG00097#1`) in the hub the reference bound to, and reads its gene track over
-the contig span the bar covers. The HPRC portal has one for every release 2
-haplotype, with its CAT annotation. A row whose haplotype the hub lacks shows no
-genes. Click a bar for the span of its contig it covers, with a link that opens
-that span in JBrowse on the haplotype's assembly and gene track.
-
-## Hubs
-
-A hub is any JBrowse `config.json`. The page reads each hub's assemblies, their
-aliases, their contig name tables (`refNameAliases`) and their gene tracks. It
-checks hubs in this order and binds to the first assembly that matches:
-
-1. hubs named by the page's link (`?hub=`)
-2. hubs you added or chose a genome from, which the browser remembers
-3. the site's, from its `config.json`
-
-A hub's gene track is the first of its tabix GFF3 or BED feature tracks on the
-assembly. The page prefers the config's default session, then tracks whose name
-says genes. Where a hub has more than one, the dialog lets you choose. The page
-doesn't read bigBed gene tracks yet.
-
-## Links
-
-The page's address keeps any choice that the site's names wouldn't find again,
-so a shared link opens on the same assembly:
-
-| Parameter  | Meaning                                                    |
-| ---------- | ---------------------------------------------------------- |
-| `hub`      | a JBrowse `config.json` to check first; repeat it for more |
-| `assembly` | the assembly the reference is on, by name or alias         |
-| `contigs`  | `graph:assembly` sequence names, comma separated           |
-
-For example, an Arabidopsis graph whose reference is `Col-0#1#Chr1` reads
-TAIR10's genes from its GenArk hub, whose alias table already knows `Chr1`:
-`?gfa=https://example.org/at.gfa&hub=https://jbrowse.org/hubs/genark/GCF/000/001/735/GCF_000001735.4/config.json&assembly=GCF_000001735.4`.
-
-The JBrowse links in the File menu open JBrowse on the bound hub's config, with
-its gene track. A hub that loads the graph viewer plugin, as the HPRC portal
-does, also opens the graph there.
+Each bar is boxed with genes from its own haplotype's assembly (`HG00097#1`),
+if the hub has one. The HPRC portal has them for every release 2 haplotype.
+Click a bar for a link to that span in JBrowse.
 
 ## Your own genes
 
-File → Open genes… reads a GFF3 or BED file, plain or gzipped, in place of the
-hub's genes. It needs no assembly: it names contigs as the graph does, `chr6` or
-`GRCh38#0#chr6`, and applies to the reference drawn when you opened it. A file
-that names none of the reference's contigs says so and changes nothing.
+File → Open genes… reads a GFF3 or BED file, plain or gzipped. It needs no
+assembly, only contig names that match the graph's (`chr6` or `GRCh38#0#chr6`).
 
-## Setting up a site
+## Linking
 
-Whoever deploys the page sets its hubs in `config.json`, next to `index.html`,
-so the site's users get genes without choosing anything:
+`hub=`, `assembly=` and `contigs=` store a choice in the address. See
+[links.md](links.md).
+
+## Site setup
+
+A deployer lists hubs in `config.json` next to `index.html`:
 
 ```json
 {
   "jbrowse": "https://jbrowse.org/code/jb2/main/",
   "hubs": [
     "https://jbrowse.org/pangenome/hprc-grch38/config.json",
-    "https://jbrowse.org/ucsc/hs1/config.json",
     {
       "url": "https://jbrowse.org/hubs/genark/GCF/000/005/845/GCF_000005845.2/config.json",
       "aliases": { "GCF_000005845.2": ["K12"] },
       "refNameAliases": { "GCF_000005845.2": { "chr": "NC_000913.3" } }
     }
-  ],
-  "genomes": {
-    "ucsc": "https://jbrowse.org/ucsc/",
-    "genark": "https://jbrowse.org/hubs/genark/",
-    "index": "https://genomes.jbrowse.org/searchIndex.json"
-  }
+  ]
 }
 ```
 
-- `jbrowse` is the JBrowse Web that the JBrowse links in the File menu open. The
-  default is `main`, because the HPRC portal's config needs features that
-  `latest` lacks.
-- `hubs` is the list of JBrowse configs, first to last. An entry is a url, or a
-  url with what that config doesn't say itself, keyed by assembly name:
-  - `aliases`: the sample names your graphs call the assembly by
-  - `refNameAliases`: the assembly's names for sequences your graphs name
-    otherwise, as `{ "graph name": "assembly name" }`
-  - `genes`: the track id of its gene track, or `""` for none
-- `genomes.genark` and `genomes.ucsc` are where the dialog finds a genome typed
-  by accession or UCSC name. `genomes.index` is a genomes.jbrowse.org-style
-  `searchIndex.json`, which lets the dialog find a genome by its common or
-  scientific name. The dialog reads it, 2 MB compressed, on the first search.
-  The server has to allow cross-origin reads, as genomes.jbrowse.org does.
+- `hubs`: JBrowse `config.json` urls, searched in order
+- `aliases`: sample names your graphs use for the assembly
+- `refNameAliases`: `{ "graph name": "assembly name" }` for sequences named
+  differently
+- `genes`: the gene track id, or `""` for none
+- `jbrowse`: the JBrowse Web that File → JBrowse links open
+- `genomes`: where the search dialog finds UCSC, GenArk and
+  genomes.jbrowse.org-style `searchIndex.json` entries
 
-Where you run your own JBrowse, putting your sample names in its assemblies'
-`aliases` and your sequence names in its `refNameAliases` does the same job, for
-JBrowse and BandageJS alike.
+Adding the same `aliases` and `refNameAliases` to your own JBrowse works for
+both apps.
