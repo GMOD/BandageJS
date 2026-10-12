@@ -12,6 +12,11 @@ CFHR3 and CFHR1. HG02055 and HG01123 take it, and HG00097 does not:
 
 ![The CFH locus in three HPRC samples, force-directed with genes](../img/cfh_force.png)
 
+The same CFH cut faceted, one panel per walk. GRCh38 and HG00097#1 take the loop
+through CFHR3 and CFHR1. HG02055#1 takes the 84.5 kb deletion edge instead:
+
+![GRCh38, HG00097#1 and HG02055#1 through CFH, one panel each](../img/cfh_facet.png)
+
 HLA-DRB5, DRB6 and DRB1 in an HPRC rGFA slice, drawn with the stress layout. The
 dashed edge is an 86 kb deletion, and the large loop is 46.9 kb of sequence that
 the reference lacks:

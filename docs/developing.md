@@ -47,6 +47,15 @@ overlays need the same change in `src/overlays.ts`.
 The tests block network requests and serve fixtures from `test/e2e/data`,
 including the plugin's 46-sample `micb-kir3dl1.gbz.db` at `https://gbz.test/`.
 
+## Figures
+
+- `pnpm shoot` builds, then reshoots every figure in `img/` with puppeteer.
+  `pnpm shoot cfh_facet` reshoots one. `CHROME=<path>` picks the browser
+- `scripts/shoot-readme.mjs` holds each figure's address, window size and
+  settings. The HPRC figures cut live over the network
+- `img/jbrowse_kiv2.png` and `img/jbrowse_kiv2_facet.png` are screenshots of the
+  JBrowse plugin, copied from its `img/`. This script does not shoot them
+
 ## Updating the core
 
 ```console

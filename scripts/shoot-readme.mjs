@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 //
-// Reshoots the README figures in img/ from a fresh build, cutting the HPRC
-// figures live from the hosted gbz-base database and haplotype index.
+// Reshoots the README and gallery figures in img/ from a fresh build, cutting
+// the HPRC figures live from the hosted gbz-base database and haplotype index.
 //
 // Usage:
 //   node scripts/shoot-readme.mjs              # every figure, into img/
-//   node scripts/shoot-readme.mjs kiv2_facet   # one figure
+//   node scripts/shoot-readme.mjs cfh_facet    # one figure
+//
+// CHROME=/path/to/chrome overrides the browser.
 import { execFileSync } from 'node:child_process'
 
-import { chromium } from '@playwright/test'
 import * as esbuild from 'esbuild'
+import puppeteer from 'puppeteer-core'
+
+const TIMEOUT = 120_000
 
 const FIGURES = {
   kiv2_force: {
@@ -38,7 +42,6 @@ const FIGURES = {
     ].join('&'),
     size: [1400, 460],
   },
-  // a point on HG01123#2's bar rings its node and ticks each walk through it
   kiv2_strip: {
     query: [
       'gbz=hprc',
@@ -59,6 +62,19 @@ const FIGURES = {
     ].join('&'),
     size: [1400, 800],
   },
+  cfh_facet: {
+    query: [
+      'gbz=hprc',
+      'loc=chr1:196,640,000-196,900,000',
+      'haps=HG00097,HG02055',
+      'walk=GRCh38%230%23chr1',
+      'walk=HG00097%231%23CM094060.1',
+      'walk=HG02055%231%23CM092205.1',
+      'facet=walk',
+      'columns=3',
+    ].join('&'),
+    size: [1400, 300],
+  },
   mhc_stress: {
     query: 'gfa=examples/hprc_mhc_class2.gfa&layout=force&engine=stress',
     size: [1400, 800],
@@ -78,6 +94,8 @@ const FIGURES = {
   },
 }
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 const names = process.argv.slice(2)
 for (const name of names) {
   if (!(name in FIGURES)) {
@@ -88,7 +106,10 @@ for (const name of names) {
 execFileSync('node', ['build.mjs'], { stdio: 'inherit' })
 const ctx = await esbuild.context({})
 const { port } = await ctx.serve({ servedir: 'dist', port: 0 })
-const browser = await chromium.launch({ channel: 'chrome' })
+const browser = await puppeteer.launch({
+  executablePath: process.env.CHROME ?? '/usr/bin/google-chrome',
+  headless: true,
+})
 try {
   for (const [name, { query, size, settings, strip }] of Object.entries(
     FIGURES,
@@ -96,45 +117,45 @@ try {
     if (names.length && !names.includes(name)) {
       continue
     }
-    const page = await browser.newPage({
-      viewport: { width: size[0], height: size[1] },
+    const page = await browser.newPage()
+    page.setDefaultTimeout(TIMEOUT)
+    await page.setViewport({
+      width: size[0],
+      height: size[1],
       deviceScaleFactor: 1,
     })
-    await page.addInitScript(stored => {
+    await page.evaluateOnNewDocument(stored => {
       localStorage.setItem('bandagejs-hint-dismissed', 'true')
       if (stored) {
         localStorage.setItem('bandagejs-settings', JSON.stringify(stored))
       }
     }, settings)
     await page.goto(`http://localhost:${port}/?${query}`)
-    await page
-      .locator('#stats')
-      .getByText(/nodes/)
-      .waitFor({ timeout: 120_000 })
-    await page
-      .locator('#loading')
-      .waitFor({ state: 'hidden', timeout: 120_000 })
+    await page.waitForFunction(() =>
+      /nodes/.test(document.querySelector('#stats')?.textContent ?? ''),
+    )
+    await page.waitForSelector('#loading', { hidden: true })
     // genes arrive after the drawing
-    await page.waitForLoadState('networkidle')
+    await page.waitForNetworkIdle({ idleTime: 500 })
     // the force layout settles over a few frames after the worker returns
-    await page.waitForTimeout(3000)
+    await sleep(3000)
     await page.mouse.move(0, size[1] - 1)
     if (strip) {
-      const box = await page.locator('#strip-svg').boundingBox()
-      const rows = await page
-        .locator('#strip-bars [data-testid^="graph-walk-r"] > rect')
-        .evaluateAll(rects =>
+      const box = await (await page.$('#strip-svg')).boundingBox()
+      const rows = await page.$$eval(
+        '#strip-bars [data-testid^="graph-walk-r"] > rect',
+        rects =>
           [
             ...new Set(
               rects.map(r => r.y.baseVal.value + r.height.baseVal.value / 2),
             ),
           ].sort((a, b) => a - b),
-        )
+      )
       await page.mouse.move(
         box.x + box.width * strip.along,
         box.y + rows[strip.row],
       )
-      await page.waitForTimeout(300)
+      await sleep(300)
     }
     await page.screenshot({ path: `img/${name}.png` })
     console.log(`img/${name}.png`)
