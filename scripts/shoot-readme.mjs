@@ -50,6 +50,28 @@ const FIGURES = {
     settings: { walkStrip: true },
     strip: { row: 1, along: 0.3 },
   },
+  c4_rows: {
+    query: [
+      'gbz=hprc',
+      'loc=chr6:31,980,000-32,050,000',
+      'haps=HG00097,HG00133,HG01123,HG02055',
+      'layout=walkrows',
+    ].join('&'),
+    size: [1400, 460],
+  },
+  cfh_rows: {
+    query: [
+      'gbz=hprc',
+      'loc=chr1:196,640,000-196,900,000',
+      'haps=HG00097,HG00133,HG01123,HG02055,HG00099,HG01960',
+      'layout=walkrows',
+    ].join('&'),
+    size: [1400, 520],
+  },
+  ecoli_genes: {
+    query: 'gfa=examples/ecoli_rgfa_slice.gfa&layout=force',
+    size: [1400, 800],
+  },
   assembly_graph: {
     query: 'gfa=examples/assembly_graph.gfa&layout=force',
     size: [1400, 900],
