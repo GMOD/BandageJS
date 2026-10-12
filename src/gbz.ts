@@ -8,7 +8,7 @@ import type { WalkFiles } from './walkFiles'
 // GbzBaseSyntenyAdapter reads one, so a 10 GB graph costs a few MB per cut.
 // The cut itself is the core's; the page keeps each opened database for the
 // next cut and says what it is waiting on. A gfa-to-tabix walk file set,
-// `<prefix>.<sample>.walks.bed.gz` with its node file beside it, takes the
+// `<prefix>.<sample>.walks.bed.gz` with its `.tbi`, takes the
 // database's place in a cut: `walkFiles.ts` reads it.
 
 export { parseRegion } from '@jbrowse/bandage-core'
@@ -48,7 +48,7 @@ function openWalks(url: string) {
   if (!files) {
     files = import('./walkFiles').then(async ({ openWalkFiles }) => {
       const opened = openWalkFiles(url)
-      await opened.header
+      await opened.header()
       return opened
     })
     walkSets.set(url, files)
@@ -60,7 +60,7 @@ function openWalks(url: string) {
 // The reference samples a database or walk file set can be cut along
 export async function referenceSamplesAt(db: string, index?: string) {
   return isWalksUrl(db)
-    ? (await (await openWalks(db)).header).references
+    ? (await (await openWalks(db)).header()).references
     : (await openDb(db, index)).referenceSamples
 }
 

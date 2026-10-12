@@ -14,6 +14,9 @@ importers:
       '@jbrowse/bandage-core':
         specifier: ^10.2.2
         version: 10.2.2
+      '@jbrowse/graph-walks':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@playwright/test':
         specifier: ^1.64.0
         version: 1.64.0
@@ -211,6 +214,10 @@ packages:
 
   '@jbrowse/graph-stress-layout@1.0.0':
     resolution: {integrity: sha512-Yw0aMopfOIvHftmHnTP+jPL0uINCt+fdWxHQvrGeektL5KOAvrMBrUyBB1FcNizQZCSnAtYplIoXCL5K0qN7og==}
+    engines: {node: '>=20'}
+
+  '@jbrowse/graph-walks@1.0.0':
+    resolution: {integrity: sha512-/4nfD2RYQkspOC038UmRagYl5keL26J+Ijngqvi9P3PH/DCe3dBYberxH1BcHgNk6G3wOAtsVNK1A3SnvDRKUQ==}
     engines: {node: '>=20'}
 
   '@jbrowse/quick-lru@8.0.0':
@@ -488,6 +495,8 @@ snapshots:
       '@jbrowse/tubemap-core': 1.1.0
 
   '@jbrowse/graph-stress-layout@1.0.0': {}
+
+  '@jbrowse/graph-walks@1.0.0': {}
 
   '@jbrowse/quick-lru@8.0.0': {}
 

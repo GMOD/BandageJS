@@ -9,7 +9,7 @@ import {
 
 const CHRM = `gbz=${encodeURIComponent(CHRM_WALKS)}&loc=chrM:8,000-8,300&layout=force`
 
-test('a link cuts a window from a gfa-to-tabix walk file set', async ({
+test('a link cuts a window from a gfa-to-tabix walk file', async ({
   page,
   consoleErrors,
 }) => {

@@ -24,23 +24,6 @@
     "layout": "walkrows"
   },
   {
-    "gbz": "https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38.GRCh38.walks.bed.gz",
-    "region": "chr6:160,614,798-160,647,758",
-    "haplotypes": [
-      "HG00097",
-      "HG00128",
-      "HG01123",
-      "HG00099",
-      "HG01960",
-      "HG02055",
-      "HG00133",
-      "HG01109"
-    ],
-    "name": "LPA KIV-2, 8 samples (walk files)",
-    "description": "The same cut read from the HPRC graph's gfa-to-tabix walk files by range requests instead of the gbz-base database.",
-    "layout": "walkrows"
-  },
-  {
     "gbz": "hprc",
     "region": "chr6:31,980,000-32,050,000",
     "haplotypes": ["HG00097", "HG00133", "HG01123", "HG02055"],

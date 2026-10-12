@@ -2,7 +2,7 @@ import { cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 import { LocalFile } from 'generic-filehandle2'
 
-import { cutWalksRegion, decodeSteps, openWalkFiles } from '../../src/walkFiles'
+import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
 
 const DATA = 'test/e2e/data'
 const walks = () =>
@@ -22,14 +22,6 @@ const walkNames = (text: string) =>
   lines(text, 'W')
     .map(w => `${w[1]}#${w[2]}#${w[3]}`)
     .sort()
-
-test('decodeSteps reads node-id deltas with the strand in the low bit', () => {
-  const ids = new Int32Array(3)
-  const rev = new Uint8Array(3)
-  decodeSteps('20,3,-4', ids, rev, 0)
-  expect([...ids]).toEqual([10, 11, 9])
-  expect([...rev]).toEqual([0, 1, 0])
-})
 
 test('a walk file cut names the walks the gbz-base cut names, over its nodes', async () => {
   const region = 'chrM:8,000-8,300'

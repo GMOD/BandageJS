@@ -43,8 +43,8 @@ pnpm deploy     # needs aws credentials for the jbrowse.org bucket
   - `feedback.ts`: the spinner and notices; `ui.ts`: the page's elements
   - `engine.ts`, `layoutWorker.ts`: the force-directed layout's worker
   - `gbz.ts`: range-request access to gbz-base, and to gfa-to-tabix walk files
-    through `walkFiles.ts`, which it imports on first use; `recent.ts`: the Open
-    dialog's recent list
+    through `walkFiles.ts` and @jbrowse/graph-walks, which it imports on first
+    use; `recent.ts`: the Open dialog's recent list
   - `overlays.ts`: SVG ports of the plugin's React overlays
   - `reference.ts`: which assembly the drawn backbone is on: declared, found by
     name in the hubs `hubs.ts` loads in the order `public/config.json` and the

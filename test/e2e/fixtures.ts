@@ -38,12 +38,7 @@ const HUB_FILES: Record<string, string> = {
   'https://gbz.test/micb-kir3dl1.gbz.db': 'micb-kir3dl1.gbz.db',
   // gfa-to-tabix --walks --refs GRCh38 of the HPRC chrM graph
   ...Object.fromEntries(
-    [
-      'walks.bed.gz',
-      'walks.bed.gz.tbi',
-      'nodes.bed.gz',
-      'nodes.bed.gz.tbi',
-    ].map(kind => [
+    ['walks.bed.gz', 'walks.bed.gz.tbi'].map(kind => [
       `https://gbz.test/hprc-chrM.GRCh38.${kind}`,
       `hprc-chrM.GRCh38.${kind}`,
     ]),
