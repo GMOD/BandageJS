@@ -174,18 +174,21 @@ function loadWalkGenes() {
   if (!settings.showGenes || !graph || !bars || b.status !== 'bound') {
     return
   }
-  const tracked = bars.rows.flatMap(row => {
-    const axis = row.axis
+  const placed = bars.rows.flatMap(row =>
+    row.axis ? [{ row, axis: row.axis }] : [],
+  )
+  const tracked = placed.flatMap(({ row, axis }) => {
     const assembly =
       row.haplotype === undefined
         ? undefined
         : assemblyNamed(b.hub, `${row.sample}#${row.haplotype}`)
     const src = assembly && geneTrackOf({ hub: b.hub, assembly })?.genes
-    return axis && assembly && src ? [{ row, axis, assembly, src }] : []
+    return assembly && src ? [{ row, axis, assembly, src }] : []
   })
   const reads = tracked.slice(0, WALK_GENE_ROWS)
   state.walkGeneNote = {
-    untracked: bars.rows.length - tracked.length,
+    untracked: placed.length - tracked.length,
+    unplaced: bars.rows.length - placed.length,
     unread: tracked.length - reads.length,
   }
   if (reads.length === 0) {

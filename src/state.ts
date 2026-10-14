@@ -28,6 +28,7 @@ import type { Entry } from './recent'
 import type { Declaration } from './reference'
 import type {
   Bounds,
+  GeneGaps,
   GeneModel,
   Graph,
   LayoutModeValue,
@@ -99,8 +100,8 @@ export const state = {
   genesFrom: undefined as string | undefined,
   // each walk row's genes, on its own contig, by walk name
   walkGenes: undefined as Map<string, GeneModel[]> | undefined,
-  // walk rows with no gene track, and rows past those read
-  walkGeneNote: undefined as { untracked: number; unread: number } | undefined,
+  // the walk rows with no genes read, by why
+  walkGeneNote: undefined as GeneGaps | undefined,
   scale: 1,
   translateX: 0,
   translateY: 0,

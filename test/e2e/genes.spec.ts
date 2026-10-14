@@ -239,6 +239,31 @@ test("walk rows under the graph box each haplotype's genes", async ({
   await expect(rowGenes).toHaveCount(0)
 })
 
+// HG00099#2's pieces overlap, which leaves its row no contig coordinates
+test('a walk row with no contig coordinates counts as unplaced, not untracked', async ({
+  page,
+}) => {
+  await openExampleText(
+    page,
+    'haplotype.gfa',
+    [
+      ...HAPLOTYPE_GFA,
+      'W HG00099 2 CTGY 1000 1010 >1',
+      'W HG00099 2 CTGY 1005 1020 >4',
+    ],
+    undefined,
+    '&layout=walkrows',
+  )
+  await waitForDrawing(page, '4 nodes')
+  await expect(page.locator('#overlay-svg .row-gene title')).toHaveText([
+    'LPA',
+    'HAPGENE',
+  ])
+  const legends = page.locator('#legends')
+  await expect(legends).toContainText('no contig coordinates for 1 row')
+  await expect(legends).not.toContainText('no gene track')
+})
+
 // 5 flanks the bubble 1..3, which in HAPLOTYPE_GFA is the whole graph and so
 // opens to nothing
 const FLANKED_GFA = [
