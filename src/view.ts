@@ -113,26 +113,45 @@ export function onDraw(fn: () => void) {
   afterDraw.push(fn)
 }
 
+function measure(
+  layout: LayoutResult | undefined,
+  region: Region | undefined,
+  bars: WalkRows | undefined,
+) {
+  return layout
+    ? drawingBounds(layout, {
+        region,
+        extent: bars && layout.extent ? walkRowsExtent(bars) : undefined,
+      })
+    : undefined
+}
+
+const laidOutOf = memo(measure)
 const boundsOf = memo(
   (
     layout: LayoutResult | undefined,
     region: Region | undefined,
     bars: WalkRows | undefined,
-  ) =>
-    layout
-      ? drawingBounds(layout, {
-          region,
-          extent: bars && layout.extent ? walkRowsExtent(bars) : undefined,
-        })
-      : undefined,
+    _positionsVersion: number,
+  ) => measure(layout, region, bars),
 )
 
-function bounds() {
-  return boundsOf(
+const boundsKeys = () =>
+  [
     state.layout,
     state.stack.length === 0 ? state.region : undefined,
     current().bars,
-  )
+  ] as const
+
+// The drawing as dragged, which the fit frames
+function bounds() {
+  return boundsOf(...boundsKeys(), state.positionsVersion)
+}
+
+// Bounds that hold still through a drag, so the facet panels don't re-tile
+// under the pointer
+function laidOutBounds() {
+  return laidOutOf(...boundsKeys())
 }
 
 const placementOf = memo((panels: WalkLift[] | undefined, facet: Facet) =>
@@ -174,7 +193,7 @@ const gridOf = memo(
 export function grid() {
   return gridOf(
     placement(),
-    bounds(),
+    laidOutBounds(),
     pixelRows(),
     state.width,
     state.height,

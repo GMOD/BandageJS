@@ -180,3 +180,44 @@ test('the + − 0 keys change the view and restore it', async ({ page }) => {
   await page.keyboard.press('0')
   await expect.poll(() => overlayPositions(page)).toEqual(fitted)
 })
+
+// Whether any ink lies on the canvas's outermost pixels, as an edge to a node
+// off screen does
+function inkAtBorder(page: Page) {
+  return page.locator('#graph').evaluate((c: HTMLCanvasElement) => {
+    const { data, width, height } = c
+      .getContext('2d')!
+      .getImageData(0, 0, c.width, c.height)
+    const inked = (x: number, y: number) => {
+      const i = (y * width + x) * 4
+      return data[i + 3]! > 0 && data[i]! + data[i + 1]! + data[i + 2]! < 600
+    }
+    for (let x = 0; x < width; x++) {
+      if (inked(x, 0) || inked(x, height - 1)) {
+        return true
+      }
+    }
+    for (let y = 0; y < height; y++) {
+      if (inked(0, y) || inked(width - 1, y)) {
+        return true
+      }
+    }
+    return false
+  })
+}
+
+test('fit frames a node where it was dragged', async ({ page }) => {
+  for (let i = 0; i < 4; i++) {
+    await page.keyboard.press('-')
+  }
+  const node = await findNode(page)
+  const pane = (await page.locator('#graph').boundingBox())!
+  await page.mouse.move(node.x, node.y)
+  await page.mouse.down()
+  await page.mouse.move(pane.x + pane.width - 4, pane.y + pane.height - 4, {
+    steps: 10,
+  })
+  await page.mouse.up()
+  await page.keyboard.press('0')
+  await expect.poll(() => inkAtBorder(page)).toBe(false)
+})
