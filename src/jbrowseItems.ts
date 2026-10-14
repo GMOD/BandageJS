@@ -5,7 +5,6 @@ import {
   gfaViewLink,
   graphViewLink,
   hasGraphView,
-  jbrowseMode,
   laneSamples,
   regionLink,
 } from './jbrowse'
@@ -49,7 +48,7 @@ export function jbrowseItems(): MenuItem[] {
   const region = { ...one, refName: ref.contigs[one.refName] ?? one.refName }
   const src = state.source
   const lanes = src?.gbz ? cutTrack(t, src.gbz.db) : undefined
-  const mode = jbrowseMode(effectiveMode())
+  const mode = effectiveMode()
   return [
     {
       label: 'Open this region in JBrowse',

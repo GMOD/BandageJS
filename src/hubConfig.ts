@@ -130,7 +130,7 @@ function trackFrom(t: Json, base: string): HubTrack | undefined {
     genes: type === 'FeatureTrack' ? geneSource(adapter, base) : undefined,
     gbz:
       adapterType === 'GbzBaseSyntenyAdapter'
-        ? locationUrl(adapter.uri ?? adapter.gbzLocation, base)
+        ? locationUrl(adapter.uri ?? adapter.gbzDbLocation, base)
         : undefined,
   }
 }

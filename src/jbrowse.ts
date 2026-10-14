@@ -13,19 +13,8 @@ const PLUGIN = 'GraphGenomeView'
 // paddedLocation does
 const MIN_NODE_WINDOW = 1000
 
-// the layout modes a released plugin in the JBrowse portal accepts
-const JBROWSE_MODES = new Set([
-  'auto',
-  'samplerows',
-  'walkrows',
-  'ordered',
-  'force',
-])
-
-// `mode` if the portal's plugin can draw it, else force-directed
-export function jbrowseMode(mode: string) {
-  return JBROWSE_MODES.has(mode) ? mode : 'force'
-}
+// the plugin refuses a wider cut unless the view raises its maxRegionBp
+const PLUGIN_MAX_REGION_BP = 5_000_000
 
 export interface Region {
   refName: string
@@ -99,7 +88,7 @@ export function regionLink(t: Target, region: Region, samples: string[]) {
                 {
                   trackId: lanes.trackId,
                   type: 'MultiWaySyntenyDisplay',
-                  laneFilter: { only: lanesOf(samples) },
+                  rows: { kept: lanesOf(samples) },
                 },
               ]
             : []),
@@ -140,6 +129,7 @@ export function graphViewLink(
         loadedTrackId: lanes.trackId,
         loadedRegion: { ...region, assemblyName: t.assembly.name },
         ...(samples.length ? { subgraphHaplotypes: samples } : {}),
+        maxRegionBp: Math.max(PLUGIN_MAX_REGION_BP, region.end - region.start),
         layoutMode,
       },
     ],

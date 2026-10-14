@@ -28,7 +28,9 @@ The GBZ route is deprecated in favour of walk files and rGFA (gfa-to-tabix).
 - Have the JBrowse link open one `LinearGenomeView` whose tracks are the gene
   track and that lanes track with `type: 'LinearGraphDisplay'`, as the plugin's
   `LinearGraphDisplay.test.ts` does with `showTrack`
-- Pass `subgraphHaplotypes`, which the display takes
+- Pass `subgraphHaplotypes`, which the display takes. Send `[]` for every
+  haplotype, since on a walk track an unset value means the track's default
+  lanes
 - Keep `gfaViewLink`: a standalone GFA has no linear view to sit in
 - Update `test/unit/jbrowse.test.ts` and any e2e spec that expects the paired
   views

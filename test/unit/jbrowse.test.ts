@@ -1,7 +1,13 @@
 import { expect, test } from '@playwright/test'
 
 import { hubFrom, withOverlay } from '../../src/hubConfig'
-import { cutTrack, nodeLink, regionLink, rowLink } from '../../src/jbrowse'
+import {
+  cutTrack,
+  graphViewLink,
+  nodeLink,
+  regionLink,
+  rowLink,
+} from '../../src/jbrowse'
 
 import type { GraphNode, WalkRow } from '@jbrowse/bandage-core'
 
@@ -20,11 +26,18 @@ function target(tracks: object[]) {
   return { host: 'https://jbrowse.example/', hub, assembly: hub.assemblies[0]! }
 }
 
-function lanesIn(link: string) {
-  const spec = JSON.parse(decodeURIComponent(link.split('session=spec-')[1]!))
-  return spec.views[0].tracks.find(
+function specOf(link: string) {
+  return JSON.parse(decodeURIComponent(link.split('session=spec-')[1]!))
+}
+
+function lanesDisplay(link: string) {
+  return specOf(link).views[0].tracks.find(
     (x: { type?: string }) => x.type === 'MultiWaySyntenyDisplay',
-  )?.trackId
+  )
+}
+
+function lanesIn(link: string) {
+  return lanesDisplay(link)?.trackId
 }
 
 const region = { refName: 'chr1', start: 0, end: 100 }
@@ -49,6 +62,47 @@ test('a gbz SyntenyTrack is the lanes over a gbz GraphTrack beside it', () => {
   ])
   expect(cutTrack(t, DB)?.trackId).toBe('lanes')
   expect(lanesIn(regionLink(t, region, ['HG00097']))).toBe('lanes')
+})
+
+test('a hub naming the database by gbzDbLocation still has its lanes', () => {
+  const t = target([
+    {
+      type: 'GraphTrack',
+      trackId: 'lanes',
+      assemblyNames: ['hg38'],
+      adapter: { type: 'GbzBaseSyntenyAdapter', gbzDbLocation: { uri: DB } },
+    },
+  ])
+  expect(cutTrack(t, DB)?.trackId).toBe('lanes')
+})
+
+test('the region link keeps the lanes asked for as rows.kept', () => {
+  const t = target([
+    { type: 'GraphTrack', trackId: 'lanes', assemblyNames: ['hg38'], adapter },
+  ])
+  expect(lanesDisplay(regionLink(t, region, ['HG00097'])).rows).toEqual({
+    kept: ['HG00097#1', 'HG00097#2'],
+  })
+})
+
+test("the graph view link raises the plugin's region cap to a wide cut", () => {
+  const t = target([
+    { type: 'GraphTrack', trackId: 'lanes', assemblyNames: ['hg38'], adapter },
+  ])
+  const lanes = cutTrack(t, DB)!
+  const view = (end: number) =>
+    specOf(
+      graphViewLink(
+        t,
+        lanes,
+        { refName: 'chr1', start: 0, end },
+        [],
+        'tubemap',
+      ),
+    ).views[1]
+  expect(view(100).maxRegionBp).toBe(5_000_000)
+  expect(view(8_000_000).maxRegionBp).toBe(8_000_000)
+  expect(view(100).layoutMode).toBe('tubemap')
 })
 
 const geneTrack = (trackId: string) => ({
