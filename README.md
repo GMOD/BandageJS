@@ -67,6 +67,4 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 ## License
 
 GPL-3.0-or-later, building on [BandageNG](https://github.com/asl/BandageNG) and
-[OGDF](https://www.ogdf.uni-osnabrueck.de/). The earlier BandageNG fork is on
-the [`bandage-layout-js`](https://github.com/cmdcolin/BandageJS/tree/bandage-layout-js)
-branch.
+[OGDF](https://www.ogdf.uni-osnabrueck.de/)
