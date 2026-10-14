@@ -42,6 +42,9 @@ export async function relayout() {
   const start = performance.now()
   try {
     const m = layoutModeByValue(effectiveMode())
+    // A force run still going keeps its worker: the cache stores what it
+    // finds, so switching back to force draws at once. cancelLayout() here
+    // would free the core and make that switch slow again.
     let result = m.run(graph, state.region)
     let duration = performance.now() - start
     const layoutMode = result ? m.value : 'force'

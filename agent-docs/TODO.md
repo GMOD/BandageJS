@@ -20,7 +20,6 @@ remove a row here when you add or remove an entry.
 | [A remembered sample alias loses to a hub that names the sample](todo/remember-box-loses-to-named-hub.md) | reference | Run the remembered pass over the user overlay before the named pass in resolve().                  |
 | [A layout picked inside a popped bubble is lost on Back](todo/layout-pick-inside-bubble.md)               | layout    | In choose() in src/menuItems.ts, write state.modeOverride while state.stack is non-empty.          |
 | [A failed open leaks the link's requested view and walks](todo/failed-open-leaks-link-state.md)           | links     | Clear the asked view and walks on the failure path of beginOpen.                                   |
-| [Switching to a fast layout leaves the force worker running](todo/fast-layout-leaves-force-worker.md)     | layout    | Call cancelLayout() in the fast branch of relayout() in src/layout.ts.                             |
 | [The reference dialog keeps stale state between openings](todo/reference-dialog-state.md)                 | reference | Reset referenceRemember.checked in showReferenceDialog and pass widened to choose().               |
 
 ## Needs a visual call
