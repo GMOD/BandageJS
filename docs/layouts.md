@@ -50,7 +50,7 @@ draws nodes.
 The tube maps draw no genes, and Haplotypes → **Bars under the graph** is greyed
 out under walk rows and both tube maps.
 
-## Force-directed (FMMM) and (stress)
+## Force-directed
 
 - **FMMM:** Bandage's own layout, OGDF's fast multipole multilevel method
   compiled to wasm

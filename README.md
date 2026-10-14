@@ -34,16 +34,24 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ![LPA KIV-2 in eight HPRC samples, force-directed with its walk rows beneath](img/kiv2_strip.png)
 
-More: [genes](docs/genes.md), [gallery](docs/gallery.md),
-[developing](docs/developing.md).
+## Docs
+
+- [Haplotypes](docs/haplotypes.md): highlighting walks, panels and rows
+- [Layouts](docs/layouts.md): each layout, what it needs and its settings
+- [Genes](docs/genes.md): gene tracks, assemblies and site setup
+- [Links](docs/links.md): every address parameter
+- [Walk files](docs/walk-files.md): cutting regions from your own haplotypes
+- [Figures](docs/figures.md): SVG export and figure specs
+- [Gallery](docs/gallery.md): example figures
+- [Developing](docs/developing.md): build, test, figures and deploy
 
 ## See also
 
-- [jbrowse-plugin-graphgenomeviewer](https://github.com/GMOD/jbrowse-plugin-graphgenomeviewer),
+- [jbrowse-plugin-graphgenomeviewer](https://github.com/GMOD/jbrowse-plugin-graphgenomeviewer):
   the JBrowse 2 plugin for these graphs
 - [HPRC tutorial](https://jbrowse.org/jb2/docs/tutorials/pangenome_hprc/)
 
-### Programmatic usage
+## Libraries
 
 - [@jbrowse/bandage-core](https://github.com/GMOD/bandage-core) (npm): layout
   and drawing, plus `bandage-figure` for SVGs with no browser
@@ -60,6 +68,5 @@ More: [genes](docs/genes.md), [gallery](docs/gallery.md),
 
 GPL-3.0-or-later, building on [BandageNG](https://github.com/asl/BandageNG) and
 [OGDF](https://www.ogdf.uni-osnabrueck.de/). The earlier BandageNG fork is on
-the
-[`bandage-layout-js`](https://github.com/cmdcolin/BandageJS/tree/bandage-layout-js)
+the [`bandage-layout-js`](https://github.com/cmdcolin/BandageJS/tree/bandage-layout-js)
 branch.
