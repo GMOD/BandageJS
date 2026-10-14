@@ -308,7 +308,7 @@ export function walkKeyHtml(
   return `<div class="walk-key"${title ? ` title="${esc(title)}"` : ''}><div class="legend-row"><div class="swatch walk${
     key.shades ? ' scale' : ''
   }" style="background:${encodingSwatchCss(walk.encoding)}"></div><span><strong>${esc(label)}</strong>${esc(
-    key.delta + key.reversed,
+    key.delta + key.outside + key.reversed,
   )}</span></div><div class="walk-at">${esc(at ?? key.scale ?? '')}</div></div>`
 }
 

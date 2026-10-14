@@ -22,7 +22,6 @@ remove a row here when you add or remove an entry.
 | [A failed open leaks the link's requested view and walks](todo/failed-open-leaks-link-state.md)           | links     | Clear the asked view and walks on the failure path of beginOpen.                                   |
 | [Switching to a fast layout leaves the force worker running](todo/fast-layout-leaves-force-worker.md)     | layout    | Call cancelLayout() in the fast branch of relayout() in src/layout.ts.                             |
 | [The reference dialog keeps stale state between openings](todo/reference-dialog-state.md)                 | reference | Reset referenceRemember.checked in showReferenceDialog and pass widened to choose().               |
-| [The walk key leaves out the bp outside the cut](todo/walk-key-outside-bp.md)                             | legend    | Print key.outside in the walk key in src/overlays.ts.                                              |
 | [Walk rows with no axis count as untracked, not unplaced](todo/walk-gene-rows-unplaced.md)                | genes     | Count axis-less rows as unplaced in the walk-row gene reads in src/genes.ts.                       |
 
 ## Needs a call

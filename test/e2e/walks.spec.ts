@@ -261,6 +261,38 @@ async function openDiploid(page: Page, query: string) {
   await waitForDrawing(page, /nodes/)
 }
 
+// alt#1 leaves the cut after s2 and returns at s4
+const LEAVES_AND_RETURNS = [
+  'S s1 AAAAAAAAAA',
+  'S s2 CCCCCCCCCC',
+  'S s3 GGGGGGGGGG',
+  'S s4 TTTTTTTTTT',
+  'S s5 AAAAAAAAAA',
+  'L s1 + s2 + 0M',
+  'L s2 + s3 + 0M',
+  'L s3 + s4 + 0M',
+  'L s4 + s5 + 0M',
+  'W ref 0 chr 0 50 >s1>s2>s3>s4>s5',
+  'W alt 1 chr 0 20 >s1>s2',
+  'W alt 1 chr 30 50 >s4>s5',
+].map(l => l.replaceAll(' ', '\t'))
+
+test("a lifted walk's key says how much of it lies outside the cut", async ({
+  page,
+}) => {
+  await page.route('**/examples/leaves.gfa', route =>
+    route.fulfill({ body: LEAVES_AND_RETURNS.join('\n') }),
+  )
+  await openPage(
+    page,
+    `gfa=examples/leaves.gfa&layout=force${lifted('alt#1#chr')}`,
+  )
+  await waitForDrawing(page, /nodes/)
+  await expect(page.locator('#legends .walk-key')).toContainText(
+    '10 bp outside the cut',
+  )
+})
+
 test('Reference haplotype lists each walk once, however many fragments it has', async ({
   page,
 }) => {
