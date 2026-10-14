@@ -5,7 +5,6 @@ import {
   LABEL_PAD,
   LABEL_PX,
   RAMP_GRADIENT_CSS,
-  REFERENCE_RAMP_MAX_HUE,
   encodingSwatchCss,
   exonOutlineTree,
   exonStretches,
@@ -290,12 +289,6 @@ export function overlayHtml(p: Pane) {
   return rows.join('') + sizes.join('')
 }
 
-const RAMP = `linear-gradient(to right, ${Array.from(
-  { length: 7 },
-  (_, i) =>
-    `hsl(${(i / 6) * REFERENCE_RAMP_MAX_HUE}, 70%, 50%) ${(i / 6) * 100}%`,
-).join(', ')})`
-
 // a node off the lifted walks: grey at the fade's alpha
 const FADED_SWATCH = 'rgba(160, 160, 160, 0.18)'
 
@@ -365,7 +358,7 @@ export function legendsHtml(o: {
     const start = Math.round(o.ramp.start)
     const end = Math.round(o.ramp.end)
     out.push(
-      `<div class="legend"><div class="legend-title">${esc(o.ramp.refName ? `${o.ramp.refName} position` : 'Reference position')}</div><div class="ramp" style="background:${RAMP}"></div><div class="ramp-ends"><span>${start.toLocaleString()}</span><span>(${formatBp(
+      `<div class="legend"><div class="legend-title">${esc(o.ramp.refName ? `${o.ramp.refName} position` : 'Reference position')}</div><div class="ramp" style="background:${RAMP_GRADIENT_CSS}"></div><div class="ramp-ends"><span>${start.toLocaleString()}</span><span>(${formatBp(
         end - start,
       )})</span><span>${end.toLocaleString()}</span></div></div>`,
     )

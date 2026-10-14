@@ -69,11 +69,6 @@ export function ownGenesName() {
   return ownGenes()?.name
 }
 
-export function genesSourceName() {
-  const w = referenceWindow()
-  return w && geneTrackOf(w)?.name
-}
-
 // why the Genes toggle has nothing to show, if it doesn't
 export function noGenesReason() {
   if (ownGenes()) {
