@@ -25,8 +25,8 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
   and genes
 - **Haplotypes:** highlight walks as lanes or side by side
   ([details](docs/haplotypes.md))
-- **Layout:** the Layout menu picks force-directed, anchored, ordered, walk rows
-  or tube map
+- **Layout:** the Layout menu picks force-directed, anchored, sample rows, walk
+  rows, ordered, tube map or tube map on reference ([details](docs/layouts.md))
 - **Share:** File → **Copy link** ([parameters](docs/links.md))
 - **Export:** File → **Export SVG** ([figures](docs/figures.md))
 
