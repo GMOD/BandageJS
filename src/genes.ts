@@ -42,7 +42,7 @@ interface Read {
 
 const fetched = new Map<string, Read>()
 let abort: AbortController | undefined
-let warned = false
+const warned = new Set<string>()
 let missing: string[] = []
 let own:
   | { text: string; backbone: string; name: string; genes: GeneModel[] }
@@ -260,8 +260,8 @@ export function loadGenes() {
         return
       }
       console.error(e)
-      if (!warned) {
-        warned = true
+      if (!warned.has(src.file)) {
+        warned.add(src.file)
         notify(
           `Couldn't read ${track.name}: ${e instanceof Error ? e.message : String(e)}`,
           false,

@@ -725,3 +725,16 @@ test('a failed RefSeq read leaves the graph drawn with a notice', async ({
   await expect(page.locator('#toast')).not.toHaveClass(/error/)
   await expect(genes(page)).toHaveCount(0)
 })
+
+test('a second gene track that fails says so too', async ({ page }) => {
+  await page.route(/ncbiRefSeq|hs1\.gff/, route => route.abort())
+  await openPage(page, 'gfa=examples/chr1_chm13_grch38_paths.gfa')
+  await waitForDrawing(page, /nodes/)
+  await expect(page.locator('#toast')).toContainText(
+    "Couldn't read NCBI RefSeq - RefSeq All (GFF)",
+  )
+  await drawAlong(page, 'GRCh38#0#chr1')
+  await expect(page.locator('#toast')).toContainText(
+    "Couldn't read NCBI RefSeq genes (hg38)",
+  )
+})
