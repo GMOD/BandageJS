@@ -22,6 +22,13 @@ test('with no query the page opens the first example', async ({
   expect(consoleErrors).toEqual([])
 })
 
+test('a link naming a hub that is no url still opens its graph', async ({
+  page,
+}) => {
+  await openPage(page, 'gfa=examples/assembly_graph.gfa&hub=http://')
+  await waitForDrawing(page, '64 nodes')
+})
+
 test('a layout the graph cannot draw falls back to force-directed with halos', async ({
   page,
 }) => {

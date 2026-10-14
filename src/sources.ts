@@ -457,7 +457,11 @@ export function openFromQuery(params: URLSearchParams) {
   askWalks(params)
   askView(params)
   askedAlong = params.get('along') ?? ''
-  linkHubs(params.getAll('hub').map(url => new URL(url, location.href).href))
+  linkHubs(
+    params
+      .getAll('hub')
+      .flatMap(url => URL.parse(url, location.href)?.href ?? []),
+  )
   const declare = declarationFromQuery(params)
   const gfa = params.get('gfa')
   const gbz = gbzFromQuery(params)
