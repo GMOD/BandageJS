@@ -5,7 +5,7 @@ import {
   NodeLimitError,
 } from '@jbrowse/bandage-core/gbzWindow'
 import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
-import { WalkReader, walkNameFilter } from '@jbrowse/graph-walks'
+import { WALK_BUDGETS, WalkReader, walksKept } from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
 import type { GenericFilehandle } from 'generic-filehandle2'
@@ -53,11 +53,18 @@ export async function cutWalksRegion(
   const region = parseRegion(src.region)
   const header = await walks.header({ signal })
   const sample = src.referenceSample ?? header.references[0] ?? ''
-  const anchor = await anchorFor(walks, region.refName, sample, signal)
+  const anchor = await walks.sequenceFor(sample, region.refName, { signal })
+  if (anchor === undefined) {
+    const names = await walks.referenceSequences({ signal })
+    throw new Error(
+      `The walk file has no sequence ${region.refName} on ${sample}; it holds ${names.slice(0, 5).join(', ')}${names.length > 5 ? ', …' : ''}`,
+    )
+  }
   const { graph, kept, fragments } = await walks.cut(anchor, region, {
     signal,
     context: src.context ?? GBZ_CUT_DEFAULTS.context,
-    keep: walkNameFilter(src.haplotypes, `${sample}#0`),
+    keep: walksKept(src.haplotypes, anchor),
+    byteBudget: WALK_BUDGETS.byteBudget,
   })
   const { limit } = GBZ_CUT_DEFAULTS
   if (kept.size > limit) {
@@ -70,24 +77,4 @@ export async function cutWalksRegion(
   }
   const text = graphTablesGFA(graph.tables(kept, fragments))
   return { text, region, sample }
-}
-
-// The walk file's sequence for `refName` on `sample`: a walk file names its
-// reference sequences in full PanSN, `GRCh38#0#chr6`
-async function anchorFor(
-  walks: WalkFiles,
-  refName: string,
-  sample: string,
-  signal?: AbortSignal,
-) {
-  const names = await walks.referenceSequences({ signal })
-  const found = [refName, `${sample}#0#${refName}`, `${sample}#${refName}`]
-    .map(n => n.replace(/^([^#]+)#([^#]+)$/, '$1#0#$2'))
-    .find(n => names.includes(n))
-  if (found === undefined) {
-    throw new Error(
-      `The walk file has no sequence ${refName} on ${sample}; it holds ${names.slice(0, 5).join(', ')}${names.length > 5 ? ', …' : ''}`,
-    )
-  }
-  return found
 }

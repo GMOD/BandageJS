@@ -59,6 +59,14 @@ test('a walk file cut places reference nodes by their coordinate', async () => {
   expect(first).toContain('SR:i:0')
 })
 
+test('a walk file cut takes a region named as the file names it', async () => {
+  const { text } = await cutWalksRegion(walks(), {
+    region: 'GRCh38#0#chrM:100-300',
+    haplotypes: ['HG00438'],
+  })
+  expect(walkNames(text)).toEqual(['GRCh38#0#chrM', 'HG00438#2#MT'])
+})
+
 test('a walk file cut names the sequences it holds for one it lacks', async () => {
   await expect(
     cutWalksRegion(walks(), { region: 'chr1:0-100' }),
