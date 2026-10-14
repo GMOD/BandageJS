@@ -1,11 +1,11 @@
-import { HPRC } from './gbz'
+import { HPRC, isHprc } from './gbz'
 
 import type { GbzSource } from './gbz'
 
 // A gbz cut as the page's query string, the HPRC database as `gbz=hprc`, and
 // back.
 export function gbzQuery(src: GbzSource): Record<string, string> {
-  const preset = src.db === HPRC.db && src.index === HPRC.index
+  const preset = isHprc(src)
   return {
     gbz: preset ? 'hprc' : src.db,
     ...(!preset && src.index ? { index: src.index } : {}),

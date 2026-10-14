@@ -5,7 +5,7 @@ import {
 } from '@jbrowse/bandage-core'
 
 import { notify } from './feedback'
-import { HPRC } from './gbz'
+import { isHprc } from './gbz'
 import { ownGenesName } from './genes'
 import { geneTrackOf } from './hubConfig'
 import { referenceName, referenceWindow } from './reference'
@@ -28,7 +28,7 @@ export function figureSpec() {
     return undefined
   }
   const gbz = source.gbz
-  const preset = gbz?.db === HPRC.db && gbz.index === HPRC.index
+  const preset = gbz && isHprc(gbz)
   const lifted = state.walkLayers.length
   const spec = {
     ...(gbz
