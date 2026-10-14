@@ -22,6 +22,7 @@ import {
   userEntries,
 } from './hubs'
 import { esc } from './overlays'
+import { fetchOk } from './read'
 import {
   assemblyLabel,
   backboneKey,
@@ -249,8 +250,8 @@ async function search(query: string): Promise<Result[]> {
       : []
   let indexed: Result[] = []
   if (genomes.index && q.length >= 2) {
-    index ??= fetch(genomes.index)
-      .then(res => (res.ok ? (res.json() as Promise<unknown>) : []))
+    index ??= fetchOk(genomes.index)
+      .then(res => res.json() as Promise<unknown>)
       .catch((e: unknown) => {
         console.error(e)
         index = undefined

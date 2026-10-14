@@ -16,7 +16,7 @@ import { loadGenes, stopGenes } from './genes'
 import { relayout, stopLayout } from './layout'
 import { askView } from './linkView'
 import { gbzFromQuery, gbzQuery } from './query'
-import { gfaText, readError } from './read'
+import { fetchOk, gfaText, readError } from './read'
 import { remember } from './recent'
 import { readSettingsParams, settingsParams } from './settings'
 import { siteConfig } from './hubs'
@@ -223,12 +223,9 @@ export async function openUrl(
   const name = url.split('/').pop() || url
   const { live, signal, work } = beginOpen(`Fetching ${name}`)
   try {
-    const res = await fetch(url, { signal }).catch((e: unknown) => {
+    const res = await fetchOk(url, { signal }).catch((e: unknown) => {
       throw readError(e, url)
     })
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status} fetching ${url}`)
-    }
     const text = await gfaText(await res.blob())
     const absolute = new URL(url, location.href)
     const recent = extra.remember

@@ -1,6 +1,8 @@
 import { HPRC_GBZ, cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { RemoteFile } from 'generic-filehandle2'
 
+import { readOnce } from './read'
+
 import type { GbzSource } from '@jbrowse/bandage-core'
 import type { WalkFiles } from './walkFiles'
 
@@ -21,14 +23,9 @@ const opened = new Map<string, ReturnType<typeof openGbz>>()
 // The database at `db`, with its haplotype index where there is one, opened
 // once for every cut and probe
 export function openDb(db: string, index?: string) {
-  const key = `${db}|${index ?? ''}`
-  let gbz = opened.get(key)
-  if (!gbz) {
-    gbz = openGbz(new RemoteFile(db), index ? new RemoteFile(index) : undefined)
-    opened.set(key, gbz)
-    gbz.catch(() => opened.delete(key))
-  }
-  return gbz
+  return readOnce(opened, `${db}|${index ?? ''}`, () =>
+    openGbz(new RemoteFile(db), index ? new RemoteFile(index) : undefined),
+  )
 }
 
 const WALKS = /\.walks\.bed\.gz$/i
@@ -44,17 +41,13 @@ export function isWalksUrl(url: string) {
 const walkSets = new Map<string, Promise<WalkFiles>>()
 
 function openWalks(url: string) {
-  let files = walkSets.get(url)
-  if (!files) {
-    files = import('./walkFiles').then(async ({ openWalkFiles }) => {
-      const opened = openWalkFiles(url)
-      await opened.header()
-      return opened
-    })
-    walkSets.set(url, files)
-    files.catch(() => walkSets.delete(url))
-  }
-  return files
+  return readOnce(walkSets, url, () =>
+    import('./walkFiles').then(async ({ openWalkFiles }) => {
+      const files = openWalkFiles(url)
+      await files.header()
+      return files
+    }),
+  )
 }
 
 // The reference samples a database or walk file set can be cut along

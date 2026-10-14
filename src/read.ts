@@ -16,3 +16,28 @@ export function readError(e: unknown, url: string) {
       )
     : e
 }
+
+// fetch, with an HTTP error status thrown as an error
+export async function fetchOk(url: string, init?: RequestInit) {
+  const res = await fetch(url, init)
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} fetching ${url}`)
+  }
+  return res
+}
+
+// The promise `read` makes for `key`, kept in `cache` for every later call
+// until it fails
+export function readOnce<T>(
+  cache: Map<string, Promise<T>>,
+  key: string,
+  read: () => Promise<T>,
+) {
+  let p = cache.get(key)
+  if (!p) {
+    p = read()
+    cache.set(key, p)
+    p.catch(() => cache.delete(key))
+  }
+  return p
+}

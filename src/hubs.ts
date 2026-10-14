@@ -1,4 +1,5 @@
 import { aliasRows, hubFrom } from './hubConfig'
+import { fetchOk, readOnce } from './read'
 import { store, stored } from './settings'
 import { hubEntry, mergeOverlays, siteFrom } from './siteConfig'
 
@@ -99,37 +100,19 @@ export function orderedHubs(linked: string[]): OrderedHub[] {
 const hubs = new Map<string, Promise<Hub>>()
 
 export function loadHub(url: string) {
-  let hub = hubs.get(url)
-  if (!hub) {
-    hub = fetch(url)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status} fetching ${url}`)
-        }
-        return res.json() as Promise<unknown>
-      })
-      .then(json => hubFrom(json, url))
-    hubs.set(url, hub)
-    hub.catch(() => hubs.delete(url))
-  }
-  return hub
+  return readOnce(hubs, url, () =>
+    fetchOk(url)
+      .then(res => res.json() as Promise<unknown>)
+      .then(json => hubFrom(json, url)),
+  )
 }
 
 const aliases = new Map<string, Promise<string[][]>>()
 
 export function loadAliases(url: string) {
-  let rows = aliases.get(url)
-  if (!rows) {
-    rows = fetch(url)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status} fetching ${url}`)
-        }
-        return res.text()
-      })
-      .then(aliasRows)
-    aliases.set(url, rows)
-    rows.catch(() => aliases.delete(url))
-  }
-  return rows
+  return readOnce(aliases, url, () =>
+    fetchOk(url)
+      .then(res => res.text())
+      .then(aliasRows),
+  )
 }
