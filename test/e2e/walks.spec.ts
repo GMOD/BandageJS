@@ -308,6 +308,43 @@ test('Reference haplotype keeps the highlighted walks, and a link keeps the walk
   ).toBeVisible()
 })
 
+test('an open that fails leaves the graph on screen drawn along its walk', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  await page.route('**/examples/missing.gfa', route =>
+    route.fulfill({ status: 404 }),
+  )
+  await openDiploid(page, '')
+  const popup = await walkMenu(page)
+  await popup.getByRole('menuitem', { name: /^Reference haplotype/ }).click()
+  await popup.getByRole('menuitemradio', { name: 'alt#1#chr' }).click()
+  await waitForDrawing(page, /nodes/)
+
+  await menuButton(page, 'File').click()
+  await page
+    .locator('#menu-popup')
+    .getByRole('menuitem', { name: 'Open…' })
+    .click()
+  await page.locator('#url').fill('examples/missing.gfa')
+  await page
+    .locator('#open-dialog')
+    .getByRole('button', { name: 'Open', exact: true })
+    .click()
+  await expect(page.locator('#toast')).toContainText('HTTP 404')
+
+  await menuButton(page, 'File').click()
+  await page
+    .locator('#menu-popup')
+    .getByRole('menuitem', { name: /^Copy figure spec/ })
+    .click()
+  const spec = JSON.parse(
+    await page.evaluate(() => navigator.clipboard.readText()),
+  ) as Record<string, unknown>
+  expect(spec.referencePath).toBe('alt#1#chr')
+})
+
 test('by sample, a sample takes a row and its haplotypes the columns', async ({
   page,
 }) => {

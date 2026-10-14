@@ -342,8 +342,7 @@ export function haplotypeItems(): MenuItem[] {
                 radio: true,
                 checked: graph?.referencePath === name,
                 onClick: () => {
-                  state.referencePath = name
-                  reparse()
+                  reparse(name)
                 },
               })),
           },

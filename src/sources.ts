@@ -57,7 +57,6 @@ function beginOpen(text: string) {
   openWork = progress(text)
   const open = ++liveOpen
   dismiss()
-  state.referencePath = ''
   return {
     live: () => open === liveOpen,
     signal: openAbort.signal,
@@ -133,25 +132,29 @@ export function declarationFromQuery(
   return assembly ? { assembly, ...(contigs ? { contigs } : {}) } : undefined
 }
 
-// `declare` is the assembly a link or example says the graph's reference is on
+// `declare` is the assembly a link or example says the graph's reference is on,
+// and `along` the path to draw x along, by default the link's `along` parameter
 export function openGFA(
   text: string,
   {
     declare,
     walks,
+    along = askedAlong,
     ...source
-  }: Omit<Source, 'text'> & { declare?: Declaration; walks?: WalkLayer[] },
+  }: Omit<Source, 'text'> & {
+    declare?: Declaration
+    walks?: WalkLayer[]
+    along?: string
+  },
   onOpen?: () => void,
   maxNodes = MAX_NODES,
 ) {
+  askedAlong = ''
   const work = progress('Parsing GFA')
   try {
-    const along = state.referencePath || askedAlong
-    askedAlong = ''
     const graph = loadGraph(text, source.name, {
       referencePath: along || undefined,
     })
-    state.referencePath = graph.referencePath === along ? along : ''
     if (graph.nodes.length > maxNodes) {
       notify(
         `${source.name} has ${graph.nodes.length.toLocaleString()} nodes, over the ${maxNodes.toLocaleString()} this page draws by default. A layout that size can take minutes.`,
@@ -159,12 +162,18 @@ export function openGFA(
         {
           label: 'Draw anyway',
           run: () => {
-            openGFA(text, { ...source, declare, walks }, onOpen, Infinity)
+            openGFA(
+              text,
+              { ...source, declare, walks, along },
+              onOpen,
+              Infinity,
+            )
           },
         },
       )
       return
     }
+    state.referencePath = graph.referencePath === along ? along : ''
     // the path a walk-anchored cut is first drawn along is the one its region
     // is on
     const regionPath =
@@ -269,9 +278,6 @@ export async function openGbz(
   kept: Partial<Kept> = {},
 ) {
   const { live, signal, work } = beginOpen('Opening pangenome database')
-  if (kept.referencePath) {
-    state.referencePath = kept.referencePath
-  }
   const wholeWalks = cutsWholeWalks()
   try {
     parseRegion(src.region)
@@ -298,6 +304,7 @@ export async function openGbz(
         declared: kept.declared,
         regionPath: kept.regionPath,
         walks: kept.walks,
+        along: kept.referencePath,
         recent:
           kept.recent ??
           (rememberIt
@@ -380,13 +387,12 @@ export function rememberSource() {
   }
 }
 
-// Re-reads the graph on screen, its walks still lifted, after a change to how
-// it parses
-export function reparse() {
+// Re-reads the graph on screen along the path `along`, its walks still lifted
+export function reparse(along: string) {
   const { text, ...src } = state.source!
   openGFA(
     text,
-    { ...src, walks: state.walkLayers },
+    { ...src, walks: state.walkLayers, along },
     () => {
       replaceParams(['along'], alongParams())
     },
