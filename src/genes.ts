@@ -310,7 +310,7 @@ async function readGenes(file: File) {
       )
       return
     }
-    stopGenes()
+    abort?.abort()
     own = {
       text: source.text,
       backbone: backboneId(backbone)!,
