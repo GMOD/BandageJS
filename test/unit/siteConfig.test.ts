@@ -122,6 +122,10 @@ test('genomeHubUrl shards a GenArk accession and names a UCSC db', () => {
     'https://jbrowse.org/ucsc/danRer11/config.json',
   )
   expect(genomeHubUrl('E. coli', GENOMES)).toBeUndefined()
+  expect(genomeHubUrl('chr6', GENOMES)).toBeUndefined()
+  expect(genomeHubUrl('chrPic1', GENOMES)).toBe(
+    'https://jbrowse.org/ucsc/chrPic1/config.json',
+  )
   expect(genomeHubUrl('GCF_000005845.2', {})).toBeUndefined()
 })
 

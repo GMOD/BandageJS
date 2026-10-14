@@ -127,7 +127,8 @@ export function mergeOverlays(a: HubOverlay, b: HubOverlay): HubOverlay {
 }
 
 // The hub config a genome name or accession stands for: a GenArk accession
-// (`GCF_000005845.2`) or a UCSC db name (`mm39`)
+// (`GCF_000005845.2`) or a UCSC db name (`mm39`), which a contig name (`chr6`)
+// is not
 export function genomeHubUrl(
   query: string,
   genomes: SiteConfig['genomes'],
@@ -139,7 +140,7 @@ export function genomeHubUrl(
     return new URL(`${prefix}/${a}/${b}/${c}/${q}/config.json`, genomes.genark)
       .href
   }
-  return /^[a-z][A-Za-z]*\d+$/.test(q) && genomes.ucsc
+  return /^[a-z][A-Za-z]*\d+$/.test(q) && !/^chr\d+$/i.test(q) && genomes.ucsc
     ? new URL(`${q}/config.json`, genomes.ucsc).href
     : undefined
 }
