@@ -16,6 +16,7 @@ function showWorks() {
   const newest = works.at(-1)
   if (newest && ui.loading.hidden) {
     loadingSince = performance.now()
+    ui.loadingTime.textContent = ''
     loadingTimer = setInterval(() => {
       ui.loadingTime.textContent = `${((performance.now() - loadingSince) / 1000).toFixed(0)} s`
     }, 500)
