@@ -1,5 +1,5 @@
-function el<T extends HTMLElement>(id: string) {
-  return document.getElementById(id) as T
+function el<T extends Element>(id: string) {
+  return document.querySelector<T>(`#${id}`)!
 }
 
 export const ui = {
@@ -7,15 +7,15 @@ export const ui = {
   canvas: el<HTMLCanvasElement>('graph'),
   tube: el<HTMLCanvasElement>('tube'),
   hover: el<HTMLCanvasElement>('hover'),
-  svg: el<HTMLElement>('overlay-svg') as unknown as SVGSVGElement,
-  marks: el<HTMLElement>('overlay-marks') as unknown as SVGGElement,
-  walkRows: el<HTMLElement>('walk-rows') as unknown as SVGGElement,
-  stripLocator: el<HTMLElement>('strip-locator') as unknown as SVGGElement,
+  svg: el<SVGSVGElement>('overlay-svg'),
+  marks: el<SVGGElement>('overlay-marks'),
+  walkRows: el<SVGGElement>('walk-rows'),
+  stripLocator: el<SVGGElement>('strip-locator'),
   strip: el<HTMLElement>('walk-strip'),
-  stripSvg: el<HTMLElement>('strip-svg') as unknown as SVGSVGElement,
-  stripBars: el<HTMLElement>('strip-bars') as unknown as SVGGElement,
-  stripMarks: el<HTMLElement>('strip-marks') as unknown as SVGGElement,
-  stripLabels: el<HTMLElement>('strip-labels') as unknown as SVGGElement,
+  stripSvg: el<SVGSVGElement>('strip-svg'),
+  stripBars: el<SVGGElement>('strip-bars'),
+  stripMarks: el<SVGGElement>('strip-marks'),
+  stripLabels: el<SVGGElement>('strip-labels'),
   stripTip: el<HTMLDivElement>('strip-tip'),
   stripKey: el<HTMLDivElement>('strip-key'),
   html: el<HTMLDivElement>('overlay-html'),
