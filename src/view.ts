@@ -87,10 +87,6 @@ function rowHtml(row: WalkRow) {
   }`
 }
 
-// the ramp's interval for walk rows to paint by, where the drawing has one
-const walkRampOf = (d: ReturnType<typeof current>) =>
-  d.bars ? rampInterval(d.ramp) : undefined
-
 const CONNECTOR_THICKNESS = 2
 const HOVER_BRIGHTEN = 1.4
 const SELECT_BRIGHTEN = 1.6
@@ -708,6 +704,8 @@ function drawOverlays() {
   const back = state.stack.at(-1)
   const backLabel = back && `◀ Back to ${back.graph.name}`
   const ink = inkOf(state.graph, settings.nodeWidth, settings.nodeThickness)
+  const ramp = rampInterval(d.ramp)
+  const walkRamp = d.bars ? ramp : undefined
   const labels = layoutLabels({
     paneWidth: state.width,
     canvasHeight: state.height,
@@ -745,7 +743,7 @@ function drawOverlays() {
     rowLabels: d.rowLabels,
     walkBars: d.bars,
     rowGenes: d.rowGenes,
-    walkRamp: walkRampOf(d),
+    walkRamp,
     regionEnd: state.region?.end,
     highlight: lift,
   }
@@ -756,7 +754,6 @@ function drawOverlays() {
   setHtml(ui.html, layout ? overlayHtml(pane) : '')
   overlayBubbles = d.halos.map(h => h.bubble)
 
-  const ramp = rampInterval(d.ramp)
   const legends = layout
     ? legendsHtml({
         // a lifted walk's key states its own scale, and the rest is grey
@@ -768,7 +765,7 @@ function drawOverlays() {
         paths: drawPaths() && graph?.paths ? pathLegend(graph.paths) : [],
         walkBars: d.bars,
         rowGenes: d.rowGenes?.size ? state.walkGeneNote : undefined,
-        walkRamp: walkRampOf(d),
+        walkRamp,
         walks: (lift?.walks ?? []).map(walk => ({
           walk,
           label: f.walkLabels.get(walk.name) ?? walk.name,
