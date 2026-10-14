@@ -9,6 +9,7 @@ import { isHprc } from './gbz'
 import { ownGenesName } from './genes'
 import { geneTrackOf } from './hubConfig'
 import { referenceName, referenceWindow } from './reference'
+import { coreRegion, parseRegion } from './region'
 import {
   current,
   drawnMode,
@@ -36,14 +37,14 @@ function figureSpec() {
           gbz: {
             db: preset ? 'hprc' : gbz.db,
             index: preset ? undefined : gbz.index,
-            region: gbz.region,
+            region: coreRegion(parseRegion(gbz.region)),
             haplotypes: gbz.haplotypes,
             referenceSample: gbz.referenceSample,
           },
         }
       : {
           gfa: source.url ?? source.name,
-          region: region && `${region.refName}:${region.start}-${region.end}`,
+          region: region && coreRegion(region),
         }),
     genes: geneSpec(),
     referencePath: state.referencePath || undefined,

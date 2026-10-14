@@ -11,12 +11,13 @@ import {
   progress,
   report,
 } from './feedback'
-import { HPRC, cutGbz, parseRegion } from './gbz'
+import { HPRC, cutGbz } from './gbz'
 import { loadGenes, stopGenes } from './genes'
 import { relayout, stopLayout } from './layout'
 import { askView } from './linkView'
 import { gbzFromQuery, gbzQuery } from './query'
 import { fetchOk, gfaText, readError } from './read'
+import { parseRegion } from './region'
 import { remember } from './recent'
 import { readSettingsParams, settingsParams } from './settings'
 import { siteConfig } from './hubs'

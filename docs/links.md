@@ -19,3 +19,6 @@ it. A graph opened from your computer has no link.
 | `engine`, `quality`, `spacing`, `separation`, `spread` | Force layout settings                                                                                             |
 
 A parameter appears only when it differs from the default.
+
+- `loc` reads 1-based and closed, as JBrowse writes a locus:
+  `chr6:160,614,798-160,647,758`, or `chr6:160,614,798` for one base

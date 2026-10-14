@@ -37,7 +37,7 @@ export function popBubble(bubble: MinigraphBubble) {
     ...sub,
     name: bubble.offReference
       ? `${kind} in ${graph.name}`
-      : `${kind} at ${bubble.refName}:${bubble.start.toLocaleString()}`,
+      : `${kind} at ${bubble.refName}:${(bubble.start + 1).toLocaleString()}`,
   }
   state.layout = undefined
   keepingSelection(clearInteraction)

@@ -18,6 +18,7 @@ test('a link cuts a window from a gfa-to-tabix walk file', async ({
   await expect(page.locator('#caption')).toContainText(
     'GRCh38 chrM:8,000-8,300',
   )
+  await expect(page.locator('#locate')).toHaveValue('chrM:8,000-8,300')
   expect(consoleErrors).toEqual([])
 })
 

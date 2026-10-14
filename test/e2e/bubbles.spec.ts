@@ -37,7 +37,7 @@ test('a pop opens the bubbles inside the one it opened', async ({ page }) => {
   await waitForDrawing(page, '6 nodes')
   await chips.first().click()
   await waitForDrawing(page, '4 nodes')
-  await expect(page.locator('#back')).toHaveText(/^◀ Back to .+ at chr:8$/)
+  await expect(page.locator('#back')).toHaveText(/^◀ Back to .+ at chr:9$/)
   await expect(page.locator('#caption')).toContainText('SNP in ')
   // the SNP is the whole drawing now: named, but opening it would redraw it
   const own = page.locator('#overlay-svg .chip', { hasText: 'SNP' })

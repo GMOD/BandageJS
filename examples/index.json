@@ -2,9 +2,9 @@
   {
     "file": "hprc_kiv2.gfa",
     "name": "LPA KIV-2 (HPRC rGFA)",
-    "description": "chr6:160,525,000-160,655,000 of the HPRC release 2 Minigraph-Cactus graph: the kringle IV-2 repeat forms the loops.",
+    "description": "chr6:160,525,001-160,655,000 of the HPRC release 2 Minigraph-Cactus graph: the kringle IV-2 repeat forms the loops.",
     "layout": "force",
-    "region": "chr6:160,525,000-160,655,000"
+    "region": "chr6:160,525,001-160,655,000"
   },
   {
     "gbz": "hprc",
@@ -59,23 +59,23 @@
   {
     "file": "hprc_mhc_class2.gfa",
     "name": "MHC class II (HPRC rGFA)",
-    "description": "chr6:32,510,000-32,600,000: the DRB haplotypes, dozens of alleles.",
+    "description": "chr6:32,510,001-32,600,000: the DRB haplotypes, dozens of alleles.",
     "layout": "force",
-    "region": "chr6:32,510,000-32,600,000"
+    "region": "chr6:32,510,001-32,600,000"
   },
   {
     "file": "hprc_cfh.gfa",
     "name": "CFH deletion (HPRC rGFA)",
-    "description": "chr1:196,640,000-196,900,000: an 84 kb deletion drawn as a bare edge.",
+    "description": "chr1:196,640,001-196,900,000: an 84 kb deletion drawn as a bare edge.",
     "layout": "force",
-    "region": "chr1:196,640,000-196,900,000"
+    "region": "chr1:196,640,001-196,900,000"
   },
   {
     "file": "hprc_amy1.gfa",
     "name": "AMY1B to AMY1C (HPRC rGFA)",
-    "description": "chr1:103,690,000-103,780,000: an rGFA has no walks, so the amylase copies show only as edges turning back along the backbone.",
+    "description": "chr1:103,690,001-103,780,000: an rGFA has no walks, so the amylase copies show only as edges turning back along the backbone.",
     "layout": "force",
-    "region": "chr1:103,690,000-103,780,000"
+    "region": "chr1:103,690,001-103,780,000"
   },
   {
     "file": "chr1_chm13_grch38_paths.gfa",

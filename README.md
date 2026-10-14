@@ -20,7 +20,8 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - **Cut a region:**
   `?gbz=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`. Paste a
   `.gbz.db` or [walk file](docs/walk-files.md) url to cut your own
-- **Go to:** type a region, position or gene name in the location box (`g`)
+- **Go to:** type a region, position or gene name in the location box (`g`);
+  regions read 1-based, as JBrowse writes them
 - **Inspect:** click a node, or find it by name, for its links, walks, bubble
   and genes
 - **Haplotypes:** highlight walks as lanes or side by side

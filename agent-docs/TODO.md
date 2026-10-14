@@ -23,12 +23,6 @@ remove a row here when you add or remove an entry.
 | [Switching to a fast layout leaves the force worker running](todo/fast-layout-leaves-force-worker.md)     | layout    | Call cancelLayout() in the fast branch of relayout() in src/layout.ts.                             |
 | [The reference dialog keeps stale state between openings](todo/reference-dialog-state.md)                 | reference | Reset referenceRemember.checked in showReferenceDialog and pass widened to choose().               |
 
-## Needs a call
-
-| Item                                                                   | Area  | First move                                                                                  |
-| ---------------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- |
-| [Read a typed locus 1-based, as JBrowse does](todo/one-based-locus.md) | links | Decide whether loc= and the location box switch to 1-based, and how old links keep working. |
-
 ## Needs a visual call
 
 | Item                                                                      | Area   | First move                                                                                               |

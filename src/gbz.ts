@@ -2,6 +2,7 @@ import { HPRC_GBZ, cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { RemoteFile } from 'generic-filehandle2'
 
 import { readOnce } from './read'
+import { coreRegion, parseRegion } from './region'
 
 import type { GbzSource } from '@jbrowse/bandage-core'
 import type { WalkFiles } from './walkFiles'
@@ -13,7 +14,6 @@ import type { WalkFiles } from './walkFiles'
 // `<prefix>.<sample>.walks.bed.gz` with its `.tbi`, takes the
 // database's place in a cut: `walkFiles.ts` reads it.
 
-export { parseRegion } from '@jbrowse/bandage-core'
 export type { GbzSource } from '@jbrowse/bandage-core'
 
 export const HPRC: Omit<GbzSource, 'region'> = HPRC_GBZ
@@ -65,17 +65,18 @@ export async function cutGbz(
   status: (text: string) => void,
   signal: AbortSignal,
 ) {
+  const cut = { ...src, region: coreRegion(parseRegion(src.region)) }
   if (isWalksUrl(src.db)) {
     status('Opening walk files')
     const files = await openWalks(src.db)
     signal.throwIfAborted()
     status(`Cutting ${src.region}`)
     const { cutWalksRegion } = await import('./walkFiles')
-    return cutWalksRegion(files, src, signal)
+    return cutWalksRegion(files, cut, signal)
   }
   status('Opening pangenome database')
   const gbz = await openDb(src.db, src.index)
   signal.throwIfAborted()
   status(`Cutting ${src.region}`)
-  return cutGbzRegion(gbz, src, signal)
+  return cutGbzRegion(gbz, cut, signal)
 }

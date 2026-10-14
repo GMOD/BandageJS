@@ -2,6 +2,7 @@ import { cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 import { LocalFile } from 'generic-filehandle2'
 
+import { coreRegion, formatRegion, parseRegion } from '../../src/region'
 import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
 
 const DATA = 'test/e2e/data'
@@ -71,4 +72,12 @@ test('a walk file cut names the sequences it holds for one it lacks', async () =
   await expect(
     cutWalksRegion(walks(), { region: 'chr1:0-100' }),
   ).rejects.toThrow(/no sequence chr1 on GRCh38; it holds GRCh38#0#chrM/)
+})
+
+test('a 1-based locus cuts the window it names', async () => {
+  const { region } = await cutWalksRegion(walks(), {
+    region: coreRegion(parseRegion('chrM:8,001-8,300')),
+  })
+  expect(region).toEqual({ refName: 'chrM', start: 8000, end: 8300 })
+  expect(formatRegion(region)).toBe('chrM:8,001-8,300')
 })
