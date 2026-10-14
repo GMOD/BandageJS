@@ -77,7 +77,7 @@ function frameRegion(region: Region) {
   scheduleDraw()
 }
 
-function recut(region: Region) {
+function cutAt(region: Region) {
   const source = state.source!
   void openGbz(
     {
@@ -110,7 +110,7 @@ export function locate(text: string) {
     state.stack.length === 0 &&
     !(window && within(region, window))
   ) {
-    recut(region)
+    cutAt(region)
   } else {
     frameRegion(region)
   }

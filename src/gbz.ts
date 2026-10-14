@@ -25,7 +25,7 @@ const opened = new Map<string, ReturnType<typeof openGbz>>()
 
 // The database at `db`, with its haplotype index where there is one, opened
 // once for every cut and probe
-export function openDb(db: string, index?: string) {
+function openDb(db: string, index?: string) {
   return readOnce(opened, `${db}|${index ?? ''}`, () =>
     openGbz(new RemoteFile(db), index ? new RemoteFile(index) : undefined),
   )

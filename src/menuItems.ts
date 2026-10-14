@@ -18,38 +18,19 @@ import { applySettings, showLayoutDialog } from './layoutDialog'
 import { copyLink } from './linkView'
 import { backboneOf, binding, referenceAssembly } from './reference'
 import { choiceLabel, showReferenceDialog } from './referenceDialog'
-
 import { examples, openExample, recut, reparse } from './sources'
 import { drawnMode, facts, saveSettings, settings, state, tube } from './state'
 import { rebuild, scheduleDraw } from './view'
 import { liftWalks, setFacet, toggleWalk } from './walks'
 
-import type { LayoutEngineKind, LayoutModeValue } from '@jbrowse/bandage-core'
 import type { MenuItem } from './menus'
 import type { Example } from './sources'
-import type { ColorScheme, Graph } from '@jbrowse/bandage-core'
-
-interface Choice<T> {
-  value: T
-  label: string
-}
-
-function radio<T extends string | number>(
-  items: readonly Choice<T>[],
-  current: T,
-  set: (value: T) => void,
-  effect: 'layout' | 'geometry',
-): MenuItem[] {
-  return items.map(i => ({
-    label: i.label,
-    radio: true,
-    checked: i.value === current,
-    onClick: () => {
-      set(i.value)
-      applySettings(effect)
-    },
-  }))
-}
+import type {
+  ColorScheme,
+  Graph,
+  LayoutEngineKind,
+  LayoutModeValue,
+} from '@jbrowse/bandage-core'
 
 function toggle(
   label: string,
@@ -146,17 +127,17 @@ function schemeLabel(value: ColorScheme): string {
 // Schemes that need reference coordinates are left out for a graph without
 function colourItems(): MenuItem[] {
   const referenced = !state.graph || !!state.graph.anchoredBy
-  return radio(
-    COLOR_SCHEMES.filter(s => referenced || !NEEDS_REFERENCE.has(s.value)).map(
-      s => ({
-        value: s.value,
-        label: schemeLabel(s.value),
-      }),
-    ),
-    settings.colorScheme,
-    v => (settings.colorScheme = v),
-    'geometry',
-  )
+  return COLOR_SCHEMES.filter(
+    s => referenced || !NEEDS_REFERENCE.has(s.value),
+  ).map(s => ({
+    label: schemeLabel(s.value),
+    radio: true,
+    checked: s.value === settings.colorScheme,
+    onClick: () => {
+      settings.colorScheme = s.value
+      applySettings('geometry')
+    },
+  }))
 }
 
 const GENELESS_MODES = new Set(['tubemap', 'tubemapref'])

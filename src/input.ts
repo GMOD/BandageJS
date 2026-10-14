@@ -39,7 +39,7 @@ import {
   viewBox,
   viewportMoved,
 } from './view'
-import { liftAlone } from './walks'
+import { liftWalks } from './walks'
 
 const BUTTON_ZOOM = 1.5
 
@@ -304,7 +304,7 @@ ui.facets.addEventListener('click', e => {
     .closest('[data-walk]')
     ?.getAttribute('data-walk')
   if (name) {
-    liftAlone(name)
+    liftWalks([name])
   }
 })
 

@@ -124,7 +124,7 @@ export function updateReferenceQuery() {
   replaceParams(REFERENCE_PARAMS, referenceParams())
 }
 
-export function declarationFromQuery(
+function declarationFromQuery(
   params: URLSearchParams,
 ): Declaration | undefined {
   const assembly = params.get('assembly')
@@ -134,7 +134,7 @@ export function declarationFromQuery(
 
 // `declare` is the assembly a link or example says the graph's reference is on,
 // and `along` the path to draw x along, by default the link's `along` parameter
-export function openGFA(
+function openGFA(
   text: string,
   {
     declare,

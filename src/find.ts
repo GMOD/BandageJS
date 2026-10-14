@@ -58,7 +58,7 @@ const NARROW_PX = 720
 
 // The part of the pane the details leave clear, or while side by side one
 // facet panel, since every panel draws the transform
-export function uncovered() {
+function uncovered() {
   const { width, height } = state
   return grid()
     ? viewBox()

@@ -14,7 +14,7 @@ const PLUGIN = 'GraphGenomeView'
 const MIN_NODE_WINDOW = 1000
 
 // the layout modes a released plugin in the JBrowse portal accepts
-export const JBROWSE_MODES = new Set([
+const JBROWSE_MODES = new Set([
   'auto',
   'samplerows',
   'walkrows',

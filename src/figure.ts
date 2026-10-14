@@ -22,7 +22,7 @@ import {
 // from, and as the SVG that makes: what is on screen, fitted, made again from a
 // script with `npx -p @jbrowse/bandage-core bandage-figure spec.json`.
 
-export function figureSpec() {
+function figureSpec() {
   const { source, graph, region } = state
   if (!source || !graph) {
     return undefined

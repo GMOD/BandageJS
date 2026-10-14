@@ -223,7 +223,7 @@ export function onBindingChange(fn: () => void) {
 
 // The drawn backbone's binding, resolved once per backbone, declaration and
 // hub list, with a promise of it for whoever waits on hubs to load
-export function referenceBinding() {
+function referenceBinding() {
   const backbone = backboneOf(state.graph)
   if (!backbone) {
     return NONE

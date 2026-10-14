@@ -347,7 +347,7 @@ function drawFacetTitles() {
 }
 
 // The window a lane coloured by reference position spans, by name
-export function walkReference(lift: WalkLift | undefined) {
+function walkReference(lift: WalkLift | undefined) {
   const domain = lift?.referenceDomain
   return domain && { ...domain, name: referenceName() }
 }

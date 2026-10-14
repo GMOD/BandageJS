@@ -47,10 +47,6 @@ export function toggleWalk(name: string) {
   )
 }
 
-export function liftAlone(name: string) {
-  liftWalks([name])
-}
-
 export function setWalkColor(name: string, color: Partial<WalkEncoding>) {
   state.walkLayers = state.walkLayers.map(l =>
     l.walk === name ? { ...l, color: { ...l.color, ...color } } : l,
