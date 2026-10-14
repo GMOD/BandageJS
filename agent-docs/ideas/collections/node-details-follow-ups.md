@@ -9,5 +9,5 @@ description: Follow-ups on the node details panel: sequence with Copy FASTA, a r
   and L-line overlaps too; carrying them (or the first kb) would let the panel
   show bases, reverse-complemented for a node drawn −, with Copy FASTA
 - Walk rows and the tube map draw no ring round the selected node
-- A long walk list could filter, and group by sample; a graph cut from gbz
-  counts each W-line fragment as a walk
+- A long walk list could filter, and group by sample; a cut graph counts each
+  W-line fragment as a walk

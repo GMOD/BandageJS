@@ -14,7 +14,7 @@ remove a row here when you add or remove an entry.
 
 ## Ready to take
 
-| Item                                                             | Area      | First move                                                                          |
-| ---------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
-| [Improve the jbrowse integration](todo/jbrowse-graph-display.md) | jbrowse   | Emit one linear view with the lanes track as a LinearGraphDisplay in graphViewLink. |
-| [BandageJS help docs](todo/bandagejs-genes-and-help-docs.md)     | bandagejs | Write docs/layouts.md from the README layout and Haplotypes sections.               |
+| Item                                                             | Area      | First move                                                                                            |
+| ---------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------- |
+| [Improve the jbrowse integration](todo/jbrowse-graph-display.md) | jbrowse   | Teach trackFrom in src/hubConfig.ts the WalkTabixSyntenyAdapter and RgfaTabixAdapter lanes tracks.    |
+| [Layouts doc](todo/layouts-doc.md)                               | bandagejs | Write docs/layouts.md from LAYOUT_MODES in @jbrowse/bandage-core and layoutItems in src/menuItems.ts. |
