@@ -340,11 +340,11 @@ async function drawChosen() {
   ui.referenceGenes.value = current
   const sample = sampleOf(b)
   const bound = binding()
-  // a choice the names already made needs no remembering
+  // a choice already made for every graph of the sample needs no remembering
   ui.referenceRememberRow.hidden =
     !sample ||
     (bound.status === 'bound' &&
-      bound.how === 'named' &&
+      bound.how !== 'declared' &&
       sameChoice(choice, bound))
   ui.referenceRememberText.textContent = `Use it for every graph whose reference is ${sample}`
   ui.referenceContigs.innerHTML = ''
@@ -571,11 +571,15 @@ ui.referenceDialog.addEventListener('close', () => {
     })
   }
   // the assembly already bound, which choosing again would only restate
+  // unless the remember box, shown and ticked, widens it to the sample
   const bound = binding()
+  const widened =
+    !ui.referenceRememberRow.hidden && ui.referenceRemember.checked
   if (
     bound.status === 'bound' &&
     sameChoice(choice, bound) &&
-    !Object.keys(contigs).length
+    !Object.keys(contigs).length &&
+    !widened
   ) {
     if (genesChanged) {
       refresh()

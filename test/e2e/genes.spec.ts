@@ -563,6 +563,50 @@ test('an unknown sample is found by search and remembered', async ({
   await expect(await referenceMenu(page)).toContainText('GCF_000005845.2')
 })
 
+test('an assembly a link names goes to every graph of its sample once ticked', async ({
+  page,
+}) => {
+  const window = KAY12_WINDOW.map(l => l.replace('#chr', '#NC_000913.3'))
+  const dialog = page.locator('#reference-dialog')
+  const showDialog = async () => {
+    await (
+      await referenceMenu(page)
+    )
+      .getByRole('menuitem', { name: /^Reference genome/ })
+      .click()
+    await expect(
+      dialog.getByRole('button', { name: 'Use GCF_000005845.2' }),
+    ).toBeEnabled()
+  }
+
+  await openExampleText(
+    page,
+    'kay12.gfa',
+    window,
+    undefined,
+    '&assembly=GCF_000005845.2',
+  )
+  await waitForDrawing(page, '4 nodes')
+  await expect(genes(page).filter({ hasText: 'ycbF' })).toHaveCount(1)
+  await showDialog()
+  await expect(dialog.locator('#reference-status')).toContainText(
+    'as chosen for this graph',
+  )
+  await expect(dialog.locator('#reference-remember')).toBeVisible()
+  await expect(dialog.locator('#reference-remember')).toBeChecked()
+  await dialog.getByRole('button', { name: 'Use GCF_000005845.2' }).click()
+  await expect(dialog).toBeHidden()
+
+  await openExampleText(page, 'kay12.gfa', window)
+  await waitForDrawing(page, '4 nodes')
+  await expect(genes(page).filter({ hasText: 'ycbF' })).toHaveCount(1)
+  await showDialog()
+  await expect(dialog.locator('#reference-status')).toContainText(
+    'as you chose for Kay12',
+  )
+  await expect(dialog.locator('#reference-remember')).toBeHidden()
+})
+
 test('a common name finds any genome on genomes.jbrowse.org', async ({
   page,
 }) => {
