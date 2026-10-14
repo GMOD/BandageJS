@@ -169,14 +169,10 @@ function genesHtml(node: GraphNode) {
   const genes = genesOn(node, state.genes)
   return genes.length
     ? `<section><h3>Genes</h3><ul>${genes
-        .map(g => {
-          const here = !g.exons
-            ? 'intron here'
-            : g.spliced
-              ? `${g.exons} exon${g.exons > 1 ? 's' : ''} here`
-              : ''
-          return `<li><em>${esc(g.name)}</em>${here ? ` <small>${here}</small>` : ''}</li>`
-        })
+        .map(
+          g =>
+            `<li><em>${esc(g.name)}</em>${g.here ? ` <small>${g.here}</small>` : ''}</li>`,
+        )
         .join('')}</ul></section>`
     : ''
 }

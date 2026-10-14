@@ -74,10 +74,10 @@ test('genesOn names the genes over a backbone node and its exons in them', () =>
     stable: { refName, start, rank },
   })
   expect(genesOn(node(390, 100), [lpa])).toEqual([
-    { name: 'LPA', exons: 2, spliced: true },
+    { name: 'LPA', here: '2 exons here' },
   ])
   expect(genesOn(node(200, 100), [lpa])).toEqual([
-    { name: 'LPA', exons: 0, spliced: true },
+    { name: 'LPA', here: 'intron here' },
   ])
   expect(genesOn(node(900, 100), [lpa])).toEqual([])
   expect(genesOn(node(390, 100, 1), [lpa])).toEqual([])

@@ -44,8 +44,9 @@ export function recentDetail(r: Recent, base: string, now = Date.now()) {
   return `${where}${on.length ? ` on ${on.join(', ')}` : ''} · ${ago(r.at, now)}`
 }
 
-// The genes over a backbone node, each with how many of its exons the node
-// carries, and whether it has more than one exon to count
+// The genes a backbone node overlaps, with `here` set to 'intron here' where
+// the node overlaps none of a gene's exons, else to the count of exons it
+// overlaps in a gene of several
 export function genesOn(node: GraphNode, genes: GeneModel[] = []) {
   const s = node.stable
   if (s?.rank !== 0) {
@@ -56,11 +57,17 @@ export function genesOn(node: GraphNode, genes: GeneModel[] = []) {
     r.start < end && r.end > s.start
   return genes
     .filter(g => g.refName === s.refName && over(g))
-    .map(g => ({
-      name: g.name,
-      exons: g.exons.filter(over).length,
-      spliced: g.exons.length > 1,
-    }))
+    .map(g => {
+      const exons = g.exons.filter(over).length
+      return {
+        name: g.name,
+        here: !exons
+          ? 'intron here'
+          : g.exons.length > 1
+            ? `${exons} exon${exons > 1 ? 's' : ''} here`
+            : '',
+      }
+    })
 }
 
 const MAX_HOVER_GENES = 3
@@ -72,12 +79,7 @@ export function nodeHtml(node: GraphNode, genes?: GeneModel[]) {
   }
   const over = genesOn(node, genes)
   for (const g of over.slice(0, MAX_HOVER_GENES)) {
-    const here = !g.exons
-      ? ': intron here'
-      : g.spliced
-        ? `: ${g.exons} exon${g.exons > 1 ? 's' : ''} here`
-        : ''
-    html += `<br><em>${esc(g.name)}</em>${here}`
+    html += `<br><em>${esc(g.name)}</em>${g.here ? `: ${g.here}` : ''}`
   }
   if (over.length > MAX_HOVER_GENES) {
     html += `<br>+${over.length - MAX_HOVER_GENES} more genes`
