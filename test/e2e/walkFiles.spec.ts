@@ -7,7 +7,7 @@ import {
   waitForDrawing,
 } from './fixtures'
 
-const CHRM = `gbz=${encodeURIComponent(CHRM_WALKS)}&loc=chrM:8,000-8,300&layout=force`
+const CHRM = `walks=${encodeURIComponent(CHRM_WALKS)}&loc=chrM:8,000-8,300&layout=force`
 
 test('a link cuts a window from a gfa-to-tabix walk file', async ({
   page,
@@ -36,7 +36,7 @@ test('a pasted walk file url fills the cut dialog with its reference samples', a
   await page.locator('#url').press('Enter')
   await expect(page.locator('#gbz-dialog')).toBeVisible()
   await expect(page.locator('#gbz-db')).toHaveValue(CHRM_WALKS)
-  await expect(page.locator('#gbz-index')).toHaveValue('')
+  await expect(page.locator('#gbz-index')).toBeHidden()
   await expect(page.locator('#gbz-status')).toContainText(
     'Reference samples: GRCh38',
     { timeout: 20_000 },
@@ -46,4 +46,17 @@ test('a pasted walk file url fills the cut dialog with its reference samples', a
   await page.locator('#gbz-dialog').getByRole('button', { name: 'Cut' }).click()
   await waitForDrawing(page, /2 paths/)
   expect(new URL(page.url()).searchParams.get('haps')).toBe('HG00438')
+})
+
+test('a walk file cut offers no figure spec, since bandage-figure cuts only gbz-base', async ({
+  page,
+}) => {
+  await openPage(page, CHRM)
+  await waitForDrawing(page, /44 paths/)
+  await menuButton(page, 'File').click()
+  const item = page
+    .locator('#menu-popup')
+    .getByRole('menuitem', { name: /^Copy figure spec/ })
+  await expect(item).toBeDisabled()
+  await expect(item).toContainText('not a walk file')
 })

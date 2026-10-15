@@ -66,6 +66,7 @@ export const ui = {
   gbzDialog: el<HTMLDialogElement>('gbz-dialog'),
   gbzDb: el<HTMLInputElement>('gbz-db'),
   gbzIndex: el<HTMLInputElement>('gbz-index'),
+  gbzIndexField: el<HTMLLabelElement>('gbz-index-field'),
   gbzStatus: el<HTMLParagraphElement>('gbz-status'),
   gbzRef: el<HTMLInputElement>('gbz-ref'),
   gbzRefs: el<HTMLDataListElement>('gbz-refs'),

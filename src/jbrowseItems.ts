@@ -53,7 +53,7 @@ export function jbrowseItems(): MenuItem[] {
     {
       label: 'Open this region in JBrowse',
       onClick: () => {
-        openTab(regionLink(t, region, jbrowseSamples(t)))
+        openTab(regionLink(t, region, jbrowseSamples(t), src?.gbz?.db))
       },
     },
     ...(hasGraphView(t.hub) && (lanes || src?.url)

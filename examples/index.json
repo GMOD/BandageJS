@@ -7,7 +7,7 @@
     "region": "chr6:160,525,001-160,655,000"
   },
   {
-    "gbz": "hprc",
+    "walks": "hprc",
     "region": "chr6:160,614,798-160,647,758",
     "haplotypes": [
       "HG00097",
@@ -20,40 +20,23 @@
       "HG01109"
     ],
     "name": "LPA KIV-2, 8 samples",
-    "description": "Cut at base level from the HPRC release 2 gbz-base database by range requests; walk rows read the repeat's copy number as bar length.",
+    "description": "Cut at base level from the HPRC release 2 walk file by range requests; walk rows read the repeat's copy number as bar length.",
     "layout": "walkrows"
   },
   {
-    "gbz": "https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f2.GRCh38.walks.bed.gz",
-    "region": "chr6:160,614,798-160,647,758",
-    "haplotypes": [
-      "HG00097",
-      "HG00128",
-      "HG01123",
-      "HG00099",
-      "HG01960",
-      "HG02055",
-      "HG00133",
-      "HG01109"
-    ],
-    "name": "LPA KIV-2, 8 samples (walk files)",
-    "description": "The same cut read from the HPRC graph's gfa-to-tabix walk files by range requests instead of the gbz-base database.",
-    "layout": "walkrows"
-  },
-  {
-    "gbz": "hprc",
+    "walks": "hprc",
     "region": "chr6:31,980,000-32,050,000",
     "haplotypes": ["HG00097", "HG00133", "HG01123", "HG02055"],
     "name": "C4 duplication, 4 samples",
-    "description": "The complement C4 region cut from the HPRC gbz-base database.",
+    "description": "The complement C4 region cut from the HPRC walk file.",
     "layout": "force"
   },
   {
-    "gbz": "hprc",
+    "walks": "hprc",
     "region": "chr1:103,540,000-103,780,000",
     "haplotypes": ["HG00097", "HG00133", "HG01123", "HG02055"],
     "name": "Amylase locus, 4 samples",
-    "description": "AMY2B through AMY1C cut from the HPRC gbz-base database; walk rows box each haplotype's own genes, one to four AMY1 copies.",
+    "description": "AMY2B through AMY1C cut from the HPRC walk file; walk rows box each haplotype's own genes, one to four AMY1 copies.",
     "layout": "walkrows"
   },
   {

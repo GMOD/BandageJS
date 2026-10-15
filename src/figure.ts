@@ -5,7 +5,7 @@ import {
 } from '@jbrowse/bandage-core'
 
 import { notify } from './feedback'
-import { isHprc } from './gbz'
+import { isHprc, isWalksUrl } from './gbz'
 import { ownGenesName } from './genes'
 import { geneTrackOf } from './hubConfig'
 import { referenceName, referenceWindow } from './reference'
@@ -110,9 +110,11 @@ export function specBlocked() {
     ? 'Open a graph first'
     : state.stack.length
       ? 'A spec names the whole graph, so go back out of this bubble first'
-      : m.drawsNodes
-        ? undefined
-        : `bandage-figure draws no ${m.label} layout`
+      : state.source?.gbz && isWalksUrl(state.source.gbz.db)
+        ? 'bandage-figure cuts from a gbz-base database, not a walk file'
+        : m.drawsNodes
+          ? undefined
+          : `bandage-figure draws no ${m.label} layout`
 }
 
 // why Export SVG can't draw the current layout, if it can't

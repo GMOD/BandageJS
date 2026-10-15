@@ -11,7 +11,7 @@ import {
   progress,
   report,
 } from './feedback'
-import { HPRC, cutGbz } from './gbz'
+import { HPRC_WALKS, cutGbz } from './gbz'
 import { loadGenes, stopGenes } from './genes'
 import { relayout, stopLayout } from './layout'
 import { askView } from './linkView'
@@ -275,7 +275,7 @@ export async function openGbz(
   declare?: Declaration,
   kept: Partial<Kept> = {},
 ) {
-  const { live, signal, work } = beginOpen('Opening pangenome database')
+  const { live, signal, work } = beginOpen('Opening the cut')
   const wholeWalks = cutsWholeWalks()
   try {
     parseRegion(src.region)
@@ -418,7 +418,7 @@ export type Example = {
   layout?: LayoutModeValue
 } & (
   | { file: string; region?: string }
-  | { gbz: string; region: string; haplotypes?: string[] }
+  | { walks: string; region: string; haplotypes?: string[] }
 )
 
 export let examples: Example[] = []
@@ -442,7 +442,7 @@ export function openExample(x: Example) {
   } else {
     void openGbz(
       {
-        ...(x.gbz === 'hprc' ? HPRC : { db: x.gbz }),
+        db: x.walks === 'hprc' ? HPRC_WALKS : x.walks,
         region: x.region,
         haplotypes: x.haplotypes,
       },

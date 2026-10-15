@@ -32,8 +32,8 @@ export interface HubTrack {
   adapterType: string
   assemblyNames: string[]
   genes?: GeneSource
-  // a gbz-base database the track reads
-  gbz?: string
+  // the gbz-base database or walk file a lanes track reads
+  lanes?: string
 }
 
 export interface Hub {
@@ -64,6 +64,13 @@ function locationUrl(loc: unknown, base: string) {
   return isObject(loc)
     ? resolve(loc.uri, resolve(loc.baseUri, base) ?? base)
     : resolve(loc, base)
+}
+
+// WalkTabixSyntenyAdapter's `walksUri` is the walk file's name before
+// `.walks.bed.gz`
+function walksUrl(prefix: unknown, base: string) {
+  const url = resolve(prefix, base)
+  return url && `${url}.walks.bed.gz`
 }
 
 // Gff3TabixAdapter and BedTabixAdapter, with JBrowse's `uri` shorthand, whose
@@ -128,10 +135,12 @@ function trackFrom(t: Json, base: string): HubTrack | undefined {
     adapterType,
     assemblyNames: strings(t.assemblyNames),
     genes: type === 'FeatureTrack' ? geneSource(adapter, base) : undefined,
-    gbz:
+    lanes:
       adapterType === 'GbzBaseSyntenyAdapter'
         ? locationUrl(adapter.uri ?? adapter.gbzDbLocation, base)
-        : undefined,
+        : adapterType === 'WalkTabixSyntenyAdapter'
+          ? walksUrl(adapter.walksUri, base)
+          : undefined,
   }
 }
 

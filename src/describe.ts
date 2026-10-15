@@ -1,6 +1,6 @@
 import { panSNContig } from '@jbrowse/bandage-core'
 
-import { HPRC } from './gbz'
+import { HPRC, HPRC_WALKS } from './gbz'
 import { esc } from './overlays'
 
 import type { Recent } from './recent'
@@ -35,7 +35,7 @@ export function recentDetail(r: Recent, base: string, now = Date.now()) {
       ? 'File on this computer'
       : r.kind === 'url'
         ? host(r.url)
-        : `${r.gbz.db === HPRC.db ? 'HPRC' : host(r.gbz.db)} cut${
+        : `${r.gbz.db === HPRC.db || r.gbz.db === HPRC_WALKS ? 'HPRC' : host(r.gbz.db)} cut${
             r.gbz.haplotypes?.length
               ? `, ${r.gbz.haplotypes.length} haplotypes`
               : ''

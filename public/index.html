@@ -163,10 +163,9 @@
         <section>
           <h3>From a url</h3>
           <p class="hint">
-            A GFA, or a gbz-base <code>.gbz.db</code> or gfa-to-tabix
-            <code>.walks.bed.gz</code> to cut a region from. The server has to
-            allow cross-origin reads. The page's address then links back to the
-            graph.
+            A GFA, or a gfa-to-tabix <code>.walks.bed.gz</code> (or gbz-base
+            <code>.gbz.db</code>) to cut a region from. The server has to allow
+            cross-origin reads. The page's address then links back to the graph.
           </p>
           <div class="inline">
             <input
@@ -182,11 +181,10 @@
           </div>
         </section>
         <section>
-          <h3>From a pangenome database</h3>
+          <h3>From a walk file</h3>
           <p class="hint">
-            Cut a region out of a gbz-base <code>.gbz.db</code> or a
-            gfa-to-tabix walk file set by range requests, such as the HPRC
-            release 2 graph.
+            Cut a region out of a gfa-to-tabix walk file by range requests, such
+            as the HPRC release 2 graph's.
           </p>
           <button id="open-gbz" type="button">Cut a region…</button>
         </section>
@@ -387,20 +385,20 @@
 
     <dialog id="gbz-dialog">
       <form method="dialog">
-        <h2>Open pangenome database</h2>
+        <h2>Cut a region</h2>
         <p class="hint">
-          A <code>.gbz.db</code> from gbz-base, or a
-          <code>&lt;prefix&gt;.&lt;sample&gt;.walks.bed.gz</code> from
+          A <code>&lt;prefix&gt;.&lt;sample&gt;.walks.bed.gz</code> from
           <code>gfa-to-tabix --walks</code> with its <code>.tbi</code> beside
-          it. Either is read by range requests from any server that allows
-          cross-origin reads. The defaults are the HPRC release 2 graph.
+          it, or a gbz-base <code>.gbz.db</code>. BandageJS reads either by
+          range requests from any server that allows cross-origin reads. The
+          defaults are the HPRC release 2 graph.
         </p>
-        <label
-          >Database or walk file <input id="gbz-db" type="url" required
-        /></label>
-        <label>
-          Haplotype index (optional for a <code>.gbz.db</code>; names each
-          walk's sample)
+        <label>Walk file <input id="gbz-db" type="url" required /></label>
+        <label id="gbz-index-field" hidden>
+          <span
+            >Haplotype index (optional; names each walk's sample in a
+            <code>.gbz.db</code>)</span
+          >
           <input id="gbz-index" type="url" />
         </label>
         <p class="hint" id="gbz-status"></p>

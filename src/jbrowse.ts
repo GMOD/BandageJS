@@ -44,19 +44,21 @@ function lanesOf(samples: string[]) {
   return samples.flatMap(s => (s.includes('#') ? [s] : [`${s}#1`, `${s}#2`]))
 }
 
-// the hub's gbz-base haplotype lanes on the assembly: a SyntenyTrack in older
-// hubs, else the GraphTrack that carries both the lanes and the graph
-function lanesTrack(t: Target) {
-  return [
+// the hub's haplotype lanes on the assembly, those reading `db` where the hub
+// has them: a SyntenyTrack in older hubs, else the GraphTrack that carries
+// both the lanes and the graph
+function lanesTrack(t: Target, db?: string) {
+  const lanes = [
     ...tracksOn(t.hub, t.assembly, 'SyntenyTrack'),
     ...tracksOn(t.hub, t.assembly, 'GraphTrack'),
-  ].find(x => x.gbz)
+  ].filter(x => x.lanes)
+  return lanes.find(x => x.lanes === db) ?? lanes[0]
 }
 
 // the hub's graph track on the assembly, by id alone, so it opens in whatever
 // display the hub gives it
 function graphTrack(t: Target) {
-  return tracksOn(t.hub, t.assembly, 'GraphTrack').find(x => !x.gbz)
+  return tracksOn(t.hub, t.assembly, 'GraphTrack').find(x => !x.lanes)
 }
 
 export function hasGraphView(hub: Hub) {
@@ -72,8 +74,13 @@ export function laneSamples(t: Target, samples: string[]) {
 
 // The region as a linear view: genes, the hub's graph track, and one lane per
 // haplotype asked for, where the hub has them.
-export function regionLink(t: Target, region: Region, samples: string[]) {
-  const lanes = lanesTrack(t)
+export function regionLink(
+  t: Target,
+  region: Region,
+  samples: string[],
+  db?: string,
+) {
+  const lanes = lanesTrack(t, db)
   const graph = graphTrack(t)
   return specUrl(t, {
     views: [
@@ -99,10 +106,10 @@ export function regionLink(t: Target, region: Region, samples: string[]) {
   })
 }
 
-// The hub's lanes track reading the gbz-base database a cut came from
+// The hub's lanes track reading the database or walk file a cut came from
 export function cutTrack(t: Target, db: string) {
-  const lanes = lanesTrack(t)
-  return lanes?.gbz === db && hasGraphView(t.hub) ? lanes : undefined
+  const lanes = lanesTrack(t, db)
+  return lanes?.lanes === db && hasGraphView(t.hub) ? lanes : undefined
 }
 
 // The same gbz-base cut in the plugin's GraphGenomeView, paired with a linear

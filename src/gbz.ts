@@ -21,6 +21,9 @@ export const HPRC: Omit<GbzSource, 'region'> = HPRC_GBZ
 export const isHprc = (src: { db: string; index?: string }) =>
   src.db === HPRC.db && src.index === HPRC.index
 
+export const HPRC_WALKS =
+  'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f2.GRCh38.walks.bed.gz'
+
 const opened = new Map<string, ReturnType<typeof openGbz>>()
 
 // The database at `db`, with its haplotype index where there is one, opened

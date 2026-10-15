@@ -117,6 +117,7 @@ test('a pasted gbz-base url fills the cut dialog, which probes the database', as
   const dialog = page.locator('#gbz-dialog')
   await expect(dialog).toBeVisible()
   await expect(page.locator('#gbz-db')).toHaveValue(MICB_DB)
+  await expect(page.locator('#gbz-index')).toBeVisible()
   await expect(page.locator('#gbz-index')).toHaveValue(
     MICB_DB.replace(/\.gbz\.db$/, '.haplotype-index.db'),
   )
@@ -139,7 +140,7 @@ test('a pasted gbz-base url fills the cut dialog, which probes the database', as
   await dialog.getByRole('button', { name: 'Cut' }).click()
   await waitForDrawing(page, /91 paths/)
   const params = new URL(page.url()).searchParams
-  expect(params.get('gbz')).toBe(MICB_DB)
+  expect(params.get('walks')).toBe(MICB_DB)
   expect(params.has('index')).toBe(false)
   expect(params.get('ref')).toBe('GRCh38')
   expect(params.get('loc')).toBe('chr6:31,500,000-31,501,000')

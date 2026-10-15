@@ -353,8 +353,8 @@ export function examplesItems(): MenuItem[] {
     },
   })
   return [
-    { header: 'Live from the HPRC database, a few seconds each' },
-    ...examples.filter(x => 'gbz' in x).map(item),
+    { header: 'Cut live from the HPRC walk file, a few seconds each' },
+    ...examples.filter(x => 'walks' in x).map(item),
     { header: 'Bundled GFA files' },
     ...examples.filter(x => 'file' in x).map(item),
   ]

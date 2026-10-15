@@ -76,6 +76,26 @@ test('a hub naming the database by gbzDbLocation still has its lanes', () => {
   expect(cutTrack(t, DB)?.trackId).toBe('lanes')
 })
 
+test('a walk file cut takes the lanes reading that walk file', () => {
+  const walks = 'https://s3/x.GRCh38.walks.bed.gz'
+  const t = target([
+    { type: 'GraphTrack', trackId: 'gbz', assemblyNames: ['hg38'], adapter },
+    {
+      type: 'GraphTrack',
+      trackId: 'walks',
+      assemblyNames: ['hg38'],
+      adapter: {
+        type: 'WalkTabixSyntenyAdapter',
+        walksUri: 'https://s3/x.GRCh38',
+      },
+    },
+  ])
+  expect(cutTrack(t, walks)?.trackId).toBe('walks')
+  expect(cutTrack(t, DB)?.trackId).toBe('gbz')
+  expect(cutTrack(t, 'https://s3/other.walks.bed.gz')).toBeUndefined()
+  expect(lanesIn(regionLink(t, region, ['HG00097'], walks))).toBe('walks')
+})
+
 test('the region link keeps the lanes asked for as rows.kept', () => {
   const t = target([
     { type: 'GraphTrack', trackId: 'lanes', assemblyNames: ['hg38'], adapter },

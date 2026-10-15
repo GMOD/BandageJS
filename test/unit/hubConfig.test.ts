@@ -122,7 +122,7 @@ test('hubFrom reads assemblies, gene sources and gbz tracks', () => {
     index: 'https://example.org/hubs/demo/hs1.gff.gz.csi',
     indexType: 'CSI',
   })
-  expect(byId.get('lanes')!.gbz).toBe('https://s3/x.gbz.db')
+  expect(byId.get('lanes')!.lanes).toBe('https://s3/x.gbz.db')
 })
 
 test('hubFrom takes a single-assembly config and refuses one with none', () => {

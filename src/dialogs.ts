@@ -2,7 +2,7 @@ import { haplotypeIndexBeside } from '@jbrowse/bandage-core/gbzCut'
 
 import { recentDetail } from './describe'
 import { fail } from './feedback'
-import { HPRC, isWalksUrl, referenceSamplesAt } from './gbz'
+import { HPRC_WALKS, isWalksUrl, referenceSamplesAt } from './gbz'
 import { esc } from './overlays'
 import { gbzFromQuery } from './query'
 import { forget, pickFile, readHandle, recentList } from './recent'
@@ -128,12 +128,12 @@ const SAMPLE_HAPLOTYPES =
   'HG00097,HG00128,HG01123,HG00099,HG01960,HG02055,HG00133,HG01109'
 
 // The dialog filled in with `preset`, else the cut on screen or in the
-// address, else the HPRC sample
+// address, else the HPRC walk file sample
 function showGbzDialog(preset?: Partial<GbzSource>) {
   const src: Partial<GbzSource> = preset ??
     state.source?.gbz ??
     gbzFromQuery(new URLSearchParams(location.search)) ?? {
-      ...HPRC,
+      db: HPRC_WALKS,
       region: SAMPLE_REGION,
       haplotypes: SAMPLE_HAPLOTYPES.split(','),
     }
@@ -142,6 +142,7 @@ function showGbzDialog(preset?: Partial<GbzSource>) {
   ui.gbzRef.value = src.referenceSample ?? ''
   ui.gbzRegion.value = src.region ?? ''
   ui.gbzHaplotypes.value = src.haplotypes?.join(',') ?? ''
+  showIndexField()
   checkRegion()
   ui.gbzStatus.textContent = ''
   ui.gbzRefs.replaceChildren()
@@ -205,7 +206,17 @@ async function probe() {
   ui.gbzStatus.textContent = `${note}Reference samples: ${samples.join(', ') || 'none'}`
 }
 
+// Only a gbz-base database takes a haplotype index; walk files name their
+// samples
+function showIndexField() {
+  ui.gbzIndexField.hidden = !GBZ_DB.test(ui.gbzDb.value.trim())
+  if (ui.gbzIndexField.hidden) {
+    ui.gbzIndex.value = ''
+  }
+}
+
 ui.gbzRegion.addEventListener('input', checkRegion)
+ui.gbzDb.addEventListener('input', showIndexField)
 ui.gbzDb.addEventListener('change', () => void probe())
 ui.gbzIndex.addEventListener('change', () => void probe())
 ui.gbzRef.addEventListener('focus', () => void probe())

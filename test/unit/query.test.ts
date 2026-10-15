@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { HPRC } from '../../src/gbz'
+import { HPRC, HPRC_WALKS } from '../../src/gbz'
 import { gbzFromQuery, gbzQuery } from '../../src/query'
 
 import type { GbzSource } from '../../src/gbz'
@@ -31,7 +31,7 @@ test('another database keeps its index, reference and haplotypes', () => {
     haplotypes: ['HG002', 'HG00097'],
   }
   expect(gbzQuery(src)).toEqual({
-    gbz: src.db,
+    walks: src.db,
     index: src.index,
     loc: src.region,
     ref: 'CHM13',
@@ -42,7 +42,7 @@ test('another database keeps its index, reference and haplotypes', () => {
 
 test("the HPRC database without the preset's index keeps its url", () => {
   const src = { db: HPRC.db, region: 'chr1:100-200' }
-  expect(gbzQuery(src).gbz).toBe(HPRC.db)
+  expect(gbzQuery(src).walks).toBe(HPRC.db)
   expect(roundTrip(src)).toEqual({
     ...src,
     index: undefined,
@@ -51,7 +51,26 @@ test("the HPRC database without the preset's index keeps its url", () => {
   })
 })
 
-test('a query without both gbz and loc names no cut', () => {
+test('the HPRC walk file goes into the query as walks=hprc', () => {
+  const src = { db: HPRC_WALKS, region: 'chr1:100-200' }
+  expect(gbzQuery(src)).toEqual({ walks: 'hprc', loc: src.region })
+  expect(roundTrip(src)).toEqual({
+    ...src,
+    index: undefined,
+    referenceSample: undefined,
+    haplotypes: undefined,
+  })
+})
+
+test('an older gbz= link still names its database', () => {
+  const db = 'https://example.org/graph.gbz.db'
+  expect(
+    gbzFromQuery(new URLSearchParams({ gbz: db, loc: 'chr1:100-200' }))?.db,
+  ).toBe(db)
+})
+
+test('a query without both a source and loc names no cut', () => {
+  expect(gbzFromQuery(new URLSearchParams('walks=hprc'))).toBeUndefined()
   expect(gbzFromQuery(new URLSearchParams('gbz=hprc'))).toBeUndefined()
   expect(gbzFromQuery(new URLSearchParams('loc=chr1:1-2'))).toBeUndefined()
 })
