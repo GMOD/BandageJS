@@ -8,6 +8,7 @@
     "build": "node build.mjs",
     "dev": "node build.mjs --serve",
     "shoot": "node scripts/shoot-readme.mjs",
+    "shoot:tutorial": "node scripts/shoot-tutorial.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

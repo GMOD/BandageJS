@@ -53,6 +53,9 @@ including the plugin's 46-sample `micb-kir3dl1.gbz.db` at `https://gbz.test/`.
   `pnpm shoot cfh_facet` reshoots one. `CHROME=<path>` picks the browser
 - `scripts/shoot-readme.mjs` holds each figure's address, window size and
   settings. The HPRC figures cut live over the network
+- `pnpm shoot:tutorial` reshoots `img/tutorial/` for the
+  [walk file tutorial](walk-files-tutorial.md) by driving the Open and cut
+  dialogs
 - `img/jbrowse_kiv2.png` and `img/jbrowse_kiv2_facet.png` are screenshots of the
   JBrowse plugin, copied from its `img/`. This script does not shoot them
 

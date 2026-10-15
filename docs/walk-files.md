@@ -17,4 +17,6 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 - Example, the hosted HPRC release 2 file:
   `?gbz=https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f2.GRCh38.walks.bed.gz&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`
 
+[The tutorial](walk-files-tutorial.md) walks through a cut with screenshots.
+
 [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) reads the files.

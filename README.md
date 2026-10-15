@@ -42,6 +42,8 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - [Genes](docs/genes.md): gene tracks, assemblies and site setup
 - [Links](docs/links.md): every address parameter
 - [Walk files](docs/walk-files.md): cutting regions from your own haplotypes
+- [Walk file tutorial](docs/walk-files-tutorial.md): gfa-to-tabix to a cut, step
+  by step
 - [Figures](docs/figures.md): SVG export and figure specs
 - [Gallery](docs/gallery.md): example figures
 - [Developing](docs/developing.md): build, test, figures and deploy
