@@ -1,6 +1,6 @@
 # Walk file tutorial
 
-- **In:** a pangenome graph as GFA (or `.gbz`), indexed by
+- **In:** a pangenome graph as GFA, indexed by
   [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) `--walks`
 - **Out:** one region of the graph in the browser, with each haplotype's walk
   through it
@@ -11,12 +11,13 @@ walk file. [Walk files](walk-files.md) is the short reference.
 ## 1. Index the graph
 
 ```console
-vg convert -f graph.gbz > graph.gfa
 gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 ```
 
 - The run writes `graph.GRCh38.walks.bed.gz` and `graph.GRCh38.walks.bed.gz.tbi`
 - BandageJS needs walk format 2, from gfa-to-tabix 1.0 or later
+- A graph shipped as `.gbz` converts first:
+  `vg convert -f graph.gbz > graph.gfa`
 
 ## 2. Host both files
 
@@ -39,12 +40,11 @@ Paste the `.walks.bed.gz` url under **From a url** and press **Open**:
 ## 4. Choose the region and haplotypes
 
 BandageJS recognises the `.walks.bed.gz` name and opens the cut dialog. Once it
-reads the file's header, the dialog lists the reference samples under the
-haplotype index field.
+reads the file's header, the dialog lists the reference samples under the walk
+file field.
 
 ![The cut dialog filled in for chr6:160,614,798-160,647,758 and four HPRC samples](../img/tutorial/cut_dialog.png)
 
-- **Haplotype index:** leave empty; walk files name their samples
 - **Reference sample:** leave empty to use the file's first, here GRCh38
 - **Region:** 1-based and closed, on the reference, as JBrowse writes it
 - **Haplotypes:** sample names, comma separated; empty keeps every one
@@ -79,8 +79,10 @@ length:
 The address holds the whole cut, so File → **Copy link** shares it:
 
 ```
-?gbz=https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f2.GRCh38.walks.bed.gz&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133,HG01123,HG02055&layout=walkrows
+?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133,HG01123,HG02055&layout=walkrows
 ```
+
+`hprc` stands for the HPRC walk file; a link to your own file holds its url.
 
 [Links](links.md) lists every parameter.
 

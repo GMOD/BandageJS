@@ -3,7 +3,7 @@
 Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 - **Built for:** pangenomes. Haplotype walks, bubbles, genes and regions cut
-  from a GBZ are first-class
+  from a walk file are first-class
 - **Also opens:** de novo assembly graphs, as
   [Bandage](https://github.com/rrwick/Bandage) does
 
@@ -18,8 +18,8 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - **Open:** File → Open, paste a url, drop a GFA on the page, or use
   `?gfa=<url>`
 - **Cut a region:**
-  `?gbz=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`. Paste a
-  `.gbz.db` or [walk file](docs/walk-files.md) url to cut your own
+  `?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`. Paste a
+  [walk file](docs/walk-files.md) url (or a gbz-base `.gbz.db`) to cut your own
 - **Go to:** type a region, position or gene name in the location box (`g`);
   regions read 1-based, as JBrowse writes them
 - **Inspect:** click a node, or find it by name, for its links, walks, bubble

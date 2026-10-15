@@ -175,7 +175,7 @@ async function probe() {
     ui.gbzStatus.textContent = ''
     return
   }
-  ui.gbzStatus.textContent = 'Opening the database…'
+  ui.gbzStatus.textContent = 'Opening the file…'
   let note = ''
   let samples: string[] | undefined
   try {

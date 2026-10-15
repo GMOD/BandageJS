@@ -80,5 +80,5 @@ pnpm's own command.
 ## Examples
 
 `examples/index.json` lists the Examples menu. A `file` entry is a GFA in
-`examples/`. A `gbz: "hprc"` entry is cut live from the HPRC release 2 `.gbz.db`
-on S3.
+`examples/`. A `walks: "hprc"` entry is cut live from the HPRC release 2 walk
+file.
