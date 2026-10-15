@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 //
 // Reshoots the README and gallery figures in img/ from a fresh build, cutting
-// the HPRC figures live from the hosted gbz-base database and haplotype index.
+// the HPRC figures live from the hosted HPRC walk file. The figures that key
+// walks cut from gbz-base: a walk file cut's graph has no reference path, so
+// its walk keys lose their length change and the reference its charcoal.
 //
 // Usage:
 //   node scripts/shoot-readme.mjs              # every figure, into img/
@@ -47,7 +49,7 @@ const FIGURES = {
   },
   amy1_rows: {
     query: [
-      'gbz=hprc',
+      'walks=hprc',
       'loc=chr1:103,540,000-103,780,000',
       'haps=HG00097,HG00133,HG01123,HG02055',
       'layout=walkrows',
@@ -56,7 +58,7 @@ const FIGURES = {
   },
   kiv2_strip: {
     query: [
-      'gbz=hprc',
+      'walks=hprc',
       'loc=chr6:160,614,798-160,647,758',
       'haps=HG00097,HG00128,HG01123,HG00099,HG01960,HG02055,HG00133,HG01109',
       'layout=force',
@@ -67,7 +69,7 @@ const FIGURES = {
   },
   cfh_force: {
     query: [
-      'gbz=hprc',
+      'walks=hprc',
       'loc=chr1:196,640,000-196,900,000',
       'haps=HG00097,HG02055,HG01123',
       'layout=force',
