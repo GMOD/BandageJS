@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 //
 // Reshoots the README and gallery figures in img/ from a fresh build, cutting
-// the HPRC figures live from the hosted HPRC walk file. The figures that key
-// walks cut from gbz-base: a walk file cut's graph has no reference path, so
-// its walk keys lose their length change and the reference its charcoal.
+// the HPRC figures live from the hosted HPRC walk file.
 //
 // Usage:
 //   node scripts/shoot-readme.mjs              # every figure, into img/
@@ -24,7 +22,7 @@ const FIGURES = {
   },
   kiv2_facet: {
     query: [
-      'gbz=hprc',
+      'walks=hprc',
       'loc=chr6:160,614,798-160,647,758',
       'haps=HG00097,HG00133',
       'walk=GRCh38%230%23chr6',
@@ -37,7 +35,7 @@ const FIGURES = {
   },
   kiv2_overlay: {
     query: [
-      'gbz=hprc',
+      'walks=hprc',
       'loc=chr6:160,614,798-160,647,758',
       'haps=HG00097,HG00133',
       'walk=GRCh38%230%23chr6',
@@ -78,7 +76,7 @@ const FIGURES = {
   },
   cfh_facet: {
     query: [
-      'gbz=hprc',
+      'walks=hprc',
       'loc=chr1:196,640,000-196,900,000',
       'haps=HG00097,HG02055',
       'walk=GRCh38%230%23chr1',

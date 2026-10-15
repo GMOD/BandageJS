@@ -23,7 +23,7 @@ HG00133 has 116 kb more:
 The address stores the walks and the facet:
 
 ```
-?gbz=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133&walk=GRCh38%230%23chr6&walk=HG00133%231%23CM090050.1&facet=walk&columns=2
+?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133&walk=GRCh38%230%23chr6&walk=HG00133%231%23CM090050.1&facet=walk&columns=2
 ```
 
 See [links.md](links.md).
