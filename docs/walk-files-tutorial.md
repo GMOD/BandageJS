@@ -15,7 +15,7 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 ```
 
 - The run writes `graph.GRCh38.walks.bed.gz` and `graph.GRCh38.walks.bed.gz.tbi`
-- BandageJS needs walk format 2, from gfa-to-tabix 1.0 or later
+- BandageJS needs walk format 3, from gfa-to-tabix 1.1 or later
 - A graph shipped as `.gbz` converts first:
   `vg convert -f graph.gbz > graph.gfa`
 

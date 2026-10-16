@@ -277,7 +277,7 @@ const LEAVES_AND_RETURNS = [
   'W alt 1 chr 30 50 >s4>s5',
 ].map(l => l.replaceAll(' ', '\t'))
 
-test("a lifted walk's key says how much of it lies outside the cut", async ({
+test("a lifted walk's key says how much of it lies outside the extracted subgraph", async ({
   page,
 }) => {
   await page.route('**/examples/leaves.gfa', route =>
@@ -289,7 +289,7 @@ test("a lifted walk's key says how much of it lies outside the cut", async ({
   )
   await waitForDrawing(page, /nodes/)
   await expect(page.locator('#legends .walk-key')).toContainText(
-    '10 bp outside the cut',
+    '10 bp outside the extracted subgraph',
   )
 })
 

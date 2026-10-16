@@ -13,11 +13,11 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 
 - Host `graph.GRCh38.walks.bed.gz` with its `.tbi`, then paste the url into Open
   or give it as `walks=`
-- Files need walk format 2 (gfa-to-tabix 1.0 or later)
+- Files need walk format 3 (gfa-to-tabix 1.1 or later)
 - Regions are 1-based, on the file's reference (`chr6:160,614,798-160,647,758`),
   so `ref=` is optional
 - `walks=hprc` names the hosted HPRC release 2 file,
-  `https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f2.GRCh38.walks.bed.gz`:
+  `https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f3.GRCh38.walks.bed.gz`:
   `?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`
 
 [The tutorial](walk-files-tutorial.md) walks through a cut with screenshots.
