@@ -41,7 +41,9 @@ the graph, and ticks mark where the other walks pass it:
 
 The amylase locus in four HPRC samples as walk rows, boxed with CAT genes. The
 boxes count AMY1 copies: one at 146 kb, two at 168 kb, three at 240 kb (as in
-GRCh38) and four at 318 kb. Charcoal marks a stretch off GRCh38's path:
+GRCh38) and four at 318 kb. Charcoal marks a stretch off GRCh38's path, a thin
+line a gap whose bases the graph lacks (19 kb in HG00097#1), and "partial walk"
+a walk that runs out of the cut:
 
 ![The amylase locus in four HPRC samples, as walk rows with their genes](../img/amy1_rows.png)
 
