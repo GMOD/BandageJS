@@ -1,11 +1,8 @@
 import { TabixIndexedFile } from '@gmod/tabix'
 import { parseRegion } from '@jbrowse/bandage-core'
-import {
-  GBZ_CUT_DEFAULTS,
-  NodeLimitError,
-} from '@jbrowse/bandage-core/gbzWindow'
+import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
 import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
-import { WALK_BUDGETS, WalkReader, walksKept } from '@jbrowse/graph-walks'
+import { WALK_BUDGETS, WalkReader } from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
 import type { GenericFilehandle } from 'generic-filehandle2'
@@ -51,30 +48,13 @@ export async function cutWalksRegion(
   signal?: AbortSignal,
 ) {
   const region = parseRegion(src.region)
-  const header = await walks.header({ signal })
-  const sample = src.referenceSample ?? header.references[0] ?? ''
-  const anchor = await walks.sequenceFor(sample, region.refName, { signal })
-  if (anchor === undefined) {
-    const names = await walks.referenceSequences({ signal })
-    throw new Error(
-      `The walk file has no sequence ${region.refName} on ${sample}; it holds ${names.slice(0, 5).join(', ')}${names.length > 5 ? ', …' : ''}`,
-    )
-  }
-  const { graph, kept, fragments } = await walks.cut(anchor, region, {
+  const { tables, sample } = await walks.cutRegion(region, {
     signal,
+    haplotypes: src.haplotypes,
+    referenceSample: src.referenceSample,
     context: src.context ?? GBZ_CUT_DEFAULTS.context,
-    keep: walksKept(src.haplotypes, anchor),
     byteBudget: WALK_BUDGETS.byteBudget,
+    nodeLimit: GBZ_CUT_DEFAULTS.limit,
   })
-  const { limit } = GBZ_CUT_DEFAULTS
-  if (kept.size > limit) {
-    const windowBp = region.end - region.start
-    throw new NodeLimitError(
-      limit,
-      windowBp,
-      Math.max(1, Math.floor((windowBp * limit) / kept.size)),
-    )
-  }
-  const text = graphTablesGFA(graph.tables(kept, fragments))
-  return { text, region, sample }
+  return { text: graphTablesGFA(tables), region, sample }
 }
