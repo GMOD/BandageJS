@@ -2,7 +2,8 @@ import { cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 import { LocalFile } from 'generic-filehandle2'
 
-import { coreRegion, formatRegion, parseRegion } from '../../src/region'
+import { formatLocus } from '@jbrowse/bandage-core'
+import { coreRegion, parseRegion } from '../../src/region'
 import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
 
 const DATA = 'test/e2e/data'
@@ -79,5 +80,5 @@ test('a 1-based locus cuts the window it names', async () => {
     region: coreRegion(parseRegion('chrM:8,001-8,300')),
   })
   expect(region).toEqual({ refName: 'chrM', start: 8000, end: 8300 })
-  expect(formatRegion(region)).toBe('chrM:8,001-8,300')
+  expect(formatLocus(region)).toBe('chrM:8,001-8,300')
 })

@@ -1,4 +1,4 @@
-import { panSNContig } from '@jbrowse/bandage-core'
+import { formatLocus, panSNContig, parseLocus } from '@jbrowse/bandage-core'
 import {
   backboneNodes,
   overlapsWindow,
@@ -7,13 +7,7 @@ import {
 import { notify } from './feedback'
 import { frameNodes } from './find'
 import { backboneOf } from './reference'
-import {
-  formatRegion,
-  namesContig,
-  parseLocation,
-  shifted,
-  within,
-} from './region'
+import { namesContig, shifted, within } from './region'
 import { openGbz } from './sources'
 import { state } from './state'
 import { ui } from './ui'
@@ -47,7 +41,7 @@ function geneRegion(name: string): Region | undefined {
 
 function coverage() {
   return (backboneOf(state.graph)?.contigs ?? [])
-    .map(c => formatRegion({ refName: c.refName, start: c.start, end: c.end }))
+    .map(c => formatLocus({ refName: c.refName, start: c.start, end: c.end }))
     .join(', ')
 }
 
@@ -63,13 +57,13 @@ function frameRegion(region: Region) {
   )
   if (nodes.length === 0) {
     notify(
-      `Nothing in the graph at ${formatRegion(region)}; it covers ${coverage()}`,
+      `Nothing in the graph at ${formatLocus(region)}; it covers ${coverage()}`,
       false,
     )
     return
   }
   if (!frameNodes(nodes.map(n => n.id))) {
-    notify(`${formatRegion(region)} isn't drawn in this layout`, false)
+    notify(`${formatLocus(region)} isn't drawn in this layout`, false)
     return
   }
   state.selectedNode = nodes.length === 1 ? nodes[0]!.id : null
@@ -82,7 +76,7 @@ function cutAt(region: Region) {
   void openGbz(
     {
       ...source.gbz!,
-      region: formatRegion({ ...region, refName: panSNContig(region.refName) }),
+      region: formatLocus({ ...region, refName: panSNContig(region.refName) }),
     },
     undefined,
     true,
@@ -97,7 +91,7 @@ function cutAt(region: Region) {
 
 export function locate(text: string) {
   const typed = text.trim()
-  const region = parseLocation(typed) ?? geneRegion(typed)
+  const region = parseLocus(typed) ?? geneRegion(typed)
   if (!region) {
     notify(
       `${typed} is not a region like chr6:160,614,798-160,647,758, nor a gene shown`,
@@ -124,9 +118,9 @@ export function focusLocate() {
 }
 
 function step(fraction: number) {
-  const from = parseLocation(ui.locate.value) ?? shownRegion()
+  const from = parseLocus(ui.locate.value) ?? shownRegion()
   if (from) {
-    ui.locate.value = formatRegion(shifted(from, fraction))
+    ui.locate.value = formatLocus(shifted(from, fraction))
     locate(ui.locate.value)
   }
 }
@@ -157,7 +151,7 @@ onDraw(() => {
   ui.locateForm.hidden = !region
   if (state.graph !== shownGraph) {
     shownGraph = state.graph
-    ui.locate.value = state.region ? formatRegion(state.region) : ''
-    ui.locate.placeholder = region ? formatRegion(region) : ''
+    ui.locate.value = state.region ? formatLocus(state.region) : ''
+    ui.locate.placeholder = region ? formatLocus(region) : ''
   }
 })

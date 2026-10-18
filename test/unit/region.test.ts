@@ -1,24 +1,26 @@
-import { parseRegion as coreParseRegion } from '@jbrowse/bandage-core'
+import {
+  formatLocus,
+  parseRegion as coreParseRegion,
+  parseLocus,
+} from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
 import { gbzFromQuery } from '../../src/query'
 import {
   coreRegion,
-  formatRegion,
   namesContig,
-  parseLocation,
   parseRegion,
   shifted,
   within,
 } from '../../src/region'
 
 test('a region reads 1-based and closed, with commas or two dots', () => {
-  expect(parseLocation('chr6:160,614,798-160,647,758')).toEqual({
+  expect(parseLocus('chr6:160,614,798-160,647,758')).toEqual({
     refName: 'chr6',
     start: 160_614_797,
     end: 160_647_758,
   })
-  expect(parseLocation(' GRCh38#0#chr6:101..200 ')).toEqual({
+  expect(parseLocus(' GRCh38#0#chr6:101..200 ')).toEqual({
     refName: 'GRCh38#0#chr6',
     start: 100,
     end: 200,
@@ -26,13 +28,13 @@ test('a region reads 1-based and closed, with commas or two dots', () => {
 })
 
 test('one position is the single base it names', () => {
-  expect(parseLocation('chr6:160,614,798')).toEqual({
+  expect(parseLocus('chr6:160,614,798')).toEqual({
     refName: 'chr6',
     start: 160_614_797,
     end: 160_614_798,
   })
-  expect(parseLocation('chr6:1')).toEqual({ refName: 'chr6', start: 0, end: 1 })
-  expect(parseLocation('chr6:5-5')).toEqual({
+  expect(parseLocus('chr6:1')).toEqual({ refName: 'chr6', start: 0, end: 1 })
+  expect(parseLocus('chr6:5-5')).toEqual({
     refName: 'chr6',
     start: 4,
     end: 5,
@@ -40,15 +42,15 @@ test('one position is the single base it names', () => {
 })
 
 test('a region with its end first, base 0 or no contig, is not one', () => {
-  expect(parseLocation('chr6:200-100')).toBeUndefined()
-  expect(parseLocation('chr6:0-100')).toBeUndefined()
-  expect(parseLocation('chr6:0')).toBeUndefined()
-  expect(parseLocation('LPA')).toBeUndefined()
-  expect(parseLocation(':1-2')).toBeUndefined()
-  expect(parseLocation('')).toBeUndefined()
+  expect(parseLocus('chr6:200-100')).toBeUndefined()
+  expect(parseLocus('chr6:0-100')).toBeUndefined()
+  expect(parseLocus('chr6:0')).toBeUndefined()
+  expect(parseLocus('LPA')).toBeUndefined()
+  expect(parseLocus(':1-2')).toBeUndefined()
+  expect(parseLocus('')).toBeUndefined()
 })
 
-test('parseRegion throws on what parseLocation refuses', () => {
+test('parseRegion throws on what parseLocus refuses', () => {
   expect(parseRegion('  chr1:101-200\n')).toEqual({
     refName: 'chr1',
     start: 100,
@@ -60,20 +62,20 @@ test('parseRegion throws on what parseLocation refuses', () => {
 
 test('a region formats 1-based with grouped digits', () => {
   expect(
-    formatRegion({ refName: 'chr6', start: 160614797, end: 160647758 }),
+    formatLocus({ refName: 'chr6', start: 160614797, end: 160647758 }),
   ).toBe('chr6:160,614,798-160,647,758')
-  expect(formatRegion({ refName: 'chr', start: 0, end: 999 })).toBe('chr:1-999')
+  expect(formatLocus({ refName: 'chr', start: 0, end: 999 })).toBe('chr:1-999')
 })
 
 test('formatting and parsing round-trip', () => {
   for (const text of ['chr6:160,614,798-160,647,758', 'chr1:1-1', 'chrM:8-9']) {
-    expect(formatRegion(parseRegion(text))).toBe(text)
+    expect(formatLocus(parseRegion(text))).toBe(text)
   }
   for (const r of [
     { refName: 'chr', start: 0, end: 1 },
     { refName: 'GRCh38#0#chr6', start: 999, end: 2000 },
   ]) {
-    expect(parseRegion(formatRegion(r))).toEqual(r)
+    expect(parseRegion(formatLocus(r))).toEqual(r)
   }
 })
 
@@ -84,7 +86,7 @@ test("a loc= link reaches bandage-core's cut as the window it names", () => {
   const region = parseRegion(src.region)
   expect(coreRegion(region)).toBe('chr6:160614797-160647758')
   expect(coreParseRegion(coreRegion(region))).toEqual(region)
-  expect(formatRegion(coreParseRegion(coreRegion(region)))).toBe(src.region)
+  expect(formatLocus(coreParseRegion(coreRegion(region)))).toBe(src.region)
 })
 
 test('a bare contig names its PanSN contig', () => {
