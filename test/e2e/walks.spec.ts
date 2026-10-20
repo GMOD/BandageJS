@@ -66,7 +66,7 @@ test('a walk lifted alone shades along itself, its stretch written under its bar
   await waitForDrawing(page, /nodes/)
   const key = page.locator('#legends .walk-key')
   await expect(key.locator('.swatch.scale')).toBeVisible()
-  await expect(key).toContainText('chr:2,249,412-2,249,872 (460 bp)')
+  await expect(key).toContainText('chr:2,249,413-2,249,872 (460 bp)')
   await expect(page.locator('#legends')).toContainText('not on IAI39')
 })
 
@@ -115,7 +115,7 @@ test("a hovered node's place on each lifted walk replaces the walk's stretch", a
   await openPage(page, `${PGGB}${lifted(IAI39)}`)
   await waitForDrawing(page, /nodes/)
   const at = page.locator('#legends .walk-key .walk-at')
-  const stretch = 'chr:2,249,412-2,249,872 (460 bp)'
+  const stretch = 'chr:2,249,413-2,249,872 (460 bp)'
   await expect(at).toHaveText(stretch)
   await hoverUntilChanged(page, '#graph', at, stretch)
   await expect(at).toHaveText(POSITION)
@@ -154,7 +154,7 @@ test('side by side draws a panel per walk on one view, titled by its key', async
     '449 bp reversed',
   )
   await expect(panels.nth(1).locator('.facet-title')).toContainText(
-    'chr:2,249,412-2,249,872 (460 bp)',
+    'chr:2,249,413-2,249,872 (460 bp)',
   )
   await expect(page.locator('#legends')).toBeEmpty()
   const first = panels.nth(0).locator('.facet-drawing')
