@@ -23,7 +23,7 @@ Paths name BandageJS `src/`, the plugin's `src/` and bandage-core's `src/`.
 - The plugin's missing-haplotype-index error and haplotype listing into core's
   GBZ cut, so the cut dialog can offer haplotypes
 - `panSNSample`/`panSNContig`/`panSNHaplotype` now exist in both core and
-  graph-walks 2; keep one and re-export it
+  graph-walks 3; keep one and re-export it
 - `GENE_INK` is defined four times; core exports it as `WALK_GENE_INK`
 - Ports into BandageJS: tube-map genes and ruler (core has them; tube maps
   disable Genes today), the plugin's `keepInView`, core `filterSamples`
