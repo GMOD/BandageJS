@@ -15,7 +15,7 @@ import puppeteer from 'puppeteer-core'
 const TIMEOUT = 120_000
 const OUT = 'img/tutorial'
 const WALKS =
-  'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f4.GRCh38.walks.bed.gz'
+  'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5.GRCh38.walks.bed.gz'
 const REGION = 'chr6:160,614,798-160,647,758'
 const HAPS = 'HG00097,HG00133,HG01123,HG02055'
 const SIZE = { width: 1400, height: 800 }

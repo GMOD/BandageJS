@@ -17,7 +17,7 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 - Regions are 1-based, on the file's reference (`chr6:160,614,798-160,647,758`),
   so `ref=` is optional
 - `walks=hprc` names the hosted HPRC release 2 file,
-  `https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f4.GRCh38.walks.bed.gz`:
+  `https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5.GRCh38.walks.bed.gz`:
   `?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`
 
 [The tutorial](walk-files-tutorial.md) walks through a cut with screenshots.
