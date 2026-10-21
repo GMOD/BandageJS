@@ -25,8 +25,8 @@ rest. A link stores the choice as `layout=` ([links.md](links.md)).
   as a longer bar. Each bar boxes the haplotype's genes when genes are loaded
 - **Needs:** a reference and two or more walks
 
-Haplotypes → **Bars under the graph** draws the same bars beneath a layout that
-draws nodes.
+Haplotypes → **Bars under the graph** draws the same bars beneath any layout
+except walk rows and the tube maps.
 
 ## Ordered
 
@@ -39,16 +39,13 @@ draws nodes.
 
 - **Draws:** each walk as a coloured tube through boxed nodes, as
   [sequenceTubeMap](https://github.com/vgteam/sequenceTubeMap) does, with
-  columns in node order and log-scaled node widths
+  columns in node order and log-scaled node widths. No genes
 - **Needs:** at least one walk
 
 ## Tube map on reference
 
 - **Draws:** the tube map with each column at the reference bp it covers
 - **Needs:** walks and a reference
-
-The tube maps draw no genes, and Haplotypes → **Bars under the graph** is greyed
-out under walk rows and both tube maps.
 
 ## Force-directed
 
@@ -58,11 +55,6 @@ out under walk rows and both tube maps.
   an allele as a lens, a repeat loop as a ring, a deletion as an arch. A
   component with no reference gets plain stress, by stochastic gradient descent
 - **Needs:** nothing, so every graph has both. FMMM is the default
-
-## Rerun layout
-
-Layout → **Rerun layout** discards the cached force-directed result and lays the
-graph out again.
 
 ## Layout settings
 
@@ -77,5 +69,5 @@ Layout → **Layout settings…** opens a dialog:
   (Bandage's scale), Open or Wide bubbles (a minimum length for every allele),
   or Compress lengths (long and short nodes pulled towards the mean)
 - **Reset** restores the defaults
-
-A force setting lays the graph out again when its slider is released.
+- A force setting lays the graph out again when its slider is released, and
+  Layout → **Rerun layout** does so on demand
