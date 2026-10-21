@@ -47,16 +47,3 @@ test('a pasted walk file url fills the cut dialog with its reference samples', a
   await waitForDrawing(page, /2 paths/)
   expect(new URL(page.url()).searchParams.get('haps')).toBe('HG00438')
 })
-
-test('a walk file cut offers no figure spec, since bandage-figure cuts only gbz-base', async ({
-  page,
-}) => {
-  await openPage(page, CHRM)
-  await waitForDrawing(page, /44 paths/)
-  await menuButton(page, 'File').click()
-  const item = page
-    .locator('#menu-popup')
-    .getByRole('menuitem', { name: /^Copy figure spec/ })
-  await expect(item).toBeDisabled()
-  await expect(item).toContainText('not a walk file')
-})

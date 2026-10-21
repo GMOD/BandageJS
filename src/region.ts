@@ -14,7 +14,7 @@ export function parseRegion(text: string): Region {
 }
 
 // The 0-based half-open text bandage-core's parseRegion reads, as its gbz cut
-// and bandage-figure take a region
+// takes a region
 export function coreRegion(r: Region) {
   return `${r.refName}:${r.start}-${r.end}`
 }

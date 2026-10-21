@@ -10,7 +10,7 @@ import { linkable } from './address'
 import { abridgedText } from './derived'
 import { layoutName } from './describe'
 import { showAbout, showGuide, showOpenDialog } from './dialogs'
-import { copySpec, exportBlocked, exportSvg, specBlocked } from './figure'
+import { exportBlocked, exportSvg } from './figure'
 import { loadGenes, noGenesReason, openGenes } from './genes'
 import { jbrowseItems } from './jbrowseItems'
 import { showHighlightDialog } from './highlightDialog'
@@ -208,14 +208,6 @@ export function fileItems(): MenuItem[] {
       disabled: !!exportBlocked(),
       detail: exportBlocked(),
       onClick: exportSvg,
-    },
-    {
-      label: 'Copy figure spec',
-      detail: specBlocked(),
-      disabled: !!specBlocked(),
-      onClick: () => {
-        void copySpec()
-      },
     },
     {
       label: 'Copy link',

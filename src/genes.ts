@@ -71,10 +71,6 @@ function ownGenes() {
     : undefined
 }
 
-export function ownGenesName() {
-  return ownGenes()?.name
-}
-
 // why the Genes toggle has nothing to show, if it doesn't
 export function noGenesReason() {
   if (ownGenes()) {

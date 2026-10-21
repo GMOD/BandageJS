@@ -30,7 +30,7 @@ React.
   highlighting, walk rows, bubbles, node details, node search
 - `reference.ts`, `hubs.ts`, `genes.ts`: reference assembly and genes; see
   [genes.md](genes.md)
-- `figure.ts`: Export SVG and Copy figure spec
+- `figure.ts`: Export SVG
 
 Modules that touch no DOM have unit tests in Node. Changes to the plugin's
 overlays need the same change in `src/overlays.ts`.

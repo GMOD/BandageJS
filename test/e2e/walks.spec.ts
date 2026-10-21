@@ -3,7 +3,6 @@ import {
   inkedPixels,
   haplotypesMenu,
   menuButton,
-  openMenu,
   openPage,
   test,
   waitForDrawing,
@@ -342,9 +341,7 @@ test('Reference haplotype keeps the highlighted walks, and a link keeps the walk
 
 test('an open that fails leaves the graph on screen drawn along its walk', async ({
   page,
-  context,
 }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.route('**/examples/missing.gfa', route =>
     route.fulfill({ status: 404 }),
   )
@@ -366,15 +363,7 @@ test('an open that fails leaves the graph on screen drawn along its walk', async
     .click()
   await expect(page.locator('#toast')).toContainText('HTTP 404')
 
-  await menuButton(page, 'File').click()
-  await page
-    .locator('#menu-popup')
-    .getByRole('menuitem', { name: /^Copy figure spec/ })
-    .click()
-  const spec = JSON.parse(
-    await page.evaluate(() => navigator.clipboard.readText()),
-  ) as Record<string, unknown>
-  expect(spec.referencePath).toBe('alt#1#chr')
+  expect(new URL(page.url()).searchParams.get('along')).toBe('alt#1#chr')
 })
 
 test('by sample, a sample takes a row and its haplotypes the columns', async ({
@@ -399,11 +388,7 @@ test('by sample, a sample takes a row and its haplotypes the columns', async ({
   )
 })
 
-test('Export SVG saves the drawing with its spec, and the spec copies', async ({
-  page,
-  context,
-}) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+test('Export SVG saves the drawing, a panel per walk', async ({ page }) => {
   await openDiploid(page, '&facet=walk')
   await menuButton(page, 'File').click()
   const download = page.waitForEvent('download')
@@ -415,37 +400,7 @@ test('Export SVG saves the drawing with its spec, and the spec copies', async ({
   expect(file.suggestedFilename()).toMatch(/\.svg$/)
   const svg = (await (await file.createReadStream()).toArray()).join('')
   expect(svg).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)
-  expect(svg).toContain('<metadata>')
   expect(svg.match(/<svg x=/g)).toHaveLength(3)
-
-  await menuButton(page, 'File').click()
-  await page
-    .locator('#menu-popup')
-    .getByRole('menuitem', { name: /^Copy figure spec/ })
-    .click()
-  const spec = JSON.parse(
-    await page.evaluate(() => navigator.clipboard.readText()),
-  ) as Record<string, unknown>
-  expect(spec).toMatchObject({
-    gfa: expect.stringMatching(/^http.*\/examples\/diploid\.gfa$/),
-    layout: 'force',
-    walks: ['ref#0#chr', 'alt#1#chr', 'alt#2#chr'],
-    facet: 'walk',
-  })
-})
-
-test('walk rows offer no figure spec, since bandage-figure draws none', async ({
-  page,
-}) => {
-  await openDiploid(page, '')
-  const popup = await openMenu(page, 'Layout')
-  await popup.getByRole('menuitemradio', { name: /^Walk rows/ }).click()
-  await menuButton(page, 'File').click()
-  const item = page
-    .locator('#menu-popup')
-    .getByRole('menuitem', { name: /^Copy figure spec/ })
-  await expect(item).toBeDisabled()
-  await expect(item).toContainText('bandage-figure draws no Walk rows layout')
 })
 
 test('walk rows fit clear of the labels naming them', async ({ page }) => {
@@ -493,24 +448,6 @@ test('walk rows follow a zoom, and are built again once it rests', async ({
     .poll(() => rows.getAttribute('transform'))
     .toMatch(/^translate\(0 -?[\d.]+\) scale\(1 1\)$/)
   expect(await width()).toBeGreaterThan(before * 1.1)
-})
-
-test('the copied spec states the column count inside its facet', async ({
-  page,
-  context,
-}) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
-  await openDiploid(page, '&facet=walk&columns=1')
-  await menuButton(page, 'File').click()
-  await page
-    .locator('#menu-popup')
-    .getByRole('menuitem', { name: /^Copy figure spec/ })
-    .click()
-  const spec = JSON.parse(
-    await page.evaluate(() => navigator.clipboard.readText()),
-  ) as Record<string, unknown>
-  expect(spec.facet).toEqual({ field: 'walk', columns: 1 })
-  expect(spec).not.toHaveProperty('columns')
 })
 
 test('the Haplotypes menu shows only for a graph with walks', async ({

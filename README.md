@@ -55,7 +55,7 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 ## Libraries
 
 - [@jbrowse/bandage-core](https://github.com/GMOD/bandage-core) (npm): layout
-  and drawing, plus `bandage-figure` for SVGs with no browser
+  and drawing
 - [@jbrowse/graph-stress-layout](https://github.com/GMOD/graph-stress-layout)
   (npm): stress layout
 - [@gmod/gbz-base](https://github.com/GMOD/gbz-base-js) (npm): `.gbz.db` reader
