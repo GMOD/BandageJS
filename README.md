@@ -4,27 +4,32 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
 
-## Using it
+## Opening a whole graph
 
-- **Open a GFA file** (`.gfa` or `.gfa.gz`) of a pangenome or de novo assembly
-  graph: drag it onto the page, or pick it or paste its url in File → Open
-- **Open one region of a pangenome:** paste a url into File → Open, then type a
-  reference region such as `chr6:160,614,798-160,647,758` in the dialog that
-  follows. BandageJS downloads only the part of the file in that region. The url
-  is one of
-  - a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) walk file
-    (`.walks.bed.gz` beside its `.tbi`). See the
-    [walk file guide](docs/walk-files.md) or
-    [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
-  - a [gbz-base](https://github.com/jltsiren/gbz-base) database
-    (`graph.gbz.db`). With a
-    [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index) file
-    (`graph.haplotype-index.db`) in the same directory, BandageJS labels each
-    walk by sample and haplotype
-- **Explore:** click a node for its details, press `g` and type a region or gene
-  name, and pick from the [Layout](docs/layouts.md) and
-  [Haplotypes](docs/haplotypes.md) menus
-- **Share:** File → Copy link, or File → Export SVG
+Drag a GFA file (`.gfa` or `.gfa.gz`) onto the page, or choose it or paste its
+url in File → Open. BandageJS reads the whole file, so use this for de novo
+assembly graphs and for pangenome graphs small enough to load.
+
+## Opening one region of a large pangenome
+
+BandageJS reads one region at a time from an indexed pangenome hosted at a url:
+
+| Index             | Made with                                                                                    | Files to host                                                                                                                                                                     |
+| ----------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Walk file         | [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) `--walks` ([guide](docs/walk-files.md)) | `graph.<reference>.walks.bed.gz`, such as `graph.GRCh38.walks.bed.gz`, and its `.tbi`                                                                                             |
+| gbz-base database | [gbz-base](https://github.com/jltsiren/gbz-base)                                             | `graph.gbz.db`, and optionally `graph.haplotype-index.db` from [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index), which labels each walk by sample and haplotype |
+
+Paste the url of the `.walks.bed.gz` or `.gbz.db` into File → Open, then type a
+region on the reference such as `chr6:160,614,798-160,647,758`. BandageJS
+downloads only the part of the file in that region. Try
+[this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133).
+
+## Exploring and sharing
+
+- Click a node for its details, or press `g` and type a region or gene name
+- Pick a layout from the [Layout](docs/layouts.md) menu, and highlight walks
+  from the [Haplotypes](docs/haplotypes.md) menu
+- File → Copy link shares the view, and File → Export SVG saves it
 
 ## Docs
 
@@ -34,7 +39,6 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - [Links](docs/links.md): every address parameter
 - [Walk files](docs/walk-files.md): making a walk file and opening a region of
   it, step by step
-- [Developing](docs/developing.md): build, test, screenshots and deploy
 
 ## Gallery
 
