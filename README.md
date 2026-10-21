@@ -4,9 +4,9 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
 
-- **In:** a pangenome GFA, a de novo assembly graph as
-  [Bandage](https://github.com/rrwick/Bandage) opens, or one locus cut from a
-  pangenome
+- **In:** a GFA, from a pangenome or a de novo assembly as
+  [Bandage](https://github.com/rrwick/Bandage) opens, or an indexed pangenome
+  too large to load whole, viewed a region at a time
 - **Out:** a force-directed, anchored, walk-row or tube-map drawing with
   haplotypes, bubbles and genes marked
 
