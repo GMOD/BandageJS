@@ -18,8 +18,8 @@ rest. The address holds the choice as `layout=`.
 - **Force-directed**, for every graph, in two engines:
   - **FMMM**, the default: Bandage's own layout, OGDF's fast multipole
     multilevel method compiled to wasm
-  - **Stress:** draws the reference straight and places each variant against
-    it: an allele as a lens, a repeat loop as a ring, a deletion as an arch. A
+  - **Stress:** draws the reference straight and places each variant against it:
+    an allele as a lens, a repeat loop as a ring, a deletion as an arch. A
     component with no reference gets plain stress, by stochastic gradient
     descent
 - **Anchored** (needs a reference): x at reference bp, one row per stable rank

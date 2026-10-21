@@ -74,7 +74,8 @@ haplotype's bp:
   lacks
 - The label after each bar gives the walk's length and its difference from the
   reference: HG00133#1 runs 116 kb longer than GRCh38's 33 kb
-- [The user guide](guide.md#highlighting-haplotypes) covers highlighting walks and panels
+- [The user guide](guide.md#highlighting-haplotypes) covers highlighting walks
+  and panels
 
 ## 7. Share the cut
 
@@ -92,8 +93,8 @@ link to your own file holds its url.
 
 ## Abridged walks
 
-- gfa-to-tabix moves the costliest walks of a costly chunk, usually a
-  satellite array, into detail records that a window read skips
+- gfa-to-tabix moves the costliest walks of a costly chunk, usually a satellite
+  array, into detail records that a window read skips
 - BandageJS reads each such walk as two steps, where it leaves and rejoins the
   reference
 - The Haplotypes menu lists each as a block, such as

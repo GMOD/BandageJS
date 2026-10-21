@@ -78,8 +78,8 @@ pnpm's own command.
 
 ## Gene hubs
 
-`config.json` next to `index.html` lists the JBrowse hubs that [genes](guide.md#genes)
-come from:
+`config.json` next to `index.html` lists the JBrowse hubs that
+[genes](guide.md#genes) come from:
 
 ```json
 {
