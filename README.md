@@ -22,10 +22,6 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
   [layouts](docs/layouts.md) or [haplotype](docs/haplotypes.md) highlights
 - **Share** with File → Copy link, or export an SVG
 
-![GRCh38, HG00097 and HG00133 through the KIV-2 cut, side by side](img/kiv2_facet.png)
-
-![LPA KIV-2 in eight HPRC samples, force-directed with its walk rows beneath](img/kiv2_strip.png)
-
 ## Docs
 
 - [Haplotypes](docs/haplotypes.md): highlighting walks, panels and rows
@@ -33,8 +29,24 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - [Genes](docs/genes.md): gene tracks, assemblies and site setup
 - [Links](docs/links.md): every address parameter
 - [Walk files](docs/walk-files.md): gfa-to-tabix to a cut, step by step
-- [Gallery](docs/gallery.md): example figures
 - [Developing](docs/developing.md): build, test, screenshots and deploy
+
+## Gallery
+
+<table>
+<tr>
+<td><a href="docs/gallery.md"><img src="img/kiv2_overlay.png" width="260" alt="Three walks overlaid on KIV-2"></a><br>Three walks overlaid on KIV-2</td>
+<td><a href="docs/gallery.md"><img src="img/kiv2_strip.png" width="260" alt="Walk rows under the graph"></a><br>Walk rows under the graph</td>
+<td><a href="docs/gallery.md"><img src="img/cfh_force.png" width="260" alt="CFH with genes and a deletion"></a><br>CFH with genes and a deletion</td>
+</tr>
+<tr>
+<td><a href="docs/gallery.md"><img src="img/mhc_stress.png" width="260" alt="MHC class II, stress layout"></a><br>MHC class II, stress layout</td>
+<td><a href="docs/gallery.md"><img src="img/ecoli_genes.png" width="260" alt="E. coli with K-12 genes"></a><br>E. coli with K-12 genes</td>
+<td><a href="docs/gallery.md"><img src="img/assembly_graph.png" width="260" alt="A de novo assembly graph"></a><br>A de novo assembly graph</td>
+</tr>
+</table>
+
+More in [the gallery](docs/gallery.md).
 
 ## See also
 
