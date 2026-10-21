@@ -74,3 +74,14 @@ test('a query without both a source and loc names no cut', () => {
   expect(gbzFromQuery(new URLSearchParams('gbz=hprc'))).toBeUndefined()
   expect(gbzFromQuery(new URLSearchParams('loc=chr1:1-2'))).toBeUndefined()
 })
+
+test('a walk file cut keeps the abridged walks it reads in full', () => {
+  const src = {
+    db: HPRC_WALKS,
+    region: 'chr6:160,614,798-160,647,758',
+    haplotypes: ['HG00133'],
+    expand: ['HG00133#1#CM090050.1', 'HG00133#2#CM090065.1'],
+  }
+  expect(gbzQuery(src).expand).toBe('HG00133#1#CM090050.1,HG00133#2#CM090065.1')
+  expect(roundTrip(src)).toEqual(src)
+})

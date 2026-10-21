@@ -1,7 +1,7 @@
 import { loadGraph } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
-import { memo, walkView } from '../../src/derived'
+import { abridgedText, memo, walkView } from '../../src/derived'
 
 test('memo recomputes only when a key changes identity', () => {
   let calls = 0
@@ -53,4 +53,13 @@ test('walkView lifts walks as lanes, and side by side a lift of each alone', () 
     lift: undefined,
     panels: undefined,
   })
+})
+
+test("an abridged walk's block counts the steps and bp it left out", () => {
+  expect(abridgedText('HG00097#1', { steps: 140_000, bp: 2_100_000 })).toBe(
+    'HG00097#1: 140 k steps, 2.1 Mb off reference',
+  )
+  expect(abridgedText('Sakai#1', { steps: 35, bp: 460 })).toBe(
+    'Sakai#1: 35 steps, 460 bp off reference',
+  )
 })

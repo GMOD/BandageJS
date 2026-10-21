@@ -2,16 +2,22 @@ import { cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 import { LocalFile } from 'generic-filehandle2'
 
-import { formatLocus } from '@jbrowse/bandage-core'
+import { formatLocus, loadGraph } from '@jbrowse/bandage-core'
+import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
+import { abridgedWalks } from '../../src/derived'
 import { coreRegion, parseRegion } from '../../src/region'
 import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
 
+import type { WalkCutSource } from '../../src/walkFiles'
+
 const DATA = 'test/e2e/data'
-const walks = () =>
-  openWalkFiles(
-    `${DATA}/hprc-chrM.GRCh38.walks.bed.gz`,
-    path => new LocalFile(path),
-  )
+const walks = (file = 'hprc-chrM.GRCh38.walks.bed.gz') =>
+  openWalkFiles(`${DATA}/${file}`, path => new LocalFile(path))
+
+async function cut(src: WalkCutSource, file?: string) {
+  const { gfa, ...rest } = await cutWalksRegion(walks(file), src)
+  return { text: graphTablesGFA(gfa), gfa, ...rest }
+}
 
 function lines(text: string, kind: string) {
   return text
@@ -27,7 +33,7 @@ const walkNames = (text: string) =>
 
 test('a walk file cut names the walks the gbz-base cut names, over its nodes', async () => {
   const region = 'chrM:8,000-8,300'
-  const fromWalks = await cutWalksRegion(walks(), { region })
+  const fromWalks = await cut({ region })
   const gbz = await openGbz(
     new LocalFile(`${DATA}/hprc-chrM.gbz.db`),
     new LocalFile(`${DATA}/hprc-chrM.haplotype-index.db`),
@@ -42,7 +48,7 @@ test('a walk file cut names the walks the gbz-base cut names, over its nodes', a
 })
 
 test('a walk file cut keeps the reference and the haplotypes asked for', async () => {
-  const { text } = await cutWalksRegion(walks(), {
+  const { text } = await cut({
     region: 'chrM:100-300',
     haplotypes: ['HG00438', 'HG00621#2'],
   })
@@ -54,7 +60,7 @@ test('a walk file cut keeps the reference and the haplotypes asked for', async (
 })
 
 test('a walk file cut places reference nodes by their coordinate', async () => {
-  const { text } = await cutWalksRegion(walks(), { region: 'chrM:0-100' })
+  const { text } = await cut({ region: 'chrM:0-100' })
   const first = lines(text, 'S')[0]!
   expect(first).toContain('SN:Z:GRCh38#0#chrM')
   expect(first).toContain('SO:i:0')
@@ -62,7 +68,7 @@ test('a walk file cut places reference nodes by their coordinate', async () => {
 })
 
 test('a walk file cut takes a region named as the file names it', async () => {
-  const { text } = await cutWalksRegion(walks(), {
+  const { text } = await cut({
     region: 'GRCh38#0#chrM:100-300',
     haplotypes: ['HG00438'],
   })
@@ -81,4 +87,38 @@ test('a 1-based locus cuts the window it names', async () => {
   })
   expect(region).toEqual({ refName: 'chrM', start: 8000, end: 8300 })
   expect(formatLocus(region)).toBe('chrM:8,001-8,300')
+})
+
+// gfa-to-tabix --walks --refs K12 --abridge-steps 20 of the E. coli pggb graph,
+// which abridges IAI39 and Sakai here, and the same without abridging
+const ABRIDGED = 'ecoli_pggb_abridged.K12.walks.bed.gz'
+const WHOLE = 'ecoli_pggb.K12.walks.bed.gz'
+const K12 = 'K12#1#chr:1004500-1004961'
+
+function stepCounts(text: string) {
+  return Object.fromEntries(
+    lines(text, 'W').map(w => [w[1], w[6]!.split(/[<>]/).length - 1]),
+  )
+}
+
+test('a walk file cut gives an abridged walk two steps and its counts', async () => {
+  const { text, gfa, expanded } = await cut({ region: K12 }, ABRIDGED)
+  expect(stepCounts(text)).toMatchObject({ IAI39: 2, Sakai: 2 })
+  expect(expanded).toEqual([])
+  const graph = loadGraph(gfa, 'cut')
+  expect(Object.fromEntries(abridgedWalks(graph.paths))).toEqual({
+    'IAI39#1#chr': { steps: 35, bp: 460 },
+    'Sakai#1#chr': { steps: 35, bp: 460 },
+  })
+})
+
+test('a walk file cut reads the abridged walks it expands in full', async () => {
+  const { text, expanded } = await cut(
+    { region: K12, expand: ['Sakai#1#chr', 'CFT073#1#chr'] },
+    ABRIDGED,
+  )
+  const whole = await cut({ region: K12 }, WHOLE)
+  expect(expanded).toEqual(['Sakai#1#chr'])
+  expect(stepCounts(text)).toEqual({ ...stepCounts(whole.text), IAI39: 2 })
+  expect(stepCounts(text).Sakai).toBe(35)
 })

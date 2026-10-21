@@ -8,6 +8,7 @@ it. A graph opened from your computer has no link.
 | `gfa`                                                  | GFA url                                                                              |
 | `walks`, `loc`, `ref`, `haps`                          | Cut: walk file url (or `hprc`), region, reference sample, comma-separated haplotypes |
 | `index`                                                | Haplotype index for a `.gbz.db` in `walks`                                           |
+| `expand`                                               | Abridged walks the cut reads in full, comma-separated `sample#haplotype#contig`      |
 | `gbz`                                                  | Older name for `walks`; `gbz=hprc` cuts the HPRC `.gbz.db`                           |
 | `hub`, `assembly`, `contigs`                           | Genes: JBrowse configs, assembly, `graph:assembly` contig names                      |
 | `layout`                                               | `force`, `anchored`, `ordered`, `samplerows`, `walkrows`, `tubemap` or `tubemapref`  |

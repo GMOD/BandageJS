@@ -31,6 +31,7 @@ import type {
   GeneGaps,
   GeneModel,
   Graph,
+  GraphTables,
   LayoutModeValue,
   LayoutResult,
   MinigraphBubble,
@@ -49,7 +50,8 @@ export function saveSettings() {
 // Where the graph on screen came from, so a reference change can re-read it
 // and a JBrowse link can name it.
 export interface Source {
-  text: string
+  // the graph as GFA text, or as the tables a walk file cut makes
+  gfa: string | GraphTables
   name: string
   description?: string
   // the reference window a cut was made for

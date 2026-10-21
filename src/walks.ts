@@ -1,4 +1,5 @@
 import { replaceParams } from './address'
+import { expandWalks } from './sources'
 import { saveSettings, settings, state } from './state'
 import { rebuild } from './view'
 
@@ -11,6 +12,8 @@ let asked: string[] = []
 export function askWalks(params: URLSearchParams) {
   asked = params.getAll('walk')
 }
+
+export const askedWalks = () => asked
 
 // The walks to lift in a graph just opened: those a link asked for, or those
 // `kept` from the graph it replaces, colours and all, where it has them
@@ -33,11 +36,13 @@ function changed() {
   rebuild()
 }
 
-// Lift the walks named, in that order, keeping the colour any already had
+// Lift the walks named, in that order, keeping the colour any already had,
+// and cut again to read any the cut abridged in full
 export function liftWalks(names: string[]) {
   const had = new Map(state.walkLayers.map(l => [l.walk, l]))
   state.walkLayers = names.map(walk => had.get(walk) ?? { walk })
   changed()
+  expandWalks(names.filter(name => !had.has(name)))
 }
 
 export function toggleWalk(name: string) {

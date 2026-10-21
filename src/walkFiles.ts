@@ -1,7 +1,6 @@
 import { TabixIndexedFile } from '@gmod/tabix'
 import { parseRegion } from '@jbrowse/bandage-core'
 import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
-import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
 import { WALK_BUDGETS, WalkReader } from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
@@ -35,12 +34,16 @@ export interface WalkCutSource {
   haplotypes?: string[]
   referenceSample?: string
   context?: number
+  // walks, by sample#haplotype#contig, to read in full where the file abridges
+  // them
+  expand?: string[]
 }
 
 /**
- * A window of a walk file set as GFA text, cut the way the gbz-base cut is:
- * the reference sample's path over the region with `context` bp either side,
- * and the walks of the haplotypes asked for, every one when none are
+ * A window of a walk file set as graph tables, cut the way the gbz-base cut
+ * is: the reference sample's path over the region with `context` bp either
+ * side, and the walks of the haplotypes asked for, every one when none are.
+ * `expanded` names the abridged walks the cut read in full.
  */
 export async function cutWalksRegion(
   walks: WalkFiles,
@@ -48,6 +51,8 @@ export async function cutWalksRegion(
   signal?: AbortSignal,
 ) {
   const region = parseRegion(src.region)
+  const wanted = new Set(src.expand)
+  const expanded = new Set<string>()
   const { tables, sample } = await walks.cutRegion(region, {
     signal,
     haplotypes: src.haplotypes,
@@ -55,6 +60,12 @@ export async function cutWalksRegion(
     context: src.context ?? GBZ_CUT_DEFAULTS.context,
     byteBudget: WALK_BUDGETS.byteBudget,
     nodeLimit: GBZ_CUT_DEFAULTS.limit,
+    expand: name => {
+      if (wanted.has(name)) {
+        expanded.add(name)
+      }
+      return wanted.has(name)
+    },
   })
-  return { text: graphTablesGFA(tables), region, sample }
+  return { gfa: tables, region, sample, expanded: [...expanded] }
 }

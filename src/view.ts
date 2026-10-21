@@ -29,7 +29,7 @@ import {
   walkRowsExtent,
 } from '@jbrowse/bandage-core'
 
-import { inkOf, memo, rampInterval } from './derived'
+import { abridgedCounts, inkOf, memo, rampInterval } from './derived'
 import { layoutName, nodeHtml, nodeText } from './describe'
 import { svgDom } from './elDom'
 import { rowLink } from './jbrowse'
@@ -47,6 +47,7 @@ import {
   referenceWindow,
   targetOf,
 } from './reference'
+import { expandWalks } from './sources'
 import {
   axis,
   current,
@@ -892,9 +893,16 @@ function drawInfo() {
     const isReference = selectedRow === bars?.reference
     const link =
       ref && rowLink(selectedRow, isReference, targetOf(ref), ref.contigs)
-    html = `${rowHtml(selectedRow)}<div class="info-actions">${
+    const abridged = f.abridged.get(selectedRow.name)
+    html = `${rowHtml(selectedRow)}${
+      abridged ? `<br>${esc(abridgedCounts(abridged))} not loaded` : ''
+    }<div class="info-actions">${
       link
         ? `<a href="${esc(link)}" target="_blank" rel="noopener">Show in JBrowse ↗</a>`
+        : ''
+    }${
+      abridged
+        ? '<button type="button" data-expand>Load its steps</button>'
         : ''
     }<button type="button" data-close aria-label="Deselect">✕</button></div>`
     interactive = true
@@ -914,7 +922,9 @@ function drawInfo() {
 }
 
 ui.info.addEventListener('click', e => {
-  if ((e.target as Element).closest('[data-close]')) {
+  if ((e.target as Element).closest('[data-expand]') && state.selectedRow) {
+    expandWalks([state.selectedRow])
+  } else if ((e.target as Element).closest('[data-close]')) {
     state.selectedNode = null
     state.selectedRow = null
     scheduleDraw()

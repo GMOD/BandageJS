@@ -7,6 +7,7 @@ import {
 } from '@jbrowse/bandage-core'
 
 import { linkable } from './address'
+import { abridgedText } from './derived'
 import { layoutName } from './describe'
 import { showAbout, showGuide, showOpenDialog } from './dialogs'
 import { copySpec, exportBlocked, exportSvg, specBlocked } from './figure'
@@ -18,7 +19,7 @@ import { applySettings, showLayoutDialog } from './layoutDialog'
 import { copyLink } from './linkView'
 import { backboneOf, binding, referenceAssembly } from './reference'
 import { choiceLabel, showReferenceDialog } from './referenceDialog'
-import { examples, openExample, recut, reparse } from './sources'
+import { examples, expandWalks, openExample, recut, reparse } from './sources'
 import { drawnMode, facts, saveSettings, settings, state, tube } from './state'
 import { rebuild, scheduleDraw } from './view'
 import { liftWalks, setFacet, toggleWalk } from './walks'
@@ -330,11 +331,25 @@ export function haplotypeItems(): MenuItem[] {
         ]
       : []),
   ]
-  const highlights = tube() ? [] : highlightItems()
+  return [tube() ? [] : highlightItems(), abridgedItems(), others]
+    .filter(group => group.length > 0)
+    .flatMap((group, i) => (i ? [{ divider: true } as const, ...group] : group))
+}
+
+// A block per walk the cut abridged, which reads that walk in full
+function abridgedItems(): MenuItem[] {
+  const { abridged, walkLabels } = facts()
+  if (abridged.size === 0 || state.stack.length > 0) {
+    return []
+  }
   return [
-    ...highlights,
-    ...(highlights.length && others.length ? [{ divider: true } as const] : []),
-    ...others,
+    { header: 'Abridged: click one to load its steps' },
+    ...[...abridged].map(([name, a]): MenuItem => ({
+      label: abridgedText(walkLabels.get(name) ?? name, a),
+      onClick: () => {
+        expandWalks([name])
+      },
+    })),
   ]
 }
 

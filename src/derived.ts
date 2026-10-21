@@ -6,6 +6,7 @@ import {
   deletionDrawing,
   deletionEdges,
   facetLifts,
+  formatBp,
   genePins,
   genesOnRow,
   nodeInk,
@@ -50,6 +51,45 @@ export const depthVaries = memo(
   (graph: Graph) => new Set(graph.nodes.map(n => n.depth)).size > 1,
 )
 
+export interface Abridged {
+  steps: number
+  bp: number
+}
+
+// Each walk a walk file cut abridged, by name, with the steps and bp it left
+// out across the walk's fragments
+export function abridgedWalks(paths: Graph['paths'] = []) {
+  const walks = new Map<string, Abridged>()
+  for (const { name, abridged } of paths) {
+    if (abridged) {
+      const had = walks.get(name)
+      walks.set(name, {
+        steps: (had?.steps ?? 0) + abridged.steps,
+        bp: (had?.bp ?? 0) + abridged.bp,
+      })
+    }
+  }
+  return walks
+}
+
+function stepsText(steps: number) {
+  return steps < 1000
+    ? `${steps}`
+    : steps < 999_500
+      ? `${Math.round(steps / 1000)} k`
+      : `${+(steps / 1e6).toFixed(1)} M`
+}
+
+export function abridgedCounts({ steps, bp }: Abridged) {
+  return `${stepsText(steps)} steps, ${formatBp(bp)} off reference`
+}
+
+// What an abridged walk's block says: `HG00097#1: 140 k steps, 2.1 Mb off
+// reference`
+export function abridgedText(label: string, abridged: Abridged) {
+  return `${label}: ${abridgedCounts(abridged)}`
+}
+
 export const graphFacts = memo((graph: Graph | undefined) => {
   const deletions = graph ? deletionEdges(graph) : []
   const walkChoices = graph?.paths?.length ? pathLegend(graph.paths) : []
@@ -59,6 +99,7 @@ export const graphFacts = memo((graph: Graph | undefined) => {
     allDeletions: deletions,
     walkChoices,
     walkLabels: walkLabelsOf(walkChoices),
+    abridged: abridgedWalks(graph?.paths),
     drawable: new Set<string>(
       graph
         ? LAYOUT_MODES.filter(m => m.available(graph)).map(m => m.value)

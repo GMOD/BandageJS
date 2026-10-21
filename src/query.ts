@@ -4,7 +4,7 @@ import type { GbzSource } from './gbz'
 
 // A cut as the page's query string and back. `walks=hprc` is the HPRC walk
 // file; `gbz=`, from older links, still opens, and `gbz=hprc` is the HPRC
-// gbz-base database.
+// gbz-base database. `expand` names the abridged walks the cut reads in full.
 export function gbzQuery(src: GbzSource): Record<string, string> {
   const preset = isHprc(src)
   return {
@@ -15,6 +15,7 @@ export function gbzQuery(src: GbzSource): Record<string, string> {
     loc: src.region,
     ...(src.referenceSample ? { ref: src.referenceSample } : {}),
     ...(src.haplotypes?.length ? { haps: src.haplotypes.join(',') } : {}),
+    ...(src.expand?.length ? { expand: src.expand.join(',') } : {}),
   }
 }
 
@@ -38,10 +39,12 @@ export function gbzFromQuery(params: URLSearchParams): GbzSource | undefined {
     return undefined
   }
   const haps = params.get('haps')
+  const expand = params.get('expand')
   return {
     ...src,
     region: loc,
     referenceSample: params.get('ref') ?? undefined,
     haplotypes: haps ? haps.split(',') : undefined,
+    expand: expand ? expand.split(',') : undefined,
   }
 }

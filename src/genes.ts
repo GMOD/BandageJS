@@ -28,6 +28,7 @@ import { scheduleDraw } from './view'
 import type { GeneSource, HubAssembly } from './hubConfig'
 import type { Region } from './jbrowse'
 import type { ReferenceWindow } from './reference'
+import type { Source } from './state'
 import type { Backbone, GeneModel } from '@jbrowse/bandage-core'
 
 // The genes the backbone shows: the bound assembly's gene track, read after
@@ -45,7 +46,12 @@ let abort: AbortController | undefined
 const warned = new Set<string>()
 let missing: string[] = []
 let own:
-  | { text: string; backbone: string; name: string; genes: GeneModel[] }
+  | {
+      gfa: Source['gfa']
+      backbone: string
+      name: string
+      genes: GeneModel[]
+    }
   | undefined
 
 const regionKey = (r: Region) => `${r.refName}:${r.start}-${r.end}`
@@ -59,7 +65,7 @@ export function stopGenes() {
 
 function ownGenes() {
   return own &&
-    own.text === state.source?.text &&
+    own.gfa === state.source?.gfa &&
     own.backbone === backboneId(backboneOf(state.graph))
     ? own
     : undefined
@@ -224,7 +230,7 @@ export function loadGenes() {
   stopGenes()
   loadWalkGenes()
   const source = state.source
-  if (own && own.text !== source?.text) {
+  if (own && own.gfa !== source?.gfa) {
     own = undefined
   }
   missing = []
@@ -310,7 +316,7 @@ async function readGenes(file: File) {
     }
     abort?.abort()
     own = {
-      text: source.text,
+      gfa: source.gfa,
       backbone: backboneId(backbone)!,
       name: file.name,
       genes,

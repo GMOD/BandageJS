@@ -4,7 +4,7 @@ import { RemoteFile } from 'generic-filehandle2'
 import { readOnce } from './read'
 import { coreRegion, parseRegion } from './region'
 
-import type { GbzSource } from '@jbrowse/bandage-core'
+import type { GbzSource as CoreGbzSource } from '@jbrowse/bandage-core'
 import type { WalkFiles } from './walkFiles'
 
 // A window of a gbz-base database read by range requests, the way the plugin's
@@ -14,7 +14,10 @@ import type { WalkFiles } from './walkFiles'
 // `<prefix>.<sample>.walks.bed.gz` with its `.tbi`, takes the
 // database's place in a cut: `walkFiles.ts` reads it.
 
-export type { GbzSource } from '@jbrowse/bandage-core'
+export interface GbzSource extends CoreGbzSource {
+  // abridged walks a walk file cut reads in full (walkFiles.ts)
+  expand?: string[]
+}
 
 export const HPRC: Omit<GbzSource, 'region'> = HPRC_GBZ
 
@@ -81,5 +84,6 @@ export async function cutGbz(
   const gbz = await openDb(src.db, src.index)
   signal.throwIfAborted()
   status(`Cutting ${src.region}`)
-  return cutGbzRegion(gbz, cut, signal)
+  const { text, ...rest } = await cutGbzRegion(gbz, cut, signal)
+  return { gfa: text, ...rest, expanded: [] }
 }

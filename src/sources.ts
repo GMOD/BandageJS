@@ -31,10 +31,16 @@ import {
   onBindingChange,
   referenceWindow,
 } from './reference'
-import { clearInteraction, cutsWholeWalks, settings, state } from './state'
+import {
+  clearInteraction,
+  cutsWholeWalks,
+  facts,
+  settings,
+  state,
+} from './state'
 import { ui } from './ui'
 import { rebuild, showCaption } from './view'
-import { askWalks, takeAskedWalks, walkParams } from './walks'
+import { askWalks, askedWalks, takeAskedWalks, walkParams } from './walks'
 
 import type { Work } from './feedback'
 import type { GbzSource } from './gbz'
@@ -136,13 +142,13 @@ function declarationFromQuery(
 // `declare` is the assembly a link or example says the graph's reference is on,
 // and `along` the path to draw x along, by default the link's `along` parameter
 function openGFA(
-  text: string,
+  gfa: Source['gfa'],
   {
     declare,
     walks,
     along = askedAlong,
     ...source
-  }: Omit<Source, 'text'> & {
+  }: Omit<Source, 'gfa'> & {
     declare?: Declaration
     walks?: WalkLayer[]
     along?: string
@@ -153,7 +159,7 @@ function openGFA(
   askedAlong = ''
   const work = progress('Parsing GFA')
   try {
-    const graph = loadGraph(text, source.name, {
+    const graph = loadGraph(gfa, source.name, {
       referencePath: along || undefined,
     })
     if (graph.nodes.length > maxNodes) {
@@ -163,12 +169,7 @@ function openGFA(
         {
           label: 'Draw anyway',
           run: () => {
-            openGFA(
-              text,
-              { ...source, declare, walks, along },
-              onOpen,
-              Infinity,
-            )
+            openGFA(gfa, { ...source, declare, walks, along }, onOpen, Infinity)
           },
         },
       )
@@ -187,7 +188,7 @@ function openGFA(
       declare && backbone
         ? { ...source.declared, [backboneKey(backbone)]: declare }
         : source.declared
-    state.source = { ...source, regionPath, text, declared }
+    state.source = { ...source, regionPath, gfa, declared }
     state.region =
       source.region && (!regionPath || graph.referencePath === regionPath)
         ? source.region
@@ -259,6 +260,11 @@ export async function openUrl(
   }
 }
 
+// The cut as a link states it, naming only the abridged walks it read in full
+function expandedSource({ expand, ...src }: GbzSource, expanded: string[]) {
+  return expanded.length ? { ...src, expand: expanded.sort() } : src
+}
+
 // What a re-cut keeps of the region on screen, or the recent list of a cut
 interface Kept {
   declared: Source['declared']
@@ -277,10 +283,16 @@ export async function openGbz(
 ) {
   const { live, signal, work } = beginOpen('Opening the cut')
   const wholeWalks = cutsWholeWalks()
+  // a lifted walk draws its steps, so the cut reads it in full
+  const lifted = kept.walks?.map(l => l.walk) ?? askedWalks()
+  const wanted = {
+    ...src,
+    expand: [...new Set([...(src.expand ?? []), ...lifted])],
+  }
   try {
     parseRegion(src.region)
-    const { text, region, sample } = await cutGbz(
-      wholeWalks ? { ...src, snarls: 'overlapping' } : src,
+    const { gfa, region, sample, expanded } = await cutGbz(
+      wholeWalks ? { ...wanted, snarls: 'overlapping' } : wanted,
       text => {
         report(work, text)
       },
@@ -289,13 +301,14 @@ export async function openGbz(
     if (!live()) {
       return
     }
+    const cut = expandedSource(src, expanded)
     openGFA(
-      text,
+      gfa,
       {
         name: `${sample} ${src.region}`,
         description,
         region,
-        gbz: src,
+        gbz: cut,
         wholeWalks,
         sample,
         declare,
@@ -306,11 +319,11 @@ export async function openGbz(
         recent:
           kept.recent ??
           (rememberIt
-            ? { kind: 'gbz', gbz: src, name: src.region }
+            ? { kind: 'gbz', gbz: cut, name: src.region }
             : undefined),
       },
       () => {
-        setQuery(gbzQuery(src))
+        setQuery(gbzQuery(cut))
         if (rememberIt) {
           rememberSource()
         }
@@ -366,14 +379,36 @@ export function recut() {
   ) {
     return false
   }
-  void openGbz(source.gbz, source.description, false, undefined, {
+  void openGbz(source.gbz, source.description, false, undefined, keptOf(source))
+  return true
+}
+
+function keptOf(source: Source): Partial<Kept> {
+  return {
     declared: source.declared,
     regionPath: source.regionPath,
     referencePath: state.referencePath,
     walks: state.walkLayers,
     recent: source.recent,
-  })
-  return true
+  }
+}
+
+// Cuts the region on screen again, reading in full the abridged walks among
+// `names`. Not inside a popped bubble, which the cut would close.
+export function expandWalks(names: string[]) {
+  const source = state.source
+  const abridged = facts().abridged
+  const more = names.filter(name => abridged.has(name))
+  if (!source?.gbz || more.length === 0 || state.stack.length > 0) {
+    return
+  }
+  void openGbz(
+    { ...source.gbz, expand: [...(source.gbz.expand ?? []), ...more] },
+    source.description,
+    false,
+    undefined,
+    keptOf(source),
+  )
 }
 
 // Saves the graph on screen to the Open dialog's recent list, with the
@@ -387,9 +422,9 @@ export function rememberSource() {
 
 // Re-reads the graph on screen along the path `along`, its walks still lifted
 export function reparse(along: string) {
-  const { text, ...src } = state.source!
+  const { gfa, ...src } = state.source!
   openGFA(
-    text,
+    gfa,
     { ...src, walks: state.walkLayers, along },
     () => {
       replaceParams(['along'], alongParams())
