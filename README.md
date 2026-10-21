@@ -4,27 +4,22 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
 
-- **In:** one of
-  - a GFA file (`.gfa` or `.gfa.gz`) of a pangenome or of a de novo assembly, as
-    [Bandage](https://github.com/rrwick/Bandage) opens. Open it from a url, File
-    → Open or by dragging it onto the page
-  - a url to a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) walk file
-    (`.walks.bed.gz` beside its `.tbi`), plus a reference region such as
-    `chr6:160,614,798-160,647,758`. BandageJS downloads only the part of the
-    file in that region. See the [walk file guide](docs/walk-files.md) or
-    [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
-  - a url to a [gbz-base](https://github.com/jltsiren/gbz-base) database
-    (`graph.gbz.db`) plus a region, as for a walk file. The cut dialog also
-    fills in the url of `graph.haplotype-index.db` in the same directory. That
-    file, from
-    [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index), names
-    each walk by sample and haplotype. Without it, every walk except the
-    reference is named `unknown#N`
-- **Out:** a force-directed, anchored, walk-row or tube-map drawing with
-  haplotypes, bubbles and genes marked
-
 ## Using it
 
+- **Open a GFA file** (`.gfa` or `.gfa.gz`) of a pangenome or a de novo assembly
+  from a url, File → Open, or by dragging it onto the page
+- **Open one region of a pangenome** from a url and a reference region such as
+  `chr6:160,614,798-160,647,758`. BandageJS downloads only the part of the file
+  in that region. The url points to either
+  - a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) walk file
+    (`.walks.bed.gz` beside its `.tbi`). See the
+    [walk file guide](docs/walk-files.md) or
+    [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
+  - a [gbz-base](https://github.com/jltsiren/gbz-base) database
+    (`graph.gbz.db`). A
+    [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index) file
+    (`graph.haplotype-index.db`) in the same directory is optional and names
+    each walk by sample and haplotype
 - **Explore** by clicking nodes, searching regions or genes (`g`), and switching
   [layouts](docs/layouts.md) or [haplotype](docs/haplotypes.md) highlights
 - **Share** with File → Copy link, or export an SVG
