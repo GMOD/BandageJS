@@ -4,22 +4,27 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
 
-- **In:** a GFA, from a pangenome or a de novo assembly as
-  [Bandage](https://github.com/rrwick/Bandage) opens, or one region at a time of
-  a gfa-to-tabix walk file (`.walks.bed.gz`) or a gbz-base database (`.gbz.db`)
+- **In:** one of
+  - a GFA file (`.gfa` or `.gfa.gz`) of a pangenome or of a de novo assembly, as
+    [Bandage](https://github.com/rrwick/Bandage) opens. Open it from a url, File
+    → Open or by dragging it onto the page
+  - a url to a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) walk file
+    (`.walks.bed.gz` beside its `.tbi`), plus a reference region such as
+    `chr6:160,614,798-160,647,758`. BandageJS downloads only the part of the
+    file in that region. See the [walk file guide](docs/walk-files.md) or
+    [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
+  - a url to a [gbz-base](https://github.com/jltsiren/gbz-base) database
+    (`graph.gbz.db`) plus a region, as for a walk file. The cut dialog also
+    fills in the url of `graph.haplotype-index.db` in the same directory. That
+    file, from
+    [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index), names
+    each walk by sample and haplotype. Without it, every walk except the
+    reference is named `unknown#N`
 - **Out:** a force-directed, anchored, walk-row or tube-map drawing with
   haplotypes, bubbles and genes marked
 
 ## Using it
 
-- **Open** a GFA with File → Open, a url, or drag and drop
-- **Browse one locus** of a pangenome too large to load whole, from
-  - a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) walk file
-    ([guide](docs/walk-files.md)), as in
-    [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
-  - a [gbz-base](https://github.com/jltsiren/gbz-base) `.gbz.db`, plus an
-    optional [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index)
-    to name its walks
 - **Explore** by clicking nodes, searching regions or genes (`g`), and switching
   [layouts](docs/layouts.md) or [haplotype](docs/haplotypes.md) highlights
 - **Share** with File → Copy link, or export an SVG
@@ -28,7 +33,7 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 - [Haplotypes](docs/haplotypes.md): highlighting walks, panels and rows
 - [Layouts](docs/layouts.md): each layout, what it needs and its settings
-- [Genes](docs/genes.md): gene tracks, assemblies and site setup
+- [Genes](docs/genes.md): gene tracks and assemblies
 - [Links](docs/links.md): every address parameter
 - [Walk files](docs/walk-files.md): gfa-to-tabix to a cut, step by step
 - [Developing](docs/developing.md): build, test, screenshots and deploy
