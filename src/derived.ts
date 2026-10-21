@@ -90,6 +90,15 @@ export function abridgedText(label: string, abridged: Abridged) {
   return `${label}: ${abridgedCounts(abridged)}`
 }
 
+// The notice for lifted walks a cut left abridged, by their labels
+export function tooLargeText(labels: string[]) {
+  const several = labels.length > 1
+  const names = several
+    ? `${labels.slice(0, -1).join(', ')} and ${labels.at(-1)} are`
+    : `${labels[0]} is`
+  return `${names} too large to read in full here${several ? ' together' : ''}, so ${several ? 'they are' : 'it is'} drawn abridged`
+}
+
 export const graphFacts = memo((graph: Graph | undefined) => {
   const deletions = graph ? deletionEdges(graph) : []
   const walkChoices = graph?.paths?.length ? pathLegend(graph.paths) : []

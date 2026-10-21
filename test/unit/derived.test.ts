@@ -1,7 +1,7 @@
 import { loadGraph } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
-import { abridgedText, memo, walkView } from '../../src/derived'
+import { abridgedText, memo, tooLargeText, walkView } from '../../src/derived'
 
 test('memo recomputes only when a key changes identity', () => {
   let calls = 0
@@ -61,5 +61,14 @@ test("an abridged walk's block counts the steps and bp it left out", () => {
   )
   expect(abridgedText('Sakai#1', { steps: 35, bp: 460 })).toBe(
     'Sakai#1: 35 steps, 460 bp off reference',
+  )
+})
+
+test('the notice names the lifted walks a cut left abridged', () => {
+  expect(tooLargeText(['HG00133#1'])).toBe(
+    'HG00133#1 is too large to read in full here, so it is drawn abridged',
+  )
+  expect(tooLargeText(['IAI39', 'Sakai'])).toBe(
+    'IAI39 and Sakai are too large to read in full here together, so they are drawn abridged',
   )
 })

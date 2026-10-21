@@ -1,7 +1,11 @@
 import { TabixIndexedFile } from '@gmod/tabix'
 import { parseRegion } from '@jbrowse/bandage-core'
 import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
-import { WALK_BUDGETS, WalkReader } from '@jbrowse/graph-walks'
+import {
+  RegionTooLargeError,
+  WALK_BUDGETS,
+  WalkReader,
+} from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
 import type { GenericFilehandle } from 'generic-filehandle2'
@@ -37,21 +41,19 @@ export interface WalkCutSource {
   // walks, by sample#haplotype#contig, to read in full where the file abridges
   // them
   expand?: string[]
+  // walks to read in full where that keeps the cut under its budgets
+  lifted?: string[]
+  nodeLimit?: number
 }
 
-/**
- * A window of a walk file set as graph tables, cut the way the gbz-base cut
- * is: the reference sample's path over the region with `context` bp either
- * side, and the walks of the haplotypes asked for, every one when none are.
- * `expanded` names the abridged walks the cut read in full.
- */
-export async function cutWalksRegion(
+async function cutReading(
   walks: WalkFiles,
   src: WalkCutSource,
+  expand: string[],
   signal?: AbortSignal,
 ) {
   const region = parseRegion(src.region)
-  const wanted = new Set(src.expand)
+  const wanted = new Set(expand)
   const expanded = new Set<string>()
   const { tables, sample } = await walks.cutRegion(region, {
     signal,
@@ -59,7 +61,7 @@ export async function cutWalksRegion(
     referenceSample: src.referenceSample,
     context: src.context ?? GBZ_CUT_DEFAULTS.context,
     byteBudget: WALK_BUDGETS.byteBudget,
-    nodeLimit: GBZ_CUT_DEFAULTS.limit,
+    nodeLimit: src.nodeLimit ?? GBZ_CUT_DEFAULTS.limit,
     expand: name => {
       if (wanted.has(name)) {
         expanded.add(name)
@@ -68,4 +70,35 @@ export async function cutWalksRegion(
     },
   })
   return { gfa: tables, region, sample, expanded: [...expanded] }
+}
+
+/**
+ * A window of a walk file set as graph tables, cut the way the gbz-base cut
+ * is: the reference sample's path over the region with `context` bp either
+ * side, and the walks of the haplotypes asked for, every one when none are.
+ * `expanded` names the abridged walks the cut read in full. Where reading the
+ * lifted walks in full takes the cut over a budget, it cuts again with them
+ * abridged, and `tooLarge` names them.
+ */
+export async function cutWalksRegion(
+  walks: WalkFiles,
+  src: WalkCutSource,
+  signal?: AbortSignal,
+) {
+  const expand = src.expand ?? []
+  const lifted = (src.lifted ?? []).filter(name => !expand.includes(name))
+  try {
+    const cut = await cutReading(walks, src, [...expand, ...lifted], signal)
+    return { ...cut, tooLarge: [] as string[] }
+  } catch (e) {
+    if (!(e instanceof RegionTooLargeError) || lifted.length === 0) {
+      throw e
+    }
+  }
+  const cut = await cutReading(walks, src, expand, signal)
+  const { names, abridgedSteps } = cut.gfa.walks
+  const abridged = new Set(
+    names.filter((_, i) => !Number.isNaN(abridgedSteps?.[i] ?? Number.NaN)),
+  )
+  return { ...cut, tooLarge: lifted.filter(name => abridged.has(name)) }
 }

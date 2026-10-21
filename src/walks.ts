@@ -1,5 +1,5 @@
 import { replaceParams } from './address'
-import { expandWalks } from './sources'
+import { readLiftedWalks } from './sources'
 import { saveSettings, settings, state } from './state'
 import { rebuild } from './view'
 
@@ -37,12 +37,12 @@ function changed() {
 }
 
 // Lift the walks named, in that order, keeping the colour any already had,
-// and cut again to read any the cut abridged in full
+// and cut again to read any the cut abridged in full where they fit
 export function liftWalks(names: string[]) {
   const had = new Map(state.walkLayers.map(l => [l.walk, l]))
   state.walkLayers = names.map(walk => had.get(walk) ?? { walk })
   changed()
-  expandWalks(names.filter(name => !had.has(name)))
+  readLiftedWalks(names.filter(name => !had.has(name)))
 }
 
 export function toggleWalk(name: string) {

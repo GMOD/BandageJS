@@ -66,10 +66,12 @@ export async function referenceSamplesAt(db: string, index?: string) {
     : (await openDb(db, index)).referenceSamples
 }
 
+// `lifted` names walks a walk file cut reads in full where they fit
 export async function cutGbz(
   src: GbzSource,
   status: (text: string) => void,
   signal: AbortSignal,
+  lifted: string[] = [],
 ) {
   const cut = { ...src, region: coreRegion(parseRegion(src.region)) }
   if (isWalksUrl(src.db)) {
@@ -78,12 +80,12 @@ export async function cutGbz(
     signal.throwIfAborted()
     status(`Cutting ${src.region}`)
     const { cutWalksRegion } = await import('./walkFiles')
-    return cutWalksRegion(files, cut, signal)
+    return cutWalksRegion(files, { ...cut, lifted }, signal)
   }
   status('Opening pangenome database')
   const gbz = await openDb(src.db, src.index)
   signal.throwIfAborted()
   status(`Cutting ${src.region}`)
   const { text, ...rest } = await cutGbzRegion(gbz, cut, signal)
-  return { gfa: text, ...rest, expanded: [] }
+  return { gfa: text, ...rest, expanded: [], tooLarge: [] }
 }

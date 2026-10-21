@@ -31,9 +31,10 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
   steps in amber
 - Clicking the block, or **Load its steps** on a selected walk row, cuts again
   with the walk read in full
-- A highlighted walk is always read in full, since the highlight draws its steps
-- `expand=` in the address names the walks read in full. The node limit still
-  applies, so an expansion past it fails as a too-wide window does
+- A highlighted walk is read in full, since the highlight draws its steps. One
+  that would take the cut past its budgets stays abridged, with a notice
+- `expand=` in the address names the walks read in full. The budgets still
+  apply, so a click that expands past them fails as a too-wide window does
 
 [The tutorial](walk-files-tutorial.md) walks through a cut with screenshots.
 

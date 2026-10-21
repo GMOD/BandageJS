@@ -16,6 +16,7 @@ import { loadGenes, stopGenes } from './genes'
 import { relayout, stopLayout } from './layout'
 import { askView } from './linkView'
 import { gbzFromQuery, gbzQuery } from './query'
+import { tooLargeText } from './derived'
 import { fetchOk, gfaText, readError } from './read'
 import { parseRegion } from './region'
 import { remember } from './recent'
@@ -283,20 +284,17 @@ export async function openGbz(
 ) {
   const { live, signal, work } = beginOpen('Opening the cut')
   const wholeWalks = cutsWholeWalks()
-  // a lifted walk draws its steps, so the cut reads it in full
+  // a lifted walk draws its steps, so the cut reads it in full where it fits
   const lifted = kept.walks?.map(l => l.walk) ?? askedWalks()
-  const wanted = {
-    ...src,
-    expand: [...new Set([...(src.expand ?? []), ...lifted])],
-  }
   try {
     parseRegion(src.region)
-    const { gfa, region, sample, expanded } = await cutGbz(
-      wholeWalks ? { ...wanted, snarls: 'overlapping' } : wanted,
+    const { gfa, region, sample, expanded, tooLarge } = await cutGbz(
+      wholeWalks ? { ...src, snarls: 'overlapping' } : src,
       text => {
         report(work, text)
       },
       signal,
+      lifted,
     )
     if (!live()) {
       return
@@ -326,6 +324,14 @@ export async function openGbz(
         setQuery(gbzQuery(cut))
         if (rememberIt) {
           rememberSource()
+        }
+        if (tooLarge.length) {
+          notify(
+            tooLargeText(
+              tooLarge.map(name => facts().walkLabels.get(name) ?? name),
+            ),
+            false,
+          )
         }
       },
     )
@@ -393,22 +399,39 @@ function keptOf(source: Source): Partial<Kept> {
   }
 }
 
-// Cuts the region on screen again, reading in full the abridged walks among
-// `names`. Not inside a popped bubble, which the cut would close.
-export function expandWalks(names: string[]) {
+// Cuts the region on screen again where the cut abridged any of `names`,
+// with `expand` naming those it reads in full. Not inside a popped bubble,
+// which the cut would close.
+function recutAbridged(
+  names: string[],
+  expand: (gbz: GbzSource, abridged: string[]) => GbzSource,
+) {
   const source = state.source
-  const abridged = facts().abridged
-  const more = names.filter(name => abridged.has(name))
-  if (!source?.gbz || more.length === 0 || state.stack.length > 0) {
+  const abridged = names.filter(name => facts().abridged.has(name))
+  if (!source?.gbz || abridged.length === 0 || state.stack.length > 0) {
     return
   }
   void openGbz(
-    { ...source.gbz, expand: [...(source.gbz.expand ?? []), ...more] },
+    expand(source.gbz, abridged),
     source.description,
     false,
     undefined,
     keptOf(source),
   )
+}
+
+// Reads the walks named in full, or fails as a too-wide window does
+export function expandWalks(names: string[]) {
+  recutAbridged(names, (gbz, abridged) => ({
+    ...gbz,
+    expand: [...(gbz.expand ?? []), ...abridged],
+  }))
+}
+
+// Reads walks just lifted in full where they fit, as openGbz reads every
+// lifted walk
+export function readLiftedWalks(names: string[]) {
+  recutAbridged(names, gbz => gbz)
 }
 
 // Saves the graph on screen to the Open dialog's recent list, with the

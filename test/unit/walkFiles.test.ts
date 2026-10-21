@@ -1,5 +1,6 @@
 import { cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
+import { RegionTooLargeError } from '@jbrowse/graph-walks'
 import { LocalFile } from 'generic-filehandle2'
 
 import { formatLocus, loadGraph } from '@jbrowse/bandage-core'
@@ -121,4 +122,45 @@ test('a walk file cut reads the abridged walks it expands in full', async () => 
   expect(expanded).toEqual(['Sakai#1#chr'])
   expect(stepCounts(text)).toEqual({ ...stepCounts(whole.text), IAI39: 2 })
   expect(stepCounts(text).Sakai).toBe(35)
+})
+
+// Sakai read in full takes this cut from 39 nodes to 45, and IAI39 as well
+// to 54
+test('a walk file cut leaves a lifted walk abridged where reading it would go over the node limit', async () => {
+  const { text, expanded, tooLarge } = await cut(
+    { region: K12, lifted: ['Sakai#1#chr', 'K12#1#chr'], nodeLimit: 40 },
+    ABRIDGED,
+  )
+  expect(stepCounts(text).Sakai).toBe(2)
+  expect(expanded).toEqual([])
+  expect(tooLarge).toEqual(['Sakai#1#chr'])
+})
+
+test('a walk file cut reads a lifted walk in full where it fits', async () => {
+  const { expanded, tooLarge } = await cut(
+    { region: K12, lifted: ['Sakai#1#chr'], nodeLimit: 45 },
+    ABRIDGED,
+  )
+  expect(expanded).toEqual(['Sakai#1#chr'])
+  expect(tooLarge).toEqual([])
+})
+
+test('a walk file cut keeps the walks it was asked to expand when it leaves the lifted ones abridged', async () => {
+  const { expanded, tooLarge } = await cut(
+    {
+      region: K12,
+      expand: ['Sakai#1#chr'],
+      lifted: ['IAI39#1#chr'],
+      nodeLimit: 45,
+    },
+    ABRIDGED,
+  )
+  expect(expanded).toEqual(['Sakai#1#chr'])
+  expect(tooLarge).toEqual(['IAI39#1#chr'])
+})
+
+test('a walk file cut fails where a walk it was asked to expand goes over the node limit', async () => {
+  await expect(
+    cut({ region: K12, expand: ['Sakai#1#chr'], nodeLimit: 40 }, ABRIDGED),
+  ).rejects.toBeInstanceOf(RegionTooLargeError)
 })
