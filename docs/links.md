@@ -7,9 +7,7 @@ it. A graph opened from your computer has no link.
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | `gfa`                                                  | GFA url                                                                              |
 | `walks`, `loc`, `ref`, `haps`                          | Cut: walk file url (or `hprc`), region, reference sample, comma-separated haplotypes |
-| `index`                                                | Haplotype index for a `.gbz.db` in `walks`                                           |
 | `expand`                                               | Abridged walks the cut reads in full, comma-separated `sample#haplotype#contig`      |
-| `gbz`                                                  | Older name for `walks`; `gbz=hprc` cuts the HPRC `.gbz.db`                           |
 | `hub`, `assembly`, `contigs`                           | Genes: JBrowse configs, assembly, `graph:assembly` contig names                      |
 | `layout`                                               | `force`, `anchored`, `ordered`, `samplerows`, `walkrows`, `tubemap` or `tubemapref`  |
 | `along`                                                | Walk that a walk-anchored graph draws along                                          |
@@ -20,6 +18,7 @@ it. A graph opened from your computer has no link.
 | `color`, `width`, `thickness`                          | Colour scheme, `depth` or `uniform` width, node width in px                          |
 | `bubbles`, `deletions`, `genes`, `paths`, `bars`       | `1` or `0` for each drawn element                                                    |
 | `engine`, `quality`, `spacing`, `separation`, `spread` | Force layout settings                                                                |
+| `gbz`, `index`                                         | Older links: a gbz-base `.gbz.db` cut and its haplotype index                        |
 
 A parameter appears only when it differs from the default.
 

@@ -44,14 +44,12 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ## Libraries
 
+- [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix): writes walk files
+- [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) (npm): reads them
 - [@jbrowse/bandage-core](https://github.com/GMOD/bandage-core) (npm): layout
   and drawing
 - [@jbrowse/graph-stress-layout](https://github.com/GMOD/graph-stress-layout)
   (npm): stress layout
-- [@gmod/gbz-base](https://github.com/GMOD/gbz-base-js) (npm): `.gbz.db` reader
-- [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) (npm): walk file
-  reader
-- [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix): writes walk files
 - [ggbandage](https://github.com/GMOD/ggbandage) (R): Bandage-style figures as
   ggplot2 layers
 
