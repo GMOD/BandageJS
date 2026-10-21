@@ -16,8 +16,13 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 ## Using it
 
 - **Open** a GFA with File → Open, a url, or drag and drop
-- **Cut** a region from a [walk file](docs/walk-files.md), as in
-  [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
+- **Browse one locus** of a pangenome too large to load whole, from
+  - a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) walk file
+    ([guide](docs/walk-files.md)), as in
+    [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
+  - a [gbz-base](https://github.com/jltsiren/gbz-base) `.gbz.db`, plus an
+    optional [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index)
+    to name its walks
 - **Explore** by clicking nodes, searching regions or genes (`g`), and switching
   [layouts](docs/layouts.md) or [haplotype](docs/haplotypes.md) highlights
 - **Share** with File → Copy link, or export an SVG
