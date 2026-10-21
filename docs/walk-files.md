@@ -74,7 +74,7 @@ haplotype's bp:
   lacks
 - The label after each bar gives the walk's length and its difference from the
   reference: HG00133#1 runs 116 kb longer than GRCh38's 33 kb
-- [Haplotypes](haplotypes.md) covers highlighting walks and panels
+- [The user guide](guide.md#highlighting-haplotypes) covers highlighting walks and panels
 
 ## 7. Share the cut
 
@@ -88,7 +88,7 @@ The address holds the whole cut, so File → **Copy link** shares it:
 `https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5.GRCh38.walks.bed.gz`; a
 link to your own file holds its url.
 
-[Links](links.md) lists every parameter.
+[The user guide](guide.md#links) lists every parameter.
 
 ## Abridged walks
 

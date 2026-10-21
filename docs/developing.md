@@ -29,7 +29,7 @@ React.
 - `walks.ts`, `walkStrip.ts`, `bubbles.ts`, `details.ts`, `find.ts`: haplotype
   highlighting, walk rows, bubbles, node details, node search
 - `reference.ts`, `hubs.ts`, `genes.ts`: reference assembly and genes; see
-  [genes.md](genes.md)
+  [the guide](guide.md#genes)
 - `figure.ts`: Export SVG
 
 Modules that touch no DOM have unit tests in Node. Changes to the plugin's
@@ -78,7 +78,7 @@ pnpm's own command.
 
 ## Gene hubs
 
-`config.json` next to `index.html` lists the JBrowse hubs that [genes](genes.md)
+`config.json` next to `index.html` lists the JBrowse hubs that [genes](guide.md#genes)
 come from:
 
 ```json

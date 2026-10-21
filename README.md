@@ -59,16 +59,14 @@ way.
 ## Exploring and sharing
 
 - Click a node for its details, or press `g` and type a region or gene name
-- Pick a layout from the [Layout](docs/layouts.md) menu, and highlight walks
-  from the [Haplotypes](docs/haplotypes.md) menu
+- Pick a layout from the [Layout](docs/guide.md#layouts) menu, and highlight
+  walks from the [Haplotypes](docs/guide.md#highlighting-haplotypes) menu
 - File → Copy link shares the view, and File → Export SVG saves it
 
 ## Docs
 
-- [Haplotypes](docs/haplotypes.md): highlighting walks, panels and rows
-- [Layouts](docs/layouts.md): each layout, what it needs and its settings
-- [Genes](docs/genes.md): gene tracks and assemblies
-- [Links](docs/links.md): every address parameter
+- [User guide](docs/guide.md): layouts, highlighting haplotypes, genes and
+  every address parameter
 - [Walk files](docs/walk-files.md): making a walk file and opening a region of
   it, step by step
 
