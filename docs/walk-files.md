@@ -17,7 +17,7 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 ```
 
 - The run writes `graph.GRCh38.walks.bed.gz` and `graph.GRCh38.walks.bed.gz.tbi`
-- BandageJS needs walk format 4, from gfa-to-tabix 1.2 or later
+- BandageJS needs walk format 5, from gfa-to-tabix 1.4 or later
 - A graph shipped as `.gbz` converts first:
   `vg convert -f graph.gbz > graph.gfa`
 
@@ -26,7 +26,7 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 - Put the `.walks.bed.gz` and its `.tbi` side by side under one url
 - The server must answer range requests and send `Access-Control-Allow-Origin`,
   as S3 does
-- BandageJS fetches the chunks under the region by range request, so the 1.2 GB
+- BandageJS fetches the chunks under the region by range request, so the 1.5 GB
   HPRC file opens without a download
 
 ## 3. Paste the url into Open
@@ -92,9 +92,8 @@ link to your own file holds its url.
 
 ## Abridged walks
 
-- In walk format 5 (gfa-to-tabix 1.4), gfa-to-tabix moves the costliest walks of
-  a costly chunk, usually a satellite array, into detail records that a window
-  read skips
+- gfa-to-tabix moves the costliest walks of a costly chunk, usually a
+  satellite array, into detail records that a window read skips
 - BandageJS reads each such walk as two steps, where it leaves and rejoins the
   reference
 - The Haplotypes menu lists each as a block, such as
