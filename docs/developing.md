@@ -76,6 +76,37 @@ and delete the branch.
 with `--delete` and invalidates the CloudFront path. Bare `pnpm deploy` is
 pnpm's own command.
 
+## Gene hubs
+
+`config.json` next to `index.html` lists the JBrowse hubs that [genes](genes.md)
+come from:
+
+```json
+{
+  "jbrowse": "https://jbrowse.org/code/jb2/main/",
+  "hubs": [
+    "https://jbrowse.org/pangenome/hprc-grch38/config.json",
+    {
+      "url": "https://jbrowse.org/hubs/genark/GCF/000/005/845/GCF_000005845.2/config.json",
+      "aliases": { "GCF_000005845.2": ["K12"] },
+      "refNameAliases": { "GCF_000005845.2": { "chr": "NC_000913.3" } }
+    }
+  ]
+}
+```
+
+- `hubs`: JBrowse `config.json` urls, searched in order
+- `aliases`: sample names your graphs use for the assembly
+- `refNameAliases`: `{ "graph name": "assembly name" }` for sequences named
+  differently
+- `genes`: the gene track id, or `""` for none
+- `jbrowse`: the JBrowse Web that File → JBrowse links open
+- `genomes`: where the search dialog finds UCSC, GenArk and
+  genomes.jbrowse.org-style `searchIndex.json` entries
+
+Adding the same `aliases` and `refNameAliases` to your own JBrowse works for
+both apps.
+
 ## Examples
 
 `examples/index.json` lists the Examples menu. A `file` entry is a GFA in

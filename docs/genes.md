@@ -40,30 +40,5 @@ assembly, only contig names that match the graph's (`chr6` or `GRCh38#0#chr6`).
 
 ## Site setup
 
-A deployer lists hubs in `config.json` next to `index.html`:
-
-```json
-{
-  "jbrowse": "https://jbrowse.org/code/jb2/main/",
-  "hubs": [
-    "https://jbrowse.org/pangenome/hprc-grch38/config.json",
-    {
-      "url": "https://jbrowse.org/hubs/genark/GCF/000/005/845/GCF_000005845.2/config.json",
-      "aliases": { "GCF_000005845.2": ["K12"] },
-      "refNameAliases": { "GCF_000005845.2": { "chr": "NC_000913.3" } }
-    }
-  ]
-}
-```
-
-- `hubs`: JBrowse `config.json` urls, searched in order
-- `aliases`: sample names your graphs use for the assembly
-- `refNameAliases`: `{ "graph name": "assembly name" }` for sequences named
-  differently
-- `genes`: the gene track id, or `""` for none
-- `jbrowse`: the JBrowse Web that File → JBrowse links open
-- `genomes`: where the search dialog finds UCSC, GenArk and
-  genomes.jbrowse.org-style `searchIndex.json` entries
-
-Adding the same `aliases` and `refNameAliases` to your own JBrowse works for
-both apps.
+A deployer lists the hubs the page searches in `config.json`; see
+[developing.md](developing.md#gene-hubs).
