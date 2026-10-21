@@ -29,7 +29,8 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - **Layout:** the Layout menu picks force-directed, anchored, sample rows, walk
   rows, ordered, tube map or tube map on reference ([details](docs/layouts.md))
 - **Share:** File → **Copy link** ([parameters](docs/links.md))
-- **Export:** File → **Export SVG** ([figures](docs/figures.md))
+- **Export:** File → **Export SVG** saves the view as a vector figure. For
+  scripted figures, see [ggbandage](https://github.com/GMOD/ggbandage)
 
 ![GRCh38, HG00097 and HG00133 through the KIV-2 cut, side by side](img/kiv2_facet.png)
 
@@ -41,12 +42,9 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - [Layouts](docs/layouts.md): each layout, what it needs and its settings
 - [Genes](docs/genes.md): gene tracks, assemblies and site setup
 - [Links](docs/links.md): every address parameter
-- [Walk files](docs/walk-files.md): cutting regions from your own haplotypes
-- [Walk file tutorial](docs/walk-files-tutorial.md): gfa-to-tabix to a cut, step
-  by step
-- [Figures](docs/figures.md): SVG export and figure specs
+- [Walk files](docs/walk-files.md): gfa-to-tabix to a cut, step by step
 - [Gallery](docs/gallery.md): example figures
-- [Developing](docs/developing.md): build, test, figures and deploy
+- [Developing](docs/developing.md): build, test, screenshots and deploy
 
 ## See also
 
