@@ -15,22 +15,12 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ## Using it
 
-- **Open:** File → Open, paste a url, drop a GFA on the page, or use
-  `?gfa=<url>`
-- **Cut a region:**
-  `?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133`. Paste a
-  [walk file](docs/walk-files.md) url (or a gbz-base `.gbz.db`) to cut your own
-- **Go to:** type a region, position or gene name in the location box (`g`);
-  regions read 1-based, as JBrowse writes them
-- **Inspect:** click a node, or find it by name, for its links, walks, bubble
-  and genes
-- **Haplotypes:** highlight walks as lanes or side by side
-  ([details](docs/haplotypes.md))
-- **Layout:** the Layout menu picks force-directed, anchored, sample rows, walk
-  rows, ordered, tube map or tube map on reference ([details](docs/layouts.md))
-- **Share:** File → **Copy link** ([parameters](docs/links.md))
-- **Export:** File → **Export SVG** saves the view as a vector figure. For
-  scripted figures, see [ggbandage](https://github.com/GMOD/ggbandage)
+- **Open** a GFA with File → Open, a url, or drag and drop
+- **Cut** a region from a [walk file](docs/walk-files.md), as in
+  [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
+- **Explore** by clicking nodes, searching regions or genes (`g`), and switching
+  [layouts](docs/layouts.md) or [haplotype](docs/haplotypes.md) highlights
+- **Share** with File → Copy link, or export an SVG
 
 ![GRCh38, HG00097 and HG00133 through the KIV-2 cut, side by side](img/kiv2_facet.png)
 
