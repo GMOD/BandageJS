@@ -1,28 +1,59 @@
 # BandageJS
 
-Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
+BandageJS draws genome graphs in a web browser. Try it at
+https://jbrowse.org/demos/bandagejs/, which opens on an example; the Examples
+menu lists more.
 
-![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
+![The LPA gene in the HPRC human pangenome graph, force-directed](img/kiv2_force.png)
 
-## Opening a whole graph
+The LPA gene in the HPRC human pangenome graph. Coloured nodes follow chr6 of
+GRCh38, the human reference genome, from red to purple, and gold rings mark
+LPA's exons. Dark grey nodes hold sequence that GRCh38 lacks, such as the
+68.4 kb loop of extra KIV-2 repeat copies.
 
-Drag a GFA file (`.gfa` or `.gfa.gz`) onto the page, or choose it or paste its
-url in File → Open. BandageJS reads the whole file, so use this for de novo
-assembly graphs and for pangenome graphs small enough to load.
+## Genome graphs
 
-## Opening one region of a large pangenome
+- A **genome graph** stores DNA as sequence segments (nodes) joined by links
+  (edges). [GFA](https://gfa-spec.github.io/GFA-spec/GFA1.html) is its file
+  format
+- A **pangenome graph** holds many genomes, each haplotype as a **walk**: the
+  list of segments it passes through. Where genomes differ, their walks take
+  different branches
+- [Bandage](https://github.com/rrwick/Bandage) draws de novo assembly graphs,
+  and BandageJS opens those too. It also highlights walks, marks where they
+  branch, draws genes on a reference genome, and reads one region at a time
+  from a whole-genome pangenome
 
-BandageJS reads one region at a time from an indexed pangenome hosted at a url:
+## Opening a GFA file
 
-| Index             | Made with                                                                                    | Files to host                                                                                                                                                                     |
-| ----------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Walk file         | [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) `--walks` ([guide](docs/walk-files.md)) | `graph.<reference>.walks.bed.gz`, such as `graph.GRCh38.walks.bed.gz`, and its `.tbi`                                                                                             |
-| gbz-base database | [gbz-base](https://github.com/jltsiren/gbz-base)                                             | `graph.gbz.db`, and optionally `graph.haplotype-index.db` from [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index), which labels each walk by sample and haplotype |
+Drag a GFA file (`.gfa` or `.gfa.gz`) onto the page, or choose it in File →
+Open. BandageJS loads the whole file, so this suits an assembly graph or a
+pangenome graph of one region, like the examples. A whole-genome pangenome is
+too large to load; see the next section.
 
-Paste the url of the `.walks.bed.gz` or `.gbz.db` into File → Open, then type a
-region on the reference such as `chr6:160,614,798-160,647,758`. BandageJS
-downloads only the part of the file in that region. Try
-[this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133).
+## Opening a region of a whole-genome pangenome
+
+1. Index the GFA once with [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix).
+   `--refs` names the genome whose coordinates you will search by:
+
+   ```console
+   gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
+   ```
+
+   The command writes a walk file, `graph.GRCh38.walks.bed.gz`, and its index,
+   `graph.GRCh38.walks.bed.gz.tbi`. A graph shipped as `.gbz`, as HPRC's are,
+   converts to GFA first with `vg convert -f graph.gbz > graph.gfa`
+2. Put both files on a web server that answers range requests and allows
+   cross-origin reads, as Amazon S3 does
+3. Paste the `.walks.bed.gz` url into File → Open, then type a region of the
+   reference genome, such as `chr6:160,614,798-160,647,758`. BandageJS downloads
+   only the part of the file in that region
+
+The HPRC release 2 human pangenome is hosted already:
+[open LPA from it](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133). [Walk files](docs/walk-files.md) covers these steps
+with screenshots. BandageJS also reads regions from a
+[gbz-base](https://github.com/jltsiren/gbz-base) database (`.gbz.db`) the same
+way.
 
 ## Exploring and sharing
 
