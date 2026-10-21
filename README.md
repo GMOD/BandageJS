@@ -2,16 +2,13 @@
 
 Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
-- **Built for:** pangenomes. Haplotype walks, bubbles, genes and regions cut
-  from a walk file are first-class
-- **Also opens:** de novo assembly graphs, as
-  [Bandage](https://github.com/rrwick/Bandage) does
-
 ![LPA KIV-2 from the HPRC graph, force-directed](img/kiv2_force.png)
 
-- **In:** a GFA (plain or gzipped), or a region cut live from a pangenome
-- **Out:** a force-directed, anchored or tube-map drawing with haplotypes,
-  bubbles and genes marked
+- **In:** a pangenome GFA, a de novo assembly graph as
+  [Bandage](https://github.com/rrwick/Bandage) opens, or one locus cut from a
+  pangenome
+- **Out:** a force-directed, anchored, walk-row or tube-map drawing with
+  haplotypes, bubbles and genes marked
 
 ## Using it
 
