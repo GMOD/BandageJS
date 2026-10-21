@@ -59,6 +59,19 @@ const FIGURES = {
       'walks=hprc',
       'loc=chr6:160,614,798-160,647,758',
       'haps=HG00097,HG00128,HG01123,HG00099,HG01960,HG02055,HG00133,HG01109',
+      // the walks the f5 file abridges here
+      `expand=${[
+        'HG00128#1#CM090080.1',
+        'HG00128#2#CM090096.1',
+        'HG00133#1#CM090050.1',
+        'HG00133#2#CM090065.1',
+        'HG01109#1#CM092087.1',
+        'HG01123#2#CM089098.1',
+        'HG01960#1#JBHIHM010000036.1',
+        'HG02055#2#JAHEPJ020000020.1',
+      ]
+        .map(encodeURIComponent)
+        .join(',')}`,
       'layout=force',
     ].join('&'),
     size: [1400, 900],
