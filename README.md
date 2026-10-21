@@ -6,23 +6,25 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 
 ## Using it
 
-- **Open a GFA file** (`.gfa` or `.gfa.gz`) of a pangenome or a de novo assembly
-  from a url, File → Open, or by dragging it onto the page
-- **Open one region of a pangenome** from a url and a reference region such as
-  `chr6:160,614,798-160,647,758`. BandageJS downloads only the part of the file
-  in that region. The url points to either
+- **Open a GFA file** (`.gfa` or `.gfa.gz`) of a pangenome or de novo assembly
+  graph: drag it onto the page, or pick it or paste its url in File → Open
+- **Open one region of a pangenome:** paste a url into File → Open, then type a
+  reference region such as `chr6:160,614,798-160,647,758` in the dialog that
+  follows. BandageJS downloads only the part of the file in that region. The url
+  is one of
   - a [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) walk file
     (`.walks.bed.gz` beside its `.tbi`). See the
     [walk file guide](docs/walk-files.md) or
     [this HPRC example](https://jbrowse.org/demos/bandagejs/?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133)
   - a [gbz-base](https://github.com/jltsiren/gbz-base) database
-    (`graph.gbz.db`). A
+    (`graph.gbz.db`). With a
     [gbz-haplotype-index](https://github.com/GMOD/gbz-haplotype-index) file
-    (`graph.haplotype-index.db`) in the same directory is optional and names
-    each walk by sample and haplotype
-- **Explore** by clicking nodes, searching regions or genes (`g`), and switching
-  [layouts](docs/layouts.md) or [haplotype](docs/haplotypes.md) highlights
-- **Share** with File → Copy link, or export an SVG
+    (`graph.haplotype-index.db`) in the same directory, BandageJS labels each
+    walk by sample and haplotype
+- **Explore:** click a node for its details, press `g` and type a region or gene
+  name, and pick from the [Layout](docs/layouts.md) and
+  [Haplotypes](docs/haplotypes.md) menus
+- **Share:** File → Copy link, or File → Export SVG
 
 ## Docs
 
@@ -30,7 +32,8 @@ Browser viewer for pangenome graphs, at https://jbrowse.org/demos/bandagejs/
 - [Layouts](docs/layouts.md): each layout, what it needs and its settings
 - [Genes](docs/genes.md): gene tracks and assemblies
 - [Links](docs/links.md): every address parameter
-- [Walk files](docs/walk-files.md): gfa-to-tabix to a cut, step by step
+- [Walk files](docs/walk-files.md): making a walk file and opening a region of
+  it, step by step
 - [Developing](docs/developing.md): build, test, screenshots and deploy
 
 ## Gallery
@@ -53,8 +56,10 @@ More in [the gallery](docs/gallery.md).
 ## See also
 
 - [jbrowse-plugin-graphgenomeviewer](https://github.com/GMOD/jbrowse-plugin-graphgenomeviewer):
-  the JBrowse 2 plugin for these graphs
-- [HPRC tutorial](https://jbrowse.org/jb2/docs/tutorials/pangenome_hprc/)
+  draws pangenome graphs in JBrowse 2
+- [ggbandage](https://github.com/GMOD/ggbandage) (R): Bandage-style figures as
+  ggplot2 layers
+- [JBrowse's HPRC pangenome tutorial](https://jbrowse.org/jb2/docs/tutorials/pangenome_hprc/)
 
 ## Libraries
 
@@ -64,8 +69,6 @@ More in [the gallery](docs/gallery.md).
   and drawing
 - [@jbrowse/graph-stress-layout](https://github.com/GMOD/graph-stress-layout)
   (npm): stress layout
-- [ggbandage](https://github.com/GMOD/ggbandage) (R): Bandage-style figures as
-  ggplot2 layers
 
 ## License
 
