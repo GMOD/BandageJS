@@ -1,7 +1,7 @@
 # Layouts
 
 The Layout menu lists the layouts the open graph can draw and leaves out the
-rest. A link stores the choice as `layout=` ([links.md](links.md)).
+rest. The address holds the choice as `layout=` ([links.md](links.md)).
 
 - **Walks** are a GFA's P or W lines
 - **A reference** comes from rGFA `SN`/`SO`/`SR` tags, or else from the first
@@ -14,15 +14,16 @@ rest. A link stores the choice as `layout=` ([links.md](links.md)).
 
 ## Sample rows
 
-- **Draws:** x at reference bp, one row per contributing assembly. A deletion
-  leaves that assembly's row empty across the span it removes
+- **Draws:** x at reference bp, one row per contributing assembly. Where an
+  assembly has a deletion, its row is empty across the deleted span
 - **Needs:** a reference and at least one segment off it
 
 ## Walk rows
 
 - **Draws:** one bar per haplotype, x along that haplotype's own bp, blue where
   the walk follows the reference and purple off it, so a repeat expansion shows
-  as a longer bar. Each bar boxes the haplotype's genes when genes are loaded
+  as a longer bar. When genes are loaded, each bar has boxes for that
+  haplotype's genes
 - **Needs:** a reference and two or more walks
 
 Haplotypes → **Bars under the graph** draws the same bars beneath any layout
@@ -32,7 +33,7 @@ except walk rows and the tube maps.
 
 - **Draws:** x in reference order, not bp, with each node as wide as the log of
   its length, so a SNP allele stays visible beside a 10 kb segment and a bubble
-  reads as a lens
+  is drawn as a lens shape
 - **Needs:** a reference
 
 ## Tube map
@@ -61,7 +62,7 @@ except walk rows and the tube maps.
 Layout → **Layout settings…** opens a dialog:
 
 - **Node thickness** and **Width by depth**, for every layout. Width by depth is
-  greyed out when every node has one depth
+  greyed out when every node has the same depth
 - **Force-directed** settings, shown when the layout on screen comes from the
   force engine: **Engine**, **Quality** (Fastest to Best), **Bubble spread**,
   **Spacing** and **Component separation**

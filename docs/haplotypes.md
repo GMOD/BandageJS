@@ -2,9 +2,9 @@
 
 The Haplotypes menu highlights walks, and the rest of the graph fades to grey.
 
-- One walk shades light to dark along the walk
-- Several walks, with **None** selected, overlay in one drawing: each walk gets
-  a flat colour and a lane
+- A single highlighted walk is shaded light to dark along its length
+- Several walks, with **None** selected, overlay in one drawing, each walk in a
+  flat colour and a separate lane
 - **A panel per walk** draws one panel per walk on a shared gradient, yellow at
   the start and red at the end
 - **A row per sample** puts each sample in a row and each haplotype in a column
@@ -20,7 +20,7 @@ HG00133 has 116 kb more:
 
 ![GRCh38, HG00097 and HG00133 through the KIV-2 cut, side by side](../img/kiv2_facet.png)
 
-The address stores the walks and the facet:
+The address holds the walks and the facet:
 
 ```
 ?walks=hprc&loc=chr6:160,614,798-160,647,758&haps=HG00097,HG00133&walk=GRCh38%230%23chr6&walk=HG00133%231%23CM090050.1&facet=walk&columns=2

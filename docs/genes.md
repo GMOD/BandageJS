@@ -1,15 +1,15 @@
 # Genes
 
-Genes are drawn along the reference nodes, exons dark, name beside them. Hover a
-name for the span and strand. They appear in the force-directed, anchored,
-ordered and sample-row layouts, and on walk rows.
+BandageJS draws genes along the reference nodes, with exons dark and each gene's
+name beside it. Hover a name for the span and strand. They appear in the
+force-directed, anchored, ordered and sample-row layouts, and on walk rows.
 
 ## Which assembly
 
-A graph names a reference sample (`GRCh38#0#chr6`), and `chr6` exists in every
-human assembly. The page matches the sample to an assembly in its JBrowse hubs
-by name or alias, then reads that assembly's gene track. Most graphs need
-nothing more.
+A graph's reference sample has a name such as `GRCh38#0#chr6`, and `chr6` exists
+in every human assembly. The page matches the sample to an assembly in its
+JBrowse hubs by name or alias, then reads that assembly's gene track, so most
+graphs need no setup.
 
 When nothing matches, File → Choose reference genome… lets you:
 
@@ -19,8 +19,8 @@ When nothing matches, File → Choose reference genome… lets you:
 
 The browser remembers the choice for that sample. Pick Automatic to forget it.
 
-Haplotypes → Reference haplotype draws along another walk, and the genes follow
-that walk's assembly.
+Picking another walk under Haplotypes → Reference haplotype redraws the graph
+along it, with genes from that walk's assembly.
 
 ## Walk rows
 
@@ -35,7 +35,7 @@ assembly, only contig names that match the graph's (`chr6` or `GRCh38#0#chr6`).
 
 ## Linking
 
-`hub=`, `assembly=` and `contigs=` store a choice in the address. See
+`hub=`, `assembly=` and `contigs=` record a choice in the address. See
 [links.md](links.md).
 
 ## Site setup

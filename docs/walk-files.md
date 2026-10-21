@@ -51,8 +51,8 @@ file field.
 - **Region:** 1-based and closed, on the reference, as JBrowse writes it
 - **Haplotypes:** sample names, comma separated; empty keeps every one
 
-**Cut** draws the region. Where the region holds too many nodes, the error names
-a window size that fits.
+**Cut** draws the region. Where the region holds too many nodes, the error
+message gives a window size that fits.
 
 ## 5. Read the graph
 
@@ -65,8 +65,8 @@ a window size that fits.
 
 ## 6. Compare the haplotypes
 
-Under Layout → **Walk rows**, BandageJS draws each walk as a bar along its own
-length:
+Under Layout → **Walk rows**, BandageJS draws each walk as a bar as long as the
+haplotype's bp:
 
 ![Walk rows for GRCh38 and eight HPRC haplotypes across LPA](../img/tutorial/cut_rows.png)
 
@@ -92,18 +92,20 @@ link to your own file holds its url.
 
 ## Abridged walks
 
-- In walk format 5 (gfa-to-tabix 1.4), a costly chunk, usually a satellite
-  array, moves its costliest walks to detail records that a window read skips
-- The cut gives each such walk two steps, where it leaves and rejoins the
+- In walk format 5 (gfa-to-tabix 1.4), gfa-to-tabix moves the costliest walks of
+  a costly chunk, usually a satellite array, into detail records that a window
+  read skips
+- BandageJS reads each such walk as two steps, where it leaves and rejoins the
   reference
 - The Haplotypes menu lists each as a block, such as
   `HG00133#1: 11 k steps, 171 kb off reference`. Walk rows draw its missing
   steps in amber
 - Clicking the block, or **Load its steps** on a selected walk row, cuts again
   with the walk read in full
-- A highlighted walk is read in full, since the highlight draws its steps. One
-  that would take the cut past its budgets stays abridged, with a notice
-- `expand=` in the address names the walks read in full. The budgets still
+- A highlighted walk is read in full, since BandageJS needs its steps to draw
+  the highlight. One that would take the cut past its budgets stays abridged,
+  with a notice
+- `expand=` in the address lists the walks read in full. The budgets still
   apply, so a click that expands past them fails as a too-wide window does
 
 [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) reads the files.

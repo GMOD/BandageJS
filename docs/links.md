@@ -1,6 +1,6 @@
 # Links
 
-The address always states the view on screen, and File → **Copy link** copies
+The address always describes the view on screen, and File → **Copy link** copies
 it. A graph opened from your computer has no link.
 
 | Parameter                                              | Meaning                                                                              |
