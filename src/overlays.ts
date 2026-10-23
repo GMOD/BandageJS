@@ -351,6 +351,8 @@ export function legendsHtml(o: {
   rowGenes: GeneGaps | undefined
   walkRamp: { start: number; end: number } | undefined
   walks: { walk: LiftedWalk; label: string; at?: string }[]
+  // what the lift's faded drawing is, from bandage-core's fadedKey
+  faded: string
   reference: { name?: string; start: number; end: number } | undefined
 }) {
   const out: string[] = []
@@ -390,7 +392,6 @@ export function legendsHtml(o: {
     )
   }
   if (o.walks.length > 0) {
-    const notOn = o.walks.length === 1 ? o.walks[0]!.label : 'these walks'
     out.push(
       `<div class="legend walks">${o.walks
         .map(({ walk, label, at }) =>
@@ -398,7 +399,7 @@ export function legendsHtml(o: {
         )
         .join(
           '',
-        )}<div class="legend-row"><div class="swatch walk" style="background:${FADED_SWATCH}"></div><span>not on ${esc(notOn)}</span></div></div>`,
+        )}<div class="legend-row"><div class="swatch walk" style="background:${FADED_SWATCH}"></div><span>${esc(o.faded)}</span></div></div>`,
     )
   }
   return out.join('')

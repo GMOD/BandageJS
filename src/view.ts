@@ -12,6 +12,7 @@ import {
   drawingBounds,
   edgeHoverText,
   facetCells,
+  fadedKey,
   facetGrid,
   fitTransform,
   formatBp,
@@ -774,6 +775,11 @@ function drawOverlays() {
   setHtml(ui.html, layout ? overlayHtml(pane) : '')
   overlayBubbles = d.halos.map(h => h.bubble)
 
+  const keyed = (lift?.walks ?? []).map(walk => ({
+    walk,
+    label: f.walkLabels.get(walk.name) ?? walk.name,
+    at: hoveredOn(walk),
+  }))
   const legends = layout
     ? legendsHtml({
         // a lifted walk's key states its own scale, and the rest is grey
@@ -786,11 +792,15 @@ function drawOverlays() {
         walkBars: d.bars,
         rowGenes: d.rowGenes?.size ? state.walkGeneNote : undefined,
         walkRamp,
-        walks: (lift?.walks ?? []).map(walk => ({
-          walk,
-          label: f.walkLabels.get(walk.name) ?? walk.name,
-          at: hoveredOn(walk),
-        })),
+        walks: keyed,
+        faded:
+          lift && graph
+            ? fadedKey(
+                graph,
+                lift,
+                keyed.length === 1 ? keyed[0]!.label : 'these walks',
+              )
+            : '',
         reference: walkReference(lift),
       })
     : ''

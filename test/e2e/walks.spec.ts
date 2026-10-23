@@ -38,7 +38,7 @@ test('walks highlight from the menu as lanes, each keyed in one short row', asyn
   const key = page.locator('#legends .legend.walks')
   await expect(key.locator('.walk-key')).toHaveCount(2)
   await expect(key).toContainText('449 bp reversed')
-  await expect(key).toContainText('not on these walks')
+  await expect(key).toContainText('only in other haplotypes')
   expect(new URL(page.url()).searchParams.getAll('walk')).toEqual([K12, IAI39])
 })
 
@@ -66,7 +66,9 @@ test('a walk lifted alone shades along itself, its stretch written under its bar
   const key = page.locator('#legends .walk-key')
   await expect(key.locator('.swatch.scale')).toBeVisible()
   await expect(key).toContainText('chr:2,249,413-2,249,872 (460 bp)')
-  await expect(page.locator('#legends')).toContainText('not on IAI39')
+  await expect(page.locator('#legends')).toContainText(
+    'only in other haplotypes',
+  )
 })
 
 // Inked points of a canvas in page coordinates, a few hundred at most
