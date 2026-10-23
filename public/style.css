@@ -789,6 +789,13 @@ main.faceted #back {
   width: 48px;
 }
 
+.swatch.dashes {
+  flex: none;
+  height: 0;
+  border-radius: 0;
+  border-top: 2px dashed currentColor;
+}
+
 .walk-key {
   margin-bottom: 2px;
 }

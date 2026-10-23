@@ -7,6 +7,7 @@ import {
   axisScaleOf,
   buildGeometry,
   contains,
+  deletionKey,
   drawTubeMap,
   drawTubeMapHighlight,
   drawingBounds,
@@ -801,6 +802,10 @@ function drawOverlays() {
                 keyed.length === 1 ? keyed[0]!.label : 'these walks',
               )
             : '',
+        deletions:
+          d.deletions.length > 0
+            ? deletionKey(referenceName() ?? referenceAssembly())
+            : undefined,
         reference: walkReference(lift),
       })
     : ''

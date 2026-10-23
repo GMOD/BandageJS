@@ -291,6 +291,8 @@ export function overlayHtml(p: Pane) {
 
 // a node off the lifted walks: grey at the fade's alpha
 const FADED_SWATCH = 'rgba(160, 160, 160, 0.18)'
+const FADED_DASHES = 'rgb(160, 160, 160)'
+const DELETION_DASHES = 'rgb(24, 24, 28)'
 
 // One walk's key: a swatch, or a short bar of the scale its lane shades by,
 // then its name, with the stretch that scale runs over under it. `at`, where
@@ -353,6 +355,8 @@ export function legendsHtml(o: {
   walks: { walk: LiftedWalk; label: string; at?: string }[]
   // what the lift's faded drawing is, from bandage-core's fadedKey
   faded: string
+  // what the dashed links are, from bandage-core's deletionKey, when any draw
+  deletions: string | undefined
   reference: { name?: string; start: number; end: number } | undefined
 }) {
   const out: string[] = []
@@ -391,6 +395,10 @@ export function legendsHtml(o: {
       ),
     )
   }
+  // a lift fades the dashes it doesn't run along, as it fades the rest
+  const dashes = o.deletions
+    ? `<div class="legend-row"><div class="swatch dashes" style="color:${o.walks.length > 0 ? FADED_DASHES : DELETION_DASHES}"></div><span>${esc(o.deletions)}</span></div>`
+    : ''
   if (o.walks.length > 0) {
     out.push(
       `<div class="legend walks">${o.walks
@@ -399,8 +407,10 @@ export function legendsHtml(o: {
         )
         .join(
           '',
-        )}<div class="legend-row"><div class="swatch walk" style="background:${FADED_SWATCH}"></div><span>${esc(o.faded)}</span></div></div>`,
+        )}<div class="legend-row"><div class="swatch walk" style="background:${FADED_SWATCH}"></div><span>${esc(o.faded)}</span></div>${dashes}</div>`,
     )
+  } else if (dashes) {
+    out.push(`<div class="legend">${dashes}</div>`)
   }
   return out.join('')
 }

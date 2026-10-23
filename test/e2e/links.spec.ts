@@ -115,3 +115,16 @@ test('Copy link is offered for a graph with an address, not for a dropped file',
   expect(new URL(page.url()).search).toBe('')
   await expect(await fileMenuItem(page, 'Copy link')).toBeDisabled()
 })
+
+test('the legend keys dashed links as reference sequence they skip, only when some draw', async ({
+  page,
+}) => {
+  await openPage(page, 'gfa=examples/hprc_cfh.gfa')
+  await waitForDrawing(page, /nodes/)
+  await expect(page.locator('#legends')).toContainText(
+    /skips \S.* sequence \(a deletion\)/,
+  )
+  await openPage(page, 'gfa=examples/assembly_graph.gfa')
+  await waitForDrawing(page, /nodes/)
+  await expect(page.locator('#legends')).not.toContainText('(a deletion)')
+})
