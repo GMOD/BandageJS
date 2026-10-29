@@ -73,7 +73,8 @@ haplotype's bp:
 - Coloured stretches follow the reference; dark stretches are sequence GRCh38
   lacks
 - The label after each bar gives the walk's length and its difference from the
-  reference: HG00133#1 runs 116 kb longer than GRCh38's 33 kb
+  reference: HG00133#1 runs about 117 kb longer than GRCh38's 33 kb, an estimate
+  (≈) because the file abridges that walk
 - [The user guide](guide.md#highlighting-haplotypes) covers highlighting walks
   and panels
 
