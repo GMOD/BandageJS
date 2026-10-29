@@ -19,12 +19,17 @@ import {
   walkRows,
   placeRowGenes,
 } from '@jbrowse/bandage-core'
+import {
+  dashedDeletions,
+  deletionKey,
+} from '@jbrowse/bandage-core/deletionEdges'
 
 import type { Region } from './jbrowse'
 import type { Facet } from './settings'
 import type {
   ColorScheme,
   DeletionDrawing,
+  DeletionEdge,
   GeneModel,
   Graph,
   GraphNode,
@@ -32,6 +37,7 @@ import type {
   MinigraphBubble,
   NodeWidth,
   WalkLayer,
+  WalkLift,
   WalkRows,
 } from '@jbrowse/bandage-core'
 
@@ -78,6 +84,18 @@ function stepsText(steps: number) {
     : steps < 999_500
       ? `${Math.round(steps / 1000)} k`
       : `${+(steps / 1e6).toFixed(1)} M`
+}
+
+// The dashed-deletion key, only where the drawing leaves a deletion dashed: a
+// lifted walk's lane draws each deletion it takes solid
+export function deletionKeyFor(
+  deletions: DeletionEdge[],
+  lift: WalkLift | undefined,
+  reference: string,
+) {
+  return dashedDeletions(deletions, lift).length > 0
+    ? deletionKey(reference)
+    : undefined
 }
 
 export function abridgedCounts({ steps, bp }: Abridged) {
