@@ -91,7 +91,7 @@ function stepsText(steps: number) {
 export function deletionKeyFor(
   deletions: DeletionEdge[],
   lift: WalkLift | undefined,
-  reference: string,
+  reference: string | undefined,
 ) {
   return dashedDeletions(deletions, lift).length > 0
     ? deletionKey(reference)
