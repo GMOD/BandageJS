@@ -50,6 +50,13 @@ const FIGURES = {
       'walks=hprc',
       'loc=chr1:103,540,000-103,780,000',
       'haps=HG00097,HG00133,HG01123,HG02055',
+      `expand=${[
+        'HG00133#1#CM090045.1',
+        'HG01123#1#CM089081.1',
+        'HG02055#1#CM092205.1',
+      ]
+        .map(encodeURIComponent)
+        .join(',')}`,
       'layout=walkrows',
     ].join('&'),
     size: [1400, 460],
