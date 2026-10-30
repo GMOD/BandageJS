@@ -774,6 +774,11 @@ main.faceted #back {
   flex: none;
 }
 
+.swatch.gap {
+  align-self: center;
+  border-radius: 0;
+}
+
 .swatch.gene-box {
   box-sizing: border-box;
   border: 1.5px solid #1c1c22;

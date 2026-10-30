@@ -335,7 +335,9 @@ export function walkRowsKeyHtml(entries: KeyEntry[]) {
                 style:
                   e.swatch.kind === 'gene'
                     ? undefined
-                    : `background:${e.swatch.fill}`,
+                    : e.swatch.kind === 'gap'
+                      ? `background:${e.swatch.fill};height:${e.swatch.px}px`
+                      : `background:${e.swatch.fill}`,
               }),
               el('span', {}, e.label),
             ),
