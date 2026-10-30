@@ -9,6 +9,7 @@ import {
   exonOutlineTree,
   exonStretches,
   formatBp,
+  geneLeader,
   walkKey,
   el,
   serializeEl,
@@ -206,7 +207,11 @@ function leaders(p: Pane) {
 
 function geneLabels(p: Pane) {
   return p.labels.genes.map(({ item: pin, x, y, w, text }) => {
-    const pinY = pin.at.y * p.scaleY + p.translateY + p.contigThickness / 2
+    const { y1, y2 } = geneLeader(
+      { y },
+      pin.at.y * p.scaleY + p.translateY,
+      p.contigThickness,
+    )
     const name = chip({
       x,
       y,
@@ -217,7 +222,7 @@ function geneLabels(p: Pane) {
       italic: true,
       title: geneText(pin.gene, pin.covered),
     })
-    return `<g class="gene"><line x1="${x}" x2="${x}" y1="${y - LABEL_PX - 2}" y2="${pinY}" stroke="${GENE_INK}" stroke-width="0.8" stroke-opacity="0.6"/>${name}</g>`
+    return `<g class="gene"><line x1="${x}" x2="${x}" y1="${y1}" y2="${y2}" stroke="${GENE_INK}" stroke-width="0.8" stroke-opacity="0.6"/>${name}</g>`
   })
 }
 
