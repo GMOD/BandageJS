@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@gmod/tabix':
-        specifier: ^3.10.2
-        version: 3.10.2
+        specifier: ^3.13.1
+        version: 3.13.1
       '@jbrowse/bandage-core':
         specifier: ^12.3.0
         version: 12.3.0
@@ -197,18 +197,18 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@gmod/bgzf-filehandle@6.7.0':
-    resolution: {integrity: sha512-ThtHVneb+tASyGFACVL/rMu6d5AY0vWK6poeOJwIIAaJpXYpptrmwvhdk2xk5eoNzL+iN40B3bXytMvQ+e+80Q==}
+  '@gmod/bgzf-filehandle@6.8.2':
+    resolution: {integrity: sha512-idzdZgoGvgkCgshoibhmeH795wQAm7JXnEvETEMPPdrq4yBCDD6S+LkN1JC6V+wdaRc0LZSKP7A50LqNaJC6sg==}
 
   '@gmod/gbz-base@7.4.1':
     resolution: {integrity: sha512-Le+Rpj9Jp7GAOpo05XwYFhZbsakhC6TOfaslgW7F72xm2q6Z11dwDZwZFd0S93x2bgbasvO7S3Zr1oL+QBf2SA==}
     hasBin: true
 
-  '@gmod/shared-read-cache@2.0.1':
-    resolution: {integrity: sha512-HXLI9d42+wRhnUx+Iyh5DPTIY4TnuVW9ROF90nGb0vQdOLT8MHq44VdQyc2Zt0HfngJUvhmPxjJRr28YykT05g==}
+  '@gmod/shared-read-cache@2.1.0':
+    resolution: {integrity: sha512-AyiUt0hiEGl7lWc1fuigbXR/RToIw3h72dalaRoSNau9WL9ux9rEfkcsXDYTgSDudehfAEQac1jTvn2zrfnELQ==}
 
-  '@gmod/tabix@3.10.2':
-    resolution: {integrity: sha512-vlHs03ILhRNuVWbqaA01nNQvRZBR+/uXia/1hWVu4wsHoArVfro5bUBCcYAhBo+kes7tdYJRc7xVWxwxT4Jscw==}
+  '@gmod/tabix@3.13.1':
+    resolution: {integrity: sha512-usyBxD1EQ/wfIzeT/wQsqJBT6aGZwgaIFG94lBYFhWdK+csHjQU7t9i/iIjDSCIcZFTFiQ1TFp3McCMf4aH/4A==}
 
   '@jbrowse/bandage-core@12.3.0':
     resolution: {integrity: sha512-cmVZy+sLo4vZVlZ+AlAVUXOcll0P67zZEjMpVXMOf/stOA1tjUSbllqixUbzfpTAwsNGpTIrjjgzZmiM+UaU2g==}
@@ -585,7 +585,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@gmod/bgzf-filehandle@6.7.0':
+  '@gmod/bgzf-filehandle@6.8.2':
     dependencies:
       generic-filehandle2: 2.5.1
       pako-esm2: 2.0.2
@@ -594,19 +594,19 @@ snapshots:
     dependencies:
       generic-filehandle2: 2.5.1
 
-  '@gmod/shared-read-cache@2.0.1': {}
+  '@gmod/shared-read-cache@2.1.0': {}
 
-  '@gmod/tabix@3.10.2':
+  '@gmod/tabix@3.13.1':
     dependencies:
-      '@gmod/bgzf-filehandle': 6.7.0
-      '@gmod/shared-read-cache': 2.0.1
+      '@gmod/bgzf-filehandle': 6.8.2
+      '@gmod/shared-read-cache': 2.1.0
       '@jbrowse/quick-lru': 8.0.0
       generic-filehandle2: 2.5.1
 
   '@jbrowse/bandage-core@12.3.0':
     dependencies:
       '@gmod/gbz-base': 7.4.1
-      '@gmod/tabix': 3.10.2
+      '@gmod/tabix': 3.13.1
       '@jbrowse/graph-fmmm-layout': 1.0.2
       '@jbrowse/graph-stress-layout': 1.0.0
       '@jbrowse/tubemap-core': 2.0.0

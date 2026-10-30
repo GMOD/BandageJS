@@ -7,3 +7,4 @@ minimumReleaseAgeExclude:
   - '@jbrowse/graph-stress-layout@0.1.1 || 1.0.0'
   - '@jbrowse/graph-walks'
   - '@jbrowse/graph-fmmm-layout@1.0.2'
+  - '@gmod/tabix@3.13.1'
