@@ -75,6 +75,9 @@ haplotype's bp:
 - The label after each bar gives the walk's length and its difference from the
   reference: HG00133#1 runs about 117 kb longer than GRCh38's 33 kb, an estimate
   (≈) because the file abridges that walk
+- A haplotype whose deletion spans the whole window has no bar. HPRC's `-f5s`
+  file names it in a skip row, which BandageJS reads and does not yet draw; the
+  JBrowse graph track draws it as a row of deletion
 - [The user guide](guide.md#highlighting-haplotypes) covers highlighting walks
   and panels
 
