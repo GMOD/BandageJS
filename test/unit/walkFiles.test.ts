@@ -5,7 +5,7 @@ import { LocalFile } from 'generic-filehandle2'
 
 import { formatLocus, loadGraph } from '@jbrowse/bandage-core'
 import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
-import { abridgedWalks } from '../../src/derived'
+import { abridgedWalks, rowsOf } from '../../src/derived'
 import { coreRegion, parseRegion } from '../../src/region'
 import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
 
@@ -163,4 +163,21 @@ test('a walk file cut fails where a walk it was asked to expand goes over the no
   await expect(
     cut({ region: K12, expand: ['Sakai#1#chr'], nodeLimit: 40 }, ABRIDGED),
   ).rejects.toBeInstanceOf(RegionTooLargeError)
+})
+
+// gfa-to-tabix --walks --refs REF --chunk 1000 of seven 1 kb nodes: REF walks
+// them all, DEL >1>6>7 and SNP >1>2>3>5>6>7, so both skip chr1:3000-4000
+test('a haplotype whose deletion spans the window draws as a deletion row', async () => {
+  const { gfa, region } = await cutWalksRegion(walks('skip.REF.walks.bed.gz'), {
+    region: 'chr1:3,201-3,800',
+    context: 0,
+  })
+  const bars = rowsOf(loadGraph(gfa, 'cut'), region)!
+  expect(bars.rows.map(r => r.label).sort()).toEqual(['DEL#1', 'SNP#1'])
+  for (const row of bars.rows) {
+    expect(row).toMatchObject({ bp: 0, gapBp: bars.reference.bp })
+    expect(row.runs).toEqual([
+      expect.objectContaining({ start: 0, gap: true, cause: 'deleted' }),
+    ])
+  }
 })

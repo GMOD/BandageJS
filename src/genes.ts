@@ -190,7 +190,7 @@ function loadWalkGenes() {
   const reads = tracked.slice(0, WALK_GENE_ROWS)
   state.walkGeneNote = {
     untracked: placed.length - tracked.length,
-    unplaced: bars.rows.length - placed.length,
+    unplaced: bars.rows.filter(row => !row.axis && row.bp > 0).length,
     unread: tracked.length - reads.length,
   }
   if (reads.length === 0) {
