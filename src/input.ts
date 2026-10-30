@@ -1,6 +1,7 @@
 import {
   ROW_HEIGHT_PX,
   WALK_BAR_PX,
+  barEnd,
   findHoveredEdge,
   findHoveredNode,
   screenToLayout,
@@ -67,7 +68,7 @@ function walkRowAtScreen(sx: number, sy: number) {
   return row &&
     Math.abs(sy - y) <= WALK_BAR_PX / 2 + 2 &&
     offset >= 0 &&
-    offset <= row.bp
+    offset <= barEnd(row)
     ? { row, offset }
     : undefined
 }

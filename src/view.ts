@@ -85,10 +85,15 @@ import type {
   WalkRows,
 } from '@jbrowse/bandage-core'
 
-// A walk row's bar: its haplotype, length and the span of its own contig
+// A walk row's bar: its haplotype, length and the span of its own contig, or
+// for a row of deletion the deletion it lies inside
 function rowHtml(row: WalkRow) {
   const span = row.axis && rowSpan(row.axis, row.bp)
-  return `<strong>${esc(row.label)}</strong> ${formatBp(row.bp)}${
+  const length =
+    row.deletionBp === undefined
+      ? formatBp(row.bp)
+      : `inside a ${formatBp(row.deletionBp)} deletion`
+  return `<strong>${esc(row.label)}</strong> ${length}${
     span && row.axis
       ? `<br>${esc(row.axis.contig)}:${(span.start + 1).toLocaleString()}-${span.end.toLocaleString()}${row.axis.reversed ? ', walked in reverse' : ''}`
       : ''
