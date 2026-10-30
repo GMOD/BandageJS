@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@gmod/tabix": "^3.13.1",
-    "@jbrowse/bandage-core": "^12.5.0",
+    "@jbrowse/bandage-core": "^12.5.1",
     "@jbrowse/graph-walks": "^4.4.0",
     "@playwright/test": "^1.64.0",
     "@types/node": "^26.6.5",
