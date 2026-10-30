@@ -87,7 +87,7 @@ The address holds the whole cut, so File → **Copy link** shares it:
 ```
 
 `hprc` stands for the HPRC release 2 file,
-`https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5.GRCh38.walks.bed.gz`; a
+`https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5s.GRCh38.walks.bed.gz`; a
 link to your own file holds its url.
 
 [The user guide](guide.md#links) lists every parameter.

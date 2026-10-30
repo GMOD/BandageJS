@@ -25,7 +25,7 @@ export const isHprc = (src: { db: string; index?: string }) =>
   src.db === HPRC.db && src.index === HPRC.index
 
 export const HPRC_WALKS =
-  'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5.GRCh38.walks.bed.gz'
+  'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5s.GRCh38.walks.bed.gz'
 
 const opened = new Map<string, ReturnType<typeof openGbz>>()
 
