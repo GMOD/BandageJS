@@ -1,11 +1,7 @@
 import { TabixIndexedFile } from '@gmod/tabix'
 import { parseRegion } from '@jbrowse/bandage-core'
 import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
-import {
-  RegionTooLargeError,
-  WALK_BUDGETS,
-  WalkReader,
-} from '@jbrowse/graph-walks'
+import { RegionTooLargeError, WalkReader } from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
 import type { GenericFilehandle } from 'generic-filehandle2'
@@ -60,7 +56,6 @@ async function cutReading(
     haplotypes: src.haplotypes,
     referenceSample: src.referenceSample,
     context: src.context ?? GBZ_CUT_DEFAULTS.context,
-    byteBudget: WALK_BUDGETS.byteBudget,
     nodeLimit: src.nodeLimit ?? GBZ_CUT_DEFAULTS.limit,
     expand: name => {
       if (wanted.has(name)) {

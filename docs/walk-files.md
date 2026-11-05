@@ -17,7 +17,8 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 ```
 
 - The run writes `graph.GRCh38.walks.bed.gz` and `graph.GRCh38.walks.bed.gz.tbi`
-- BandageJS needs walk format 5, from gfa-to-tabix 1.4 or later
+- BandageJS needs walk format 6, from gfa-to-tabix 3.0 or later, and asks for a
+  rebuild of an older file
 - A graph shipped as `.gbz` converts first:
   `vg convert -f graph.gbz > graph.gfa`
 
@@ -75,9 +76,13 @@ haplotype's bp:
 - The label after each bar gives the walk's length and its difference from the
   reference: HG00133#1 runs about 117 kb longer than GRCh38's 33 kb, an estimate
   (≈) because the file abridges that walk
-- A haplotype whose deletion spans the whole window has no walk in the cut.
-  HPRC's `-f5s` file names it in a skip row, and BandageJS draws it as a row of
-  deletion under the reference's bar
+- A haplotype with no step in the window has no walk in the cut. The file's
+  departure records name where it leaves the reference and where it rejoins, and
+  BandageJS draws a hairline under that stretch of the reference's bar, read as
+  `no step on GRCh38 across 54 kb · 120 kb of its own`
+- `placement choice` after a readout marks a departure with an end on a node
+  GRCh38 passes more than once, as in a collapsed repeat: which pass the walk
+  takes there is the file writer's choice
 - [The user guide](guide.md#highlighting-haplotypes) covers highlighting walks
   and panels
 
@@ -90,7 +95,7 @@ The address holds the whole cut, so File → **Copy link** shares it:
 ```
 
 `hprc` stands for the HPRC release 2 file,
-`https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f5s.GRCh38.walks.bed.gz`; a
+`https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f6.GRCh38.walks.bed.gz`; a
 link to your own file holds its url.
 
 [The user guide](guide.md#links) lists every parameter.

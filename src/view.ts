@@ -15,14 +15,12 @@ import {
   fadedKey,
   facetGrid,
   fitTransform,
-  formatBp,
   getDpr,
   layoutGeometryInputs,
   layoutLabels,
   padded,
   pathLegend,
   resolveColorScheme,
-  rowSpan,
   tubeMapFrame,
   viewportOf,
   walkKey,
@@ -37,7 +35,7 @@ import {
   memo,
   rampInterval,
 } from './derived'
-import { layoutName, nodeHtml, nodeText } from './describe'
+import { layoutName, nodeHtml, nodeText, rowHtml } from './describe'
 import { svgDom } from './elDom'
 import { rowLink } from './jbrowse'
 import {
@@ -81,24 +79,8 @@ import type {
   MinigraphBubble,
   PaneTransform,
   WalkLift,
-  WalkRow,
   WalkRows,
 } from '@jbrowse/bandage-core'
-
-// A walk row's bar: its haplotype, length and the span of its own contig, or
-// for a row with no step on the reference the stretch it skips
-function rowHtml(row: WalkRow) {
-  const span = row.axis && rowSpan(row.axis, row.bp)
-  const length =
-    row.deletionBp === undefined
-      ? formatBp(row.bp)
-      : `no step on the reference across ${formatBp(row.deletionBp)}`
-  return `<strong>${esc(row.label)}</strong> ${length}${
-    span && row.axis
-      ? `<br>${esc(row.axis.contig)}:${(span.start + 1).toLocaleString()}-${span.end.toLocaleString()}${row.axis.reversed ? ', walked in reverse' : ''}`
-      : ''
-  }`
-}
 
 const CONNECTOR_THICKNESS = 2
 const HOVER_BRIGHTEN = 1.4
@@ -920,7 +902,7 @@ function drawInfo() {
     const link =
       ref && rowLink(selectedRow, isReference, targetOf(ref), ref.contigs)
     const abridged = f.abridged.get(selectedRow.name)
-    html = `${rowHtml(selectedRow)}${
+    html = `${rowHtml(selectedRow, bars?.reference)}${
       abridged ? `<br>${esc(abridgedCounts(abridged))} not loaded` : ''
     }<div class="info-actions">${
       link

@@ -6,6 +6,7 @@ import { LocalFile } from 'generic-filehandle2'
 import { formatLocus, loadGraph } from '@jbrowse/bandage-core'
 import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
 import { abridgedWalks, rowsOf } from '../../src/derived'
+import { rowHtml } from '../../src/describe'
 import { coreRegion, parseRegion } from '../../src/region'
 import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
 
@@ -165,19 +166,44 @@ test('a walk file cut fails where a walk it was asked to expand goes over the no
   ).rejects.toBeInstanceOf(RegionTooLargeError)
 })
 
-// gfa-to-tabix --walks --refs REF --chunk 1000 of seven 1 kb nodes: REF walks
-// them all, DEL >1>6>7 and SNP >1>2>3>5>6>7, so both skip chr1:3000-4000
-test('a haplotype whose deletion spans the window draws as a deletion row', async () => {
-  const { gfa, region } = await cutWalksRegion(walks('skip.REF.walks.bed.gz'), {
-    region: 'chr1:3,201-3,800',
-    context: 0,
-  })
+// test/e2e/data/stepless.REF.gfa: REF walks seven 1 kb nodes, chr1:0-7000;
+// JUMP#1 leaves after node 1 and rejoins at node 6, with nothing of its own
+// between, and OWN#1 takes a 400 bp node of its own in place of node 4, so
+// neither has a step on chr1:3,201-3,800
+test('a haplotype with no step in the window draws its departure under the reference, stating its facts', async () => {
+  const { gfa, region } = await cutWalksRegion(
+    walks('stepless.REF.walks.bed.gz'),
+    { region: 'chr1:3,201-3,800', context: 0 },
+  )
   const bars = rowsOf(loadGraph(gfa, 'cut'), region)!
-  expect(bars.rows.map(r => r.label).sort()).toEqual(['DEL#1', 'SNP#1'])
-  for (const row of bars.rows) {
-    expect(row).toMatchObject({ bp: 0, gapBp: bars.reference.bp })
-    expect(row.runs).toEqual([
-      expect.objectContaining({ start: 0, gap: true, cause: 'deleted' }),
+  const row = (label: string) => bars.rows.find(r => r.label === label)!
+  expect(bars.rows.map(r => r.label).sort()).toEqual(['JUMP#1', 'OWN#1'])
+  expect(row('JUMP#1')).toMatchObject({
+    stepless: true,
+    bp: 0,
+    offReferenceBp: 0,
+    gapBp: bars.reference.bp,
+    departures: [
+      expect.objectContaining({ leavePos: 1000, rejoinPos: 5000, ownBp: 0 }),
+    ],
+  })
+  expect(row('OWN#1')).toMatchObject({
+    stepless: true,
+    offReferenceBp: 400,
+    departures: [
+      expect.objectContaining({ leavePos: 3000, rejoinPos: 4000, ownBp: 400 }),
+    ],
+  })
+  for (const r of bars.rows) {
+    expect(r.placementChoice).toBeUndefined()
+    expect(r.runs).toEqual([
+      expect.objectContaining({ start: 0, gap: true, cause: 'departure' }),
     ])
   }
+  expect(rowHtml(row('JUMP#1'), bars.reference)).toBe(
+    '<strong>JUMP#1</strong> no step on REF across 4 kb · 0 bp of its own',
+  )
+  expect(rowHtml(row('OWN#1'), bars.reference)).toBe(
+    '<strong>OWN#1</strong> no step on REF across 1 kb · 400 bp of its own',
+  )
 })

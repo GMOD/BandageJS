@@ -6,7 +6,10 @@ import {
   genesOn,
   nodeHtml,
   recentDetail,
+  rowHtml,
 } from '../../src/describe'
+
+import type { WalkRow } from '@jbrowse/bandage-core'
 
 test('a recent graph says where it came from and the assembly declared for it', () => {
   const now = Date.UTC(2026, 0, 10)
@@ -117,4 +120,29 @@ test('nodeHtml lists three genes over a node and counts the rest', () => {
   expect(html).toContain('<em>ccc</em>: intron here')
   expect(html).not.toContain('ddd')
   expect(html).toContain('+2 more genes')
+})
+
+test('rowHtml gives a walk row its length and contig span, and says where a departure is a placement choice', () => {
+  const row: WalkRow = {
+    name: 'HG00097#1#CM1',
+    label: 'HG00097#1',
+    sample: 'HG00097',
+    haplotype: 1,
+    bp: 12_300,
+    offReferenceBp: 0,
+    gapBp: 0,
+    complete: true,
+    runs: [],
+  }
+  const on = (start: number, reversed: boolean) =>
+    rowHtml({ ...row, axis: { contig: 'CM1', start, reversed } }, undefined)
+  expect(on(100_000, false)).toBe(
+    `<strong>HG00097#1</strong> 12.3 kb<br>CM1:${(100_001).toLocaleString()}-${(112_300).toLocaleString()}`,
+  )
+  expect(on(20_000, true)).toBe(
+    `<strong>HG00097#1</strong> 12.3 kb<br>CM1:${(7701).toLocaleString()}-${(20_000).toLocaleString()}, walked in reverse`,
+  )
+  expect(rowHtml({ ...row, placementChoice: true }, undefined)).toBe(
+    '<strong>HG00097#1</strong> 12.3 kb · placement choice',
+  )
 })

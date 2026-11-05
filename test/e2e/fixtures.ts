@@ -36,14 +36,15 @@ const HUB_FILES: Record<string, string> = {
   // gbwt-rs's 46-sample HPRC slice over MICB and KIR3DL1, as gbz-base builds
   // it, from the plugin's test data
   'https://gbz.test/micb-kir3dl1.gbz.db': 'micb-kir3dl1.gbz.db',
-  // gfa-to-tabix --walks --refs GRCh38 of the HPRC chrM graph
+  // gfa-to-tabix --walks --refs GRCh38 of the HPRC chrM graph, as
+  // test/e2e/data/walks.sh builds it
   ...Object.fromEntries(
     ['walks.bed.gz', 'walks.bed.gz.tbi'].map(kind => [
       `https://gbz.test/hprc-chrM.GRCh38.${kind}`,
       `hprc-chrM.GRCh38.${kind}`,
     ]),
   ),
-  // gfa-to-tabix 1.4 --walks --refs K12 --abridge-steps 20 of the E. coli pggb
+  // gfa-to-tabix --walks --refs K12 --abridge-steps 20 of the E. coli pggb
   // graph, which abridges IAI39 and Sakai at K12#1#chr:1004500-1004961
   ...Object.fromEntries(
     ['walks.bed.gz', 'walks.bed.gz.tbi'].map(kind => [

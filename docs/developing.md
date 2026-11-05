@@ -46,6 +46,7 @@ overlays need the same change in `src/overlays.ts`.
 
 The tests block network requests and serve fixtures from `test/e2e/data`,
 including the plugin's 46-sample `micb-kir3dl1.gbz.db` at `https://gbz.test/`.
+`test/e2e/data/walks.sh` rebuilds the walk-file fixtures with gfa-to-tabix.
 
 ## Screenshots
 
@@ -65,7 +66,7 @@ pnpm update @jbrowse/bandage-core
 pnpm typecheck && pnpm build
 ```
 
-The plugin's CI tests each core push against BandageJS's `core-next` branch if
+bandage-core's CI tests each core push against BandageJS's `core-next` branch if
 it exists, else `main`. For a breaking change, push the BandageJS side to
 `core-next` first. After the release, bump the core there, fast-forward `main`
 and delete the branch.
