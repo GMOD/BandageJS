@@ -121,10 +121,10 @@ test('the legend keys dashed links as reference sequence they skip, only when so
 }) => {
   await openPage(page, 'gfa=examples/hprc_cfh.gfa')
   await waitForDrawing(page, /nodes/)
-  await expect(page.locator('#legends')).toContainText(
-    /skips \S.* sequence \(a deletion\)/,
-  )
+  await expect(page.locator('#legends')).toContainText(/skips \S.* sequence/)
   await openPage(page, 'gfa=examples/assembly_graph.gfa')
   await waitForDrawing(page, /nodes/)
-  await expect(page.locator('#legends')).not.toContainText('(a deletion)')
+  await expect(page.locator('#legends')).not.toContainText(
+    /skips \S.* sequence/,
+  )
 })

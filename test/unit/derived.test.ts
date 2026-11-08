@@ -101,7 +101,7 @@ test('the deletion key is there only while a deletion stays dashed', () => {
       walk ? walkLift(graph, [{ walk }]) : undefined,
       'chr',
     )
-  expect(keyFor()).toMatch(/\(a deletion\)/)
-  expect(keyFor('ref#0#chr')).toMatch(/\(a deletion\)/)
+  expect(keyFor()).toMatch(/^skips chr sequence/)
+  expect(keyFor('ref#0#chr')).toMatch(/^skips chr sequence/)
   expect(keyFor('a#1#c')).toBeUndefined()
 })
