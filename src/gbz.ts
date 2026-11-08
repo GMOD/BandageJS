@@ -11,7 +11,7 @@ import type { WalkFiles } from './walkFiles'
 // GbzBaseSyntenyAdapter reads one, so a 10 GB graph costs a few MB per cut.
 // The cut itself is the core's; the page keeps each opened database for the
 // next cut and says what it is waiting on. A gfa-to-tabix walk file set,
-// `<prefix>.<sample>.walks.bed.gz` with its `.tbi`, takes the
+// `<prefix>.<sample>.walks.gz` with its `.walks.gz.idx`, takes the
 // database's place in a cut: `walkFiles.ts` reads it.
 
 export interface GbzSource extends CoreGbzSource {
@@ -25,7 +25,7 @@ export const isHprc = (src: { db: string; index?: string }) =>
   src.db === HPRC.db && src.index === HPRC.index
 
 export const HPRC_WALKS =
-  'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f6.GRCh38.walks.bed.gz'
+  'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38.GRCh38.walks.gz'
 
 const opened = new Map<string, ReturnType<typeof openGbz>>()
 
@@ -37,7 +37,7 @@ function openDb(db: string, index?: string) {
   )
 }
 
-const WALKS = /\.walks\.bed\.gz$/i
+const WALKS = /\.walks\.gz$/i
 
 export function isWalksUrl(url: string) {
   try {

@@ -6,7 +6,7 @@
   through it
 
 [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix) `--walks` indexes every
-haplotype's path by reference chunk. A cut reads the chunks under the window and
+haplotype's path by reference tile. A cut reads the tiles under the window and
 needs no haplotype index. The screenshots cut the KIV-2 repeat in _LPA_ from the
 hosted HPRC release 2 walk file.
 
@@ -16,18 +16,19 @@ hosted HPRC release 2 walk file.
 gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 ```
 
-- The run writes `graph.GRCh38.walks.bed.gz` and `graph.GRCh38.walks.bed.gz.tbi`
-- BandageJS needs walk format 6, from gfa-to-tabix 3.0 or later, and asks for a
+- The run writes `graph.GRCh38.walks.gz` and its directory
+  `graph.GRCh38.walks.gz.idx`
+- BandageJS needs walk format 7, from gfa-to-tabix 4.0 or later, and asks for a
   rebuild of an older file
 - A graph shipped as `.gbz` converts first:
   `vg convert -f graph.gbz > graph.gfa`
 
 ## 2. Host both files
 
-- Put the `.walks.bed.gz` and its `.tbi` side by side under one url
+- Put the `.walks.gz` and its `.idx` side by side under one url
 - The server must answer range requests and send `Access-Control-Allow-Origin`,
   as S3 does
-- BandageJS fetches the chunks under the region by range request, so the 1.5 GB
+- BandageJS fetches the tiles under the region by range request, so the 1.5 GB
   HPRC file opens without a download
 
 ## 3. Paste the url into Open
@@ -36,13 +37,13 @@ Choose File → **Open…**:
 
 ![The File menu with Open at the top](../img/tutorial/file_menu.png)
 
-Paste the `.walks.bed.gz` url under **From a url** and press **Open**:
+Paste the `.walks.gz` url under **From a url** and press **Open**:
 
 ![The Open dialog with a walk file url pasted](../img/tutorial/open_url.png)
 
 ## 4. Choose the region and haplotypes
 
-BandageJS recognises the `.walks.bed.gz` name and opens the cut dialog. Once it
+BandageJS recognises the `.walks.gz` name and opens the cut dialog. Once it
 reads the file's header, the dialog lists the reference samples under the walk
 file field.
 
@@ -95,15 +96,15 @@ The address holds the whole cut, so File → **Copy link** shares it:
 ```
 
 `hprc` stands for the HPRC release 2 file,
-`https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f6.GRCh38.walks.bed.gz`; a
-link to your own file holds its url.
+`https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38.GRCh38.walks.gz`; a link to
+your own file holds its url.
 
 [The user guide](guide.md#links) lists every parameter.
 
 ## Abridged walks
 
-- gfa-to-tabix moves the costliest walks of a costly chunk, usually a satellite
-  array, into detail records that a window read skips
+- gfa-to-tabix moves the costliest walks of a costly tile, usually a satellite
+  array, into detail rows that a window read skips
 - BandageJS reads each such walk as two steps, where it leaves and rejoins the
   reference
 - The Haplotypes menu lists each as a block, such as

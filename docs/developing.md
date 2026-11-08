@@ -46,7 +46,7 @@ overlays need the same change in `src/overlays.ts`.
 
 The tests block network requests and serve fixtures from `test/e2e/data`,
 including the plugin's 46-sample `micb-kir3dl1.gbz.db` at `https://gbz.test/`.
-`test/e2e/data/walks.sh` rebuilds the walk-file fixtures with gfa-to-tabix.
+`test/e2e/data/build.sh` rebuilds the walk-file fixtures with gfa-to-tabix.
 
 ## Screenshots
 

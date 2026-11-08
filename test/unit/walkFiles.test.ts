@@ -13,7 +13,7 @@ import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
 import type { WalkCutSource } from '../../src/walkFiles'
 
 const DATA = 'test/e2e/data'
-const walks = (file = 'hprc-chrM.GRCh38.walks.bed.gz') =>
+const walks = (file = 'hprc-chrM.GRCh38.walks.gz') =>
   openWalkFiles(`${DATA}/${file}`, path => new LocalFile(path))
 
 async function cut(src: WalkCutSource, file?: string) {
@@ -93,8 +93,8 @@ test('a 1-based locus cuts the window it names', async () => {
 
 // gfa-to-tabix --walks --refs K12 --abridge-steps 20 of the E. coli pggb graph,
 // which abridges IAI39 and Sakai here, and the same without abridging
-const ABRIDGED = 'ecoli_pggb_abridged.K12.walks.bed.gz'
-const WHOLE = 'ecoli_pggb.K12.walks.bed.gz'
+const ABRIDGED = 'ecoli_pggb_abridged.K12.walks.gz'
+const WHOLE = 'ecoli_pggb.K12.walks.gz'
 const K12 = 'K12#1#chr:1004500-1004961'
 
 function stepCounts(text: string) {
@@ -171,10 +171,10 @@ test('a walk file cut fails where a walk it was asked to expand goes over the no
 // between, and OWN#1 takes a 400 bp node of its own in place of node 4, so
 // neither has a step on chr1:3,201-3,800
 test('a haplotype with no step in the window draws its departure under the reference, stating its facts', async () => {
-  const { gfa, region } = await cutWalksRegion(
-    walks('stepless.REF.walks.bed.gz'),
-    { region: 'chr1:3,201-3,800', context: 0 },
-  )
+  const { gfa, region } = await cutWalksRegion(walks('stepless.REF.walks.gz'), {
+    region: 'chr1:3,201-3,800',
+    context: 0,
+  })
   const bars = rowsOf(loadGraph(gfa, 'cut'), region)!
   const row = (label: string) => bars.rows.find(r => r.label === label)!
   expect(bars.rows.map(r => r.label).sort()).toEqual(['JUMP#1', 'OWN#1'])
@@ -206,4 +206,25 @@ test('a haplotype with no step in the window draws its departure under the refer
   expect(rowHtml(row('OWN#1'), bars.reference)).toBe(
     '<strong>OWN#1</strong> no step on REF across 1 kb · 400 bp of its own',
   )
+})
+
+// With context, the cut holds JUMP#1's steps on the flanks, nodes 1 and 6, and
+// nothing between, and OWN#1's own node
+test('a walk whose steps in the cut are the flanks of its departure reads as a stepless row at any context', async () => {
+  for (const context of [500, undefined]) {
+    const { gfa, region } = await cutWalksRegion(
+      walks('stepless.REF.walks.gz'),
+      { region: 'chr1:3,201-3,800', context },
+    )
+    const bars = rowsOf(loadGraph(gfa, 'cut'), region)!
+    const row = (label: string) => bars.rows.find(r => r.label === label)!
+    expect(gfa.walks.names).toContain('OWN#1#chr1')
+    expect(gfa.walks.names).not.toContain('JUMP#1#chr1')
+    expect(rowHtml(row('JUMP#1'), bars.reference)).toBe(
+      '<strong>JUMP#1</strong> no step on REF across 4 kb · 0 bp of its own',
+    )
+    expect(rowHtml(row('OWN#1'), bars.reference)).toBe(
+      '<strong>OWN#1</strong> 400 bp<br>chr1:3,001-3,400',
+    )
+  }
 })

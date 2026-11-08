@@ -1,32 +1,23 @@
-import { TabixIndexedFile } from '@gmod/tabix'
 import { parseRegion } from '@jbrowse/bandage-core'
 import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
 import { RegionTooLargeError, WalkReader } from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
-import type { GenericFilehandle } from 'generic-filehandle2'
+import type { WalkFilehandle } from '@jbrowse/graph-walks'
 
-// A `gfa-to-tabix --walks` file, read by range requests and cut by
+// A `gfa-to-tabix --walks` file, `<prefix>.<ref>.walks.gz` with its directory
+// `.walks.gz.idx` beside it, read by range requests and cut by
 // @jbrowse/graph-walks, the reader the JBrowse graph plugin uses.
-// `gbz.ts` imports this module on first use, so the tabix reader stays out of
+// `gbz.ts` imports this module on first use, so the walk reader stays out of
 // the page's first download.
 
 export type WalkFiles = WalkReader
 
-function withTbi(url: string) {
-  return url.replace(/(?=$|[?#])/, '.tbi')
-}
-
 export function openWalkFiles(
   url: string,
-  open: (url: string) => GenericFilehandle = u => new RemoteFile(u),
+  open: (url: string) => WalkFilehandle = u => new RemoteFile(u),
 ): WalkFiles {
-  return new WalkReader(
-    new TabixIndexedFile({
-      filehandle: open(url),
-      tbiFilehandle: open(withTbi(url)),
-    }),
-  )
+  return WalkReader.open(url, open)
 }
 
 export interface WalkCutSource {

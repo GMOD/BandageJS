@@ -34,19 +34,19 @@ too large to load; see the next section.
 ## Opening a region of a whole-genome pangenome
 
 1. Index the GFA once with [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix)
-   1.4 or later. `--refs` names the genome whose coordinates you will search by:
+   4.0 or later. `--refs` names the genome whose coordinates you will search by:
 
    ```console
    gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
    ```
 
-   The command writes a walk file, `graph.GRCh38.walks.bed.gz`, and its index,
-   `graph.GRCh38.walks.bed.gz.tbi`. A graph shipped as `.gbz`, as HPRC's are,
+   The command writes a walk file, `graph.GRCh38.walks.gz`, and its directory,
+   `graph.GRCh38.walks.gz.idx`. A graph shipped as `.gbz`, as HPRC's are,
    converts to GFA first with `vg convert -f graph.gbz > graph.gfa`
 
 2. Put both files on a web server that answers range requests and allows
    cross-origin reads, as Amazon S3 does
-3. Paste the `.walks.bed.gz` url into File → Open, then type a region of the
+3. Paste the `.walks.gz` url into File → Open, then type a region of the
    reference genome, such as `chr6:160,614,798-160,647,758`. BandageJS downloads
    only the part of the file in that region
 

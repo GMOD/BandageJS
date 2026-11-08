@@ -67,10 +67,10 @@ function locationUrl(loc: unknown, base: string) {
 }
 
 // WalkTabixSyntenyAdapter's `walksUri` is the walk file's name before
-// `.walks.bed.gz`
+// `.walks.gz`
 function walksUrl(prefix: unknown, base: string) {
   const url = resolve(prefix, base)
-  return url && `${url}.walks.bed.gz`
+  return url && `${url}.walks.gz`
 }
 
 // Gff3TabixAdapter and BedTabixAdapter, with JBrowse's `uri` shorthand, whose
