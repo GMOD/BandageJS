@@ -98,7 +98,7 @@ const keyOf = memo(
     '<span>▮ ticks: where each walk passes the node under the pointer · click a bar to highlight its walk</span>',
 )
 
-function frame(bars: WalkRows) {
+function frameFor(bars: WalkRows) {
   return frameOf(
     bars,
     state.width,
@@ -149,7 +149,7 @@ function drawStrip() {
     shown = { locator }
     return
   }
-  const f = frame(bars)
+  const f = frameFor(bars)
   const ramp = current().ramp
   const id = state.hoveredNode ?? state.selectedNode
   const rowGenes = stripGenes(bars)
@@ -193,7 +193,7 @@ function hit(e: MouseEvent) {
   const box = ui.stripSvg.getBoundingClientRect()
   const x = e.clientX - box.left
   const y = e.clientY - box.top
-  const f = frame(bars)
+  const f = frameFor(bars)
   const at = stripRowAt(bars, f, x, y)
   return at && { ...at, bars, frame: f, x, y }
 }

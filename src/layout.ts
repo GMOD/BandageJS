@@ -65,7 +65,11 @@ export async function relayout() {
   } catch (e) {
     if (!isSuperseded(e) && request === liveLayout) {
       rebuild()
-      fail(new Error(`Layout failed: ${e instanceof Error ? e.message : e}`))
+      fail(
+        new Error(
+          `Layout failed: ${e instanceof Error ? e.message : String(e)}`,
+        ),
+      )
     }
   } finally {
     if (request === liveLayout) {

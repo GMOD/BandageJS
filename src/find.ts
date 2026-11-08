@@ -184,7 +184,7 @@ ui.findForm.addEventListener('submit', e => {
 
 ui.find.addEventListener('input', e => {
   clearTimeout(suggestTimer)
-  if ((e as InputEvent).inputType === 'insertReplacementText') {
+  if (e.inputType === 'insertReplacementText') {
     find(ui.find.value)
   } else {
     suggestTimer = setTimeout(suggest, SUGGEST_DEBOUNCE_MS)

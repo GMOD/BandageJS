@@ -20,7 +20,7 @@ export function ago(at: number, now = Date.now()) {
   if (minutes < 1) {
     return 'just now'
   }
-  const [value, unit] =
+  const [value, unit]: [number, Intl.RelativeTimeFormatUnit] =
     minutes < 60
       ? [minutes, 'minute']
       : minutes < 60 * 24
@@ -28,7 +28,7 @@ export function ago(at: number, now = Date.now()) {
         : [minutes / (60 * 24), 'day']
   return new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' }).format(
     -Math.round(value),
-    unit as Intl.RelativeTimeFormatUnit,
+    unit,
   )
 }
 

@@ -90,3 +90,7 @@ export const ui = {
   hubAdd: el<HTMLButtonElement>('hub-add'),
   referenceApply: el<HTMLButtonElement>('reference-apply'),
 }
+
+export function eventElement(e: Event) {
+  return e.target instanceof Element ? e.target : null
+}

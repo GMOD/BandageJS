@@ -5,7 +5,9 @@ git clone https://github.com/cmdcolin/BandageJS.git
 cd BandageJS
 pnpm install
 pnpm dev        # esbuild watch + serve dist/
-pnpm typecheck
+pnpm typecheck  # tsrs
+pnpm lint       # oxlint, type-aware
+pnpm format     # oxfmt
 pnpm build
 pnpm test       # unit and browser tests
 pnpm run deploy # needs aws credentials for the jbrowse.org bucket

@@ -143,13 +143,19 @@ depth.addEventListener('change', () => {
 })
 
 spread.addEventListener('change', () => {
-  settings.bubbleSpread = spread.value as typeof settings.bubbleSpread
-  applySettings('layout')
+  const choice = BUBBLE_SPREADS.find(c => c.value === spread.value)
+  if (choice) {
+    settings.bubbleSpread = choice.value
+    applySettings('layout')
+  }
 })
 
 engineSelect.addEventListener('change', () => {
-  settings.engine = engineSelect.value as typeof settings.engine
-  applySettings('layout')
+  const choice = LAYOUT_ENGINES.find(c => c.value === engineSelect.value)
+  if (choice) {
+    settings.engine = choice.value
+    applySettings('layout')
+  }
 })
 
 ui.layoutReset.addEventListener('click', () => {

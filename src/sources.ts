@@ -223,7 +223,7 @@ export async function openUrl(
     declared?: Source['declared']
   } = {},
 ) {
-  const name = url.split('/').pop() || url
+  const name = url.slice(url.lastIndexOf('/') + 1) || url
   const { live, signal, work } = beginOpen(`Fetching ${name}`)
   try {
     const res = await fetchOk(url, { signal }).catch((e: unknown) => {
@@ -263,7 +263,7 @@ export async function openUrl(
 
 // The cut as a link states it, naming only the abridged walks it read in full
 function expandedSource({ expand, ...src }: GbzSource, expanded: string[]) {
-  return expanded.length ? { ...src, expand: expanded.sort() } : src
+  return expanded.length ? { ...src, expand: expanded.toSorted() } : src
 }
 
 // What a re-cut keeps of the region on screen, or the recent list of a cut
@@ -481,9 +481,14 @@ export type Example = {
 
 export let examples: Example[] = []
 
+const isExampleList = (list: unknown): list is Example[] => Array.isArray(list)
+
 export async function loadExamples() {
   examples = await fetch('examples/index.json')
-    .then(res => res.json() as Promise<Example[]>)
+    .then(async res => {
+      const list: unknown = await res.json()
+      return isExampleList(list) ? list : []
+    })
     .catch(() => [])
 }
 

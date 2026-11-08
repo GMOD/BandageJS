@@ -174,10 +174,10 @@ test('Layout settings relay the graph out and hide what the layout ignores', asy
   )
   await waitForDrawing(page, /nodes/)
   expect(
-    await page.evaluate(
-      () => JSON.parse(localStorage.getItem('bandagejs-settings')!).spacing,
+    await page.evaluate((): unknown =>
+      JSON.parse(localStorage.getItem('bandagejs-settings')!),
     ),
-  ).toBe(2)
+  ).toHaveProperty('spacing', 2)
   // the stats tooltip carries the layout's time, so a new one proves the
   // engine ran and succeeded
   const laid = page.locator('#stats')
@@ -188,10 +188,10 @@ test('Layout settings relay the graph out and hide what the layout ignores', asy
   await expect(laid).toHaveAttribute('title', /layout \d+ ms/)
   await expect(page.locator('#toast')).toBeHidden()
   expect(
-    await page.evaluate(
-      () => JSON.parse(localStorage.getItem('bandagejs-settings')!).engine,
+    await page.evaluate((): unknown =>
+      JSON.parse(localStorage.getItem('bandagejs-settings')!),
     ),
-  ).toBe('stress')
+  ).toHaveProperty('engine', 'stress')
   await settings.getByRole('button', { name: 'Done' }).click()
   await expect(settings).toBeHidden()
 

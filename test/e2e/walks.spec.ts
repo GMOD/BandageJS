@@ -374,11 +374,8 @@ test('by sample, a sample takes a row and its haplotypes the columns', async ({
   await openDiploid(page, '&facet=sample')
   const cells = await page
     .locator('#facets .facet')
-    .evaluateAll(els =>
-      els.map(e => [
-        (e as HTMLElement).style.gridRow,
-        (e as HTMLElement).style.gridColumn,
-      ]),
+    .evaluateAll((els: HTMLElement[]) =>
+      els.map(e => [e.style.gridRow, e.style.gridColumn]),
     )
   expect(cells).toEqual([
     ['1', '1'],

@@ -9,7 +9,7 @@ import { forget, pickFile, readHandle, recentList } from './recent'
 import { parseRegion } from './region'
 import { openFile, openGbz, openUrl } from './sources'
 import { state } from './state'
-import { ui } from './ui'
+import { eventElement, ui } from './ui'
 
 import type { GbzSource } from './gbz'
 import type { Recent } from './recent'
@@ -49,9 +49,9 @@ function reopen(r: Recent) {
 }
 
 ui.recentList.addEventListener('click', e => {
-  const target = e.target as Element
-  const open = target.closest<HTMLElement>('[data-i]')
-  const drop = target.closest<HTMLElement>('[data-forget]')
+  const target = eventElement(e)
+  const open = target?.closest<HTMLElement>('[data-i]')
+  const drop = target?.closest<HTMLElement>('[data-forget]')
   if (open) {
     ui.openDialog.close()
     reopen(recents[Number(open.dataset.i)]!)
@@ -249,7 +249,9 @@ export function showAbout() {
 // Cancel isn't a submit button: as a dialog's first one, Enter in a field
 // would press it
 for (const b of document.querySelectorAll('dialog [data-dismiss]')) {
-  b.addEventListener('click', () => b.closest('dialog')!.close())
+  b.addEventListener('click', () => {
+    b.closest('dialog')!.close()
+  })
 }
 
 for (const d of document.querySelectorAll('dialog')) {

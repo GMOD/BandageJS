@@ -2,6 +2,7 @@ import {
   MICB_DB,
   expect,
   openPage,
+  spinnerLines,
   test,
   waitForDrawing,
   withBubbles,
@@ -23,19 +24,6 @@ function overlayPositions(page: Page) {
 async function goTo(page: Page, text: string) {
   await page.locator('#locate').fill(text)
   await page.locator('#locate').press('Enter')
-}
-
-// Every line the spinner shows from now on
-async function spinnerLines(page: Page) {
-  await page.evaluate(() => {
-    const text = document.getElementById('loading-text')!
-    const w = window as { said?: string[] }
-    w.said = []
-    new MutationObserver(() => {
-      w.said!.push(text.textContent ?? '')
-    }).observe(text, { childList: true, characterData: true, subtree: true })
-  })
-  return () => page.evaluate(() => (window as { said?: string[] }).said!)
 }
 
 test.describe('in an rGFA with a window', () => {

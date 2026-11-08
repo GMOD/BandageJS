@@ -5,8 +5,6 @@ import { facts, state, walks as walkView } from './state'
 import { ui } from './ui'
 import { setWalkColor } from './walks'
 
-import type { WalkEncoding } from '@jbrowse/bandage-core'
-
 // A highlighted walk's colouring as it is drawn: its panel's while side by
 // side, its lane's otherwise
 function encodingOf(name: string) {
@@ -50,16 +48,21 @@ function draw() {
   ].join('')
 }
 
+function colorOf(part: string | undefined, value: string) {
+  const field = WALK_FIELDS.find(f => f.value === value)?.value
+  const scheme = WALK_SCHEMES.find(c => c.value === value)?.value
+  return part === 'field' ? field && { field } : scheme && { scheme }
+}
+
 ui.highlightRows.addEventListener('change', e => {
-  const select = e.target as HTMLSelectElement
-  const walk = select.dataset.walk!
-  setWalkColor(
-    walk,
-    select.dataset.part === 'field'
-      ? { field: select.value as WalkEncoding['field'] }
-      : { scheme: select.value as WalkEncoding['scheme'] },
-  )
-  draw()
+  const select = e.target
+  if (select instanceof HTMLSelectElement && select.dataset.walk) {
+    const color = colorOf(select.dataset.part, select.value)
+    if (color) {
+      setWalkColor(select.dataset.walk, color)
+    }
+    draw()
+  }
 })
 
 export function showHighlightDialog() {

@@ -9,9 +9,10 @@
     "dev": "node build.mjs --serve",
     "shoot": "node scripts/shoot-readme.mjs",
     "shoot:tutorial": "node scripts/shoot-tutorial.mjs",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p test",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "typecheck": "tsrs --noEmit && tsrs --noEmit -p test",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "deploy": "pnpm build && ./scripts/deploy.sh",
     "test": "playwright test",
     "test:unit": "playwright test --project=unit",
@@ -25,8 +26,10 @@
     "@types/node": "^26.6.5",
     "esbuild": "^0.28.2",
     "generic-filehandle2": "^2.5.1",
-    "prettier": "^3.9.10",
+    "oxfmt": "^0.77.0",
+    "oxlint": "^1.92.0",
     "puppeteer-core": "^25.13.0",
+    "tsrs": "0.23.0-ts7.1.0-beta",
     "typescript": "^7.0.2"
   }
 }

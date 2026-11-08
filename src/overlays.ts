@@ -129,6 +129,10 @@ const RING_COLOR = '#2f6fd6'
 const RING_GAP_PX = 2
 const RING_PX = 2.5
 
+function ringPath(d: string, attrs: string) {
+  return `<path d="${d}" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" ${attrs}/>`
+}
+
 // A ring round each node in `p.rings`, a stroke wider than the node masked
 // off the node and a gap round it
 function rings(p: Pane) {
@@ -139,12 +143,10 @@ function rings(p: Pane) {
   const y = -p.translateY / p.scaleY
   const w = p.width / p.scaleX
   const h = p.height / p.scaleY
-  const path = (d: string, attrs: string) =>
-    `<path d="${d}" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" ${attrs}/>`
   return [
     `<mask id="ring-cut" maskUnits="userSpaceOnUse" x="${x}" y="${y}" width="${w}" height="${h}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>${p.rings
       .map(r =>
-        path(
+        ringPath(
           r.d,
           `stroke="#000" stroke-width="${2 * (r.halfWidthPx + RING_GAP_PX)}"`,
         ),
@@ -152,7 +154,7 @@ function rings(p: Pane) {
       .join('')}</mask>`,
     `<g mask="url(#ring-cut)">${p.rings
       .map(r =>
-        path(
+        ringPath(
           r.d,
           `stroke="${RING_COLOR}" stroke-opacity="${r.strong ? 1 : 0.5}" stroke-width="${2 * (r.halfWidthPx + RING_GAP_PX + RING_PX)}"`,
         ),

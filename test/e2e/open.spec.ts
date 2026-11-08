@@ -132,7 +132,7 @@ test('a pasted gbz-base url fills the cut dialog, which probes the database', as
   expect(
     await page
       .locator('#gbz-refs option')
-      .evaluateAll(os => os.map(o => (o as HTMLOptionElement).value)),
+      .evaluateAll((os: HTMLOptionElement[]) => os.map(o => o.value)),
   ).toContain('GRCh38')
 
   await page.locator('#gbz-ref').fill('GRCh38')

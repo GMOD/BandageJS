@@ -10,7 +10,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 
 import * as esbuild from 'esbuild'
-import puppeteer from 'puppeteer-core'
+import { launch } from 'puppeteer-core'
 
 const TIMEOUT = 120_000
 const OUT = 'img/tutorial'
@@ -44,9 +44,9 @@ async function shoot(page, name, el) {
 
 async function drawn(page, before = '') {
   await page.waitForFunction(
-    before => {
+    previous => {
       const stats = document.querySelector('#stats')?.textContent ?? ''
-      return /nodes/.test(stats) && stats !== before
+      return stats.includes('nodes') && stats !== previous
     },
     {},
     before,
@@ -67,7 +67,7 @@ mkdirSync(OUT, { recursive: true })
 execFileSync('node', ['build.mjs'], { stdio: 'inherit' })
 const ctx = await esbuild.context({})
 const { port } = await ctx.serve({ servedir: 'dist', port: 0 })
-const browser = await puppeteer.launch({
+const browser = await launch({
   executablePath: process.env.CHROME ?? '/usr/bin/google-chrome',
   headless: true,
 })
@@ -91,8 +91,8 @@ try {
   await page.click('#open-dialog button[value="url"]')
   await page.waitForSelector('#gbz-dialog', { visible: true })
   await page.waitForFunction(() =>
-    /Reference samples:/.test(
-      document.querySelector('#gbz-status')?.textContent ?? '',
+    (document.querySelector('#gbz-status')?.textContent ?? '').includes(
+      'Reference samples:',
     ),
   )
   await replaceText(page, '#gbz-region', REGION)

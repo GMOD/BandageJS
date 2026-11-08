@@ -21,14 +21,16 @@ export interface WalkThrough {
 // A node's id is its segment's name and the strand it is drawn on
 export const ownStrand = (id: string) => (id.endsWith('-') ? '-' : '+')
 
+function readsOwnStrand(id: string, strand: string | undefined) {
+  return (strand ?? ownStrand(id)) === ownStrand(id)
+}
+
 // The ends of its two nodes a link joins: a node read on the strand its id
 // carries is left from its end and entered at its start
 export function linkSides(e: GraphEdge): { from: Side; to: Side } {
-  const own = (id: string, strand: string | undefined) =>
-    (strand ?? ownStrand(id)) === ownStrand(id)
   return {
-    from: own(e.from, e.fromStrand) ? 'end' : 'start',
-    to: own(e.to, e.toStrand) ? 'start' : 'end',
+    from: readsOwnStrand(e.from, e.fromStrand) ? 'end' : 'start',
+    to: readsOwnStrand(e.to, e.toStrand) ? 'start' : 'end',
   }
 }
 

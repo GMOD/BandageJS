@@ -23,7 +23,7 @@ function overlayPositions(page: Page) {
 function suggestions(page: Page) {
   return page
     .locator('#find-list option')
-    .evaluateAll(os => os.map(o => (o as HTMLOptionElement).value))
+    .evaluateAll((os: HTMLOptionElement[]) => os.map(o => o.value))
 }
 
 test('Enter zooms to the named node and selects it', async ({ page }) => {

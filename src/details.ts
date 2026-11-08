@@ -22,7 +22,7 @@ import {
   state,
   tube,
 } from './state'
-import { ui } from './ui'
+import { eventElement, ui } from './ui'
 import { onDraw, scheduleDraw } from './view'
 import { liftWalks, toggleWalk } from './walks'
 
@@ -65,10 +65,13 @@ function span(contig: string, start: number, end: number) {
     : `${contig}:${(start + 1).toLocaleString()}-${end.toLocaleString()}`
 }
 
+function nameOf(id: string) {
+  return facts().nodeById.get(id)?.name ?? id
+}
+
 // a link as its L line reads it, `3+ → 65−`
 function gfaLink(e: GraphEdge) {
-  const name = (id: string) => facts().nodeById.get(id)?.name ?? id
-  return `${name(e.from)}${minus(e.fromStrand ?? ownStrand(e.from))} → ${name(e.to)}${minus(e.toStrand ?? ownStrand(e.to))}`
+  return `${nameOf(e.from)}${minus(e.fromStrand ?? ownStrand(e.from))} → ${nameOf(e.to)}${minus(e.toStrand ?? ownStrand(e.to))}`
 }
 
 function linksHtml(node: GraphNode, links: NodeLink[]) {
@@ -85,13 +88,13 @@ function linksHtml(node: GraphNode, links: NodeLink[]) {
       const edge = graph.edges[l.edgeIndex]!
       const deletion = deletions.get(l.edgeIndex)
       const walks = edge.pathIds?.length ?? 0
-      const facts = [
+      const notes = [
         l.nodeId === node.id ? 'itself' : formatBp(other?.length ?? 0),
         ...(other?.stable?.rank === 0 ? ['reference'] : []),
         ...(walked ? [`${walks} walk${walks === 1 ? '' : 's'}`] : []),
         ...(deletion ? [`deletion of ${formatBp(deletion.bp)}`] : []),
       ]
-      return `<li><button type="button" class="node-link" data-node="${esc(l.nodeId)}">${esc(other?.name ?? l.nodeId)}</button> <small>${esc(facts.join(' · '))}</small><code>${esc(gfaLink(edge))}</code></li>`
+      return `<li><button type="button" class="node-link" data-node="${esc(l.nodeId)}">${esc(other?.name ?? l.nodeId)}</button> <small>${esc(notes.join(' · '))}</small><code>${esc(gfaLink(edge))}</code></li>`
     })
     .join('')}</ul>`
 }
@@ -254,33 +257,37 @@ function drawDetails() {
 onDraw(drawDetails)
 
 ui.details.addEventListener('click', e => {
-  const target = e.target as Element
+  const target = eventElement(e)
   const pick = (name: string) =>
-    target.closest<HTMLElement>(`[data-${name}]`)?.dataset[name]
+    target?.closest<HTMLElement>(`[data-${name}]`)?.dataset[name]
   const node = pick('node')
   const bubble = pick('bubble')
   const id = state.selectedNode
-  if (target.closest('[data-close]')) {
+  if (target?.closest('[data-close]')) {
     state.selectedNode = null
     scheduleDraw()
   } else if (node) {
     refocus = 'h2'
     selectNode(node)
-  } else if (target.closest('[data-zoom]') && id) {
+  } else if (target?.closest('[data-zoom]') && id) {
     selectNode(id)
-  } else if (target.closest('[data-copy]') && id) {
+  } else if (target?.closest('[data-copy]') && id) {
     const name = facts().nodeById.get(id)?.name ?? ''
     navigator.clipboard.writeText(name).then(
-      () => notify(`Copied ${name}`, false),
-      (err: unknown) => notify(`Could not copy: ${String(err)}`),
+      () => {
+        notify(`Copied ${name}`, false)
+      },
+      (err: unknown) => {
+        notify(`Could not copy: ${String(err)}`)
+      },
     )
-  } else if (target.closest('[data-all]') && id) {
+  } else if (target?.closest('[data-all]') && id) {
     allWalksOf = id
     scheduleDraw()
-  } else if (target.closest('[data-lift-all]')) {
-    const node = selectedNode()
-    if (node) {
-      liftWalks(walksOf(state.graph!, node).map(w => w.name))
+  } else if (target?.closest('[data-lift-all]')) {
+    const selected = selectedNode()
+    if (selected) {
+      liftWalks(walksOf(state.graph!, selected).map(w => w.name))
     }
   } else if (bubble !== undefined) {
     const b = bubbles[Number(bubble)]
@@ -291,7 +298,8 @@ ui.details.addEventListener('click', e => {
 })
 
 ui.details.addEventListener('change', e => {
-  const walk = (e.target as HTMLElement).dataset.walk
+  const { target } = e
+  const walk = target instanceof HTMLElement ? target.dataset.walk : undefined
   if (walk) {
     toggleWalk(walk)
   }
@@ -300,8 +308,7 @@ ui.details.addEventListener('change', e => {
 // a neighbour's name rings its node in the drawing
 ui.details.addEventListener('mouseover', e => {
   const id =
-    (e.target as Element).closest<HTMLElement>('[data-node]')?.dataset.node ??
-    null
+    eventElement(e)?.closest<HTMLElement>('[data-node]')?.dataset.node ?? null
   if (id !== state.hoveredNode) {
     state.hoveredNode = id
     scheduleDraw()

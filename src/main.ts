@@ -25,7 +25,9 @@ const bar = menuBar(ui.menus, [
   { label: 'Help', items: helpItems },
 ])
 bar.refresh()
-onDraw(bar.refresh)
+onDraw(() => {
+  bar.refresh()
+})
 
 await loadExamples()
 openFromQuery(new URLSearchParams(location.search))

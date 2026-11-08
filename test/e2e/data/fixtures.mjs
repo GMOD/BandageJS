@@ -41,7 +41,8 @@ async function cut(url, regions, out) {
   )
 }
 
-function aliasCut(all, names) {
+async function aliasCut(url, names) {
+  const all = await text(url)
   return all
     .split('\n')
     .filter(
@@ -95,7 +96,7 @@ writeFileSync(
 )
 writeFileSync(
   `${here}hg38.chromAlias.txt`,
-  aliasCut(await text('https://jbrowse.org/ucsc/hg38/hg38.chromAlias.txt'), [
+  await aliasCut('https://jbrowse.org/ucsc/hg38/hg38.chromAlias.txt', [
     'chr1',
     'chr6',
   ]),
@@ -127,7 +128,7 @@ writeFileSync(
 )
 writeFileSync(
   `${here}hs1.chromAlias.txt`,
-  aliasCut(await text('https://jbrowse.org/ucsc/hs1/hs1.chromAlias.txt'), [
+  await aliasCut('https://jbrowse.org/ucsc/hs1/hs1.chromAlias.txt', [
     'chr1',
     'chr6',
   ]),

@@ -66,7 +66,7 @@ import {
   tube,
   walks,
 } from './state'
-import { ui } from './ui'
+import { eventElement, ui } from './ui'
 
 import type { Region } from './jbrowse'
 import type { Pane } from './overlays'
@@ -589,7 +589,9 @@ function draw() {
   drawFacetTitles()
   drawInfo()
   drawStats()
-  afterDraw.forEach(fn => fn())
+  afterDraw.forEach(fn => {
+    fn()
+  })
 }
 
 // The selected node, and a node its details name under the pointer, which the
@@ -623,9 +625,10 @@ let overlayBubbles: MinigraphBubble[] = []
 
 // The bubble whose chip `target` is in, if any
 export function bubbleAt(target: EventTarget | null) {
-  const halo = (target as Element | null)
-    ?.closest('[data-halo]')
-    ?.getAttribute('data-halo')
+  const halo =
+    target instanceof Element
+      ? target.closest('[data-halo]')?.getAttribute('data-halo')
+      : undefined
   return halo != null ? overlayBubbles[Number(halo)] : undefined
 }
 
@@ -930,9 +933,10 @@ function drawInfo() {
 }
 
 ui.info.addEventListener('click', e => {
-  if ((e.target as Element).closest('[data-expand]') && state.selectedRow) {
+  const target = eventElement(e)
+  if (target?.closest('[data-expand]') && state.selectedRow) {
     expandWalks([state.selectedRow])
-  } else if ((e.target as Element).closest('[data-close]')) {
+  } else if (target?.closest('[data-close]')) {
     state.selectedNode = null
     state.selectedRow = null
     scheduleDraw()

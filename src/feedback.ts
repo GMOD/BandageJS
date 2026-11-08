@@ -1,4 +1,4 @@
-import { ui } from './ui'
+import { eventElement, ui } from './ui'
 
 const NOTICE_MS = 6000
 
@@ -105,7 +105,7 @@ export function fail(e: unknown) {
 
 ui.toastClose.addEventListener('click', dismiss)
 ui.toastActions.addEventListener('click', e => {
-  const button = (e.target as Element).closest('button')
+  const button = eventElement(e)?.closest('button')
   const action = button && toastActions[Number(button.value)]
   if (action) {
     dismiss()

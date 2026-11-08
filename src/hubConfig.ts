@@ -216,7 +216,7 @@ export function geneTracks(hub: Hub, assembly: HubAssembly) {
         : 2
   return hub.tracks
     .filter(t => t.genes && t.assemblyNames.some(n => names.has(n)))
-    .sort((a, b) => rank(a) - rank(b))
+    .toSorted((a, b) => rank(a) - rank(b))
 }
 
 // the hub's gene track for the assembly: the one an overlay chose, else the

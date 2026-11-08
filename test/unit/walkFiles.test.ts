@@ -31,7 +31,7 @@ function lines(text: string, kind: string) {
 const walkNames = (text: string) =>
   lines(text, 'W')
     .map(w => `${w[1]}#${w[2]}#${w[3]}`)
-    .sort()
+    .toSorted()
 
 test('a walk file cut names the walks the gbz-base cut names, over its nodes', async () => {
   const region = 'chrM:8,000-8,300'
@@ -99,7 +99,10 @@ const K12 = 'K12#1#chr:1004500-1004961'
 
 function stepCounts(text: string) {
   return Object.fromEntries(
-    lines(text, 'W').map(w => [w[1], w[6]!.split(/[<>]/).length - 1]),
+    lines(text, 'W').map(
+      w =>
+        [w[1] ?? '', w[6]!.split(/[<>]/).length - 1] satisfies [string, number],
+    ),
   )
 }
 
@@ -177,7 +180,7 @@ test('a haplotype with no step in the window draws its departure under the refer
   })
   const bars = rowsOf(loadGraph(gfa, 'cut'), region)!
   const row = (label: string) => bars.rows.find(r => r.label === label)!
-  expect(bars.rows.map(r => r.label).sort()).toEqual(['JUMP#1', 'OWN#1'])
+  expect(bars.rows.map(r => r.label).toSorted()).toEqual(['JUMP#1', 'OWN#1'])
   expect(row('JUMP#1')).toMatchObject({
     stepless: true,
     bp: 0,

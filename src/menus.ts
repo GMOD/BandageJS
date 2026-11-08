@@ -1,4 +1,5 @@
 import { esc } from './overlays'
+import { eventElement } from './ui'
 import { aimedAt } from './submenuAim'
 
 import type { Point } from './submenuAim'
@@ -68,6 +69,57 @@ interface Level {
   apex?: Point
 }
 
+function itemHtml(item: MenuItem, i: number) {
+  if ('divider' in item) {
+    return '<hr role="separator">'
+  }
+  if ('header' in item) {
+    return `<div class="menu-header" role="presentation">${esc(item.header)}</div>`
+  }
+  if ('search' in item) {
+    return `<input class="menu-search" type="search" placeholder="${esc(item.search)}" aria-label="${esc(item.search)}">`
+  }
+  const label = `<span class="label">${esc(item.label)}${
+    item.detail ? `<small>${esc(item.detail)}</small>` : ''
+  }</span>`
+  const disabled = item.disabled ? ' aria-disabled="true" disabled' : ''
+  if ('submenu' in item) {
+    return `<button type="button" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="-1" data-i="${i}"${disabled}>${label}${icon('more')}</button>`
+  }
+  if (item.checked === undefined) {
+    return `<button type="button" role="menuitem" tabindex="-1" data-i="${i}"${disabled}>${label}</button>`
+  }
+  const role = item.radio ? 'menuitemradio' : 'menuitemcheckbox'
+  const glyph = item.radio
+    ? icon(item.checked ? 'radioOn' : 'radio', item.checked)
+    : icon(item.checked ? 'checkboxOn' : 'checkbox', item.checked)
+  return `<button type="button" role="${role}" aria-checked="${item.checked}" tabindex="-1" data-i="${i}"${disabled}>${label}${glyph}</button>`
+}
+
+function labelOf(b: HTMLButtonElement) {
+  return b.textContent.toLowerCase()
+}
+
+function rows(panel: HTMLElement) {
+  return [...panel.querySelectorAll<HTMLButtonElement>(':scope > button')]
+}
+
+function enabled(panel: HTMLElement) {
+  return rows(panel).filter(b => !b.disabled && !b.hidden)
+}
+
+function focusIn(panel: HTMLElement) {
+  ;(
+    panel.querySelector<HTMLInputElement>(':scope > .menu-search') ??
+    enabled(panel)[0]
+  )?.focus()
+}
+
+function centre(el: Element) {
+  const r = el.getBoundingClientRect()
+  return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }
+}
+
 // The WAI-ARIA menu button pattern: each button opens its items fresh, so
 // their checks say what is on screen now; arrows move within a menu and
 // across the bar, Escape closes back to the button. A submenu opens in a
@@ -94,7 +146,10 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
   popup.addEventListener(
     'scroll',
     e => {
-      follow(e.target as HTMLElement)
+      const { target } = e
+      if (target instanceof Element) {
+        follow(target)
+      }
     },
     true,
   )
@@ -174,53 +229,9 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
     return next
   }
 
-  function row(item: MenuItem, i: number) {
-    if ('divider' in item) {
-      return '<hr role="separator">'
-    }
-    if ('header' in item) {
-      return `<div class="menu-header" role="presentation">${esc(item.header)}</div>`
-    }
-    if ('search' in item) {
-      return `<input class="menu-search" type="search" placeholder="${esc(item.search)}" aria-label="${esc(item.search)}">`
-    }
-    const label = `<span class="label">${esc(item.label)}${
-      item.detail ? `<small>${esc(item.detail)}</small>` : ''
-    }</span>`
-    const disabled = item.disabled ? ' aria-disabled="true" disabled' : ''
-    if ('submenu' in item) {
-      return `<button type="button" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="-1" data-i="${i}"${disabled}>${label}${icon('more')}</button>`
-    }
-    if (item.checked === undefined) {
-      return `<button type="button" role="menuitem" tabindex="-1" data-i="${i}"${disabled}>${label}</button>`
-    }
-    const role = item.radio ? 'menuitemradio' : 'menuitemcheckbox'
-    const glyph = item.radio
-      ? icon(item.checked ? 'radioOn' : 'radio', item.checked)
-      : icon(item.checked ? 'checkboxOn' : 'checkbox', item.checked)
-    return `<button type="button" role="${role}" aria-checked="${item.checked}" tabindex="-1" data-i="${i}"${disabled}>${label}${glyph}</button>`
-  }
-
-  function labelOf(b: HTMLButtonElement) {
-    return b.textContent!.toLowerCase()
-  }
-
-  function rows(panel: HTMLElement) {
-    return [...panel.querySelectorAll<HTMLButtonElement>(':scope > button')]
-  }
-
-  function enabled(panel: HTMLElement) {
-    return rows(panel).filter(b => !b.disabled && !b.hidden)
-  }
-
-  function depthOf(el: Element) {
-    const panel = el.closest('.menu')
+  function depthOf(el: EventTarget | null) {
+    const panel = el instanceof Element ? el.closest('.menu') : null
     return open ? open.levels.findIndex(l => l.panel === panel) : -1
-  }
-
-  function centre(el: Element) {
-    const r = el.getBoundingClientRect()
-    return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }
   }
 
   function show(index: number, focusFirst: boolean) {
@@ -251,7 +262,7 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
     )?.value
     const child = panel.querySelector(':scope > .menu')
     level.list = level.items()
-    panel.innerHTML = level.list.map(row).join('')
+    panel.innerHTML = level.list.map(itemHtml).join('')
     if (child) {
       panel.append(child)
     }
@@ -303,13 +314,6 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
     panel.style.top = `${Math.max(8, Math.min(top, innerHeight - h - 8))}px`
   }
 
-  function focusIn(panel: HTMLElement) {
-    ;(
-      panel.querySelector<HTMLInputElement>(':scope > .menu-search') ??
-      enabled(panel)[0]
-    )?.focus()
-  }
-
   // Opens the submenu of the item `opener` in the panel at `depth`, unless it
   // is open already
   function enter(depth: number, opener: HTMLButtonElement, apex: Point) {
@@ -354,7 +358,7 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
 
   // A submenu follows its item as the panel holding it scrolls, and closes
   // once the item is out of sight
-  function follow(panel: HTMLElement) {
+  function follow(panel: Element) {
     const depth = depthOf(panel)
     const child = open?.levels[depth + 1]
     if (depth < 0 || !child) {
@@ -484,9 +488,13 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
 
   // Hover intent is the mouse's: a tap's pointer events arrive with its click
   popup.addEventListener('pointerover', e => {
-    const target = e.target as Element
+    const { target } = e
     const depth = depthOf(target)
-    if (depth < 0 || e.pointerType !== 'mouse') {
+    if (
+      depth < 0 ||
+      e.pointerType !== 'mouse' ||
+      !(target instanceof Element)
+    ) {
       return
     }
     const b = target.closest<HTMLButtonElement>('button[data-i]')
@@ -517,9 +525,7 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
     tapped = e.pointerType !== 'mouse'
   })
   popup.addEventListener('click', e => {
-    const target = (e.target as Element).closest<HTMLButtonElement>(
-      'button[data-i]',
-    )
+    const target = eventElement(e)?.closest<HTMLButtonElement>('button[data-i]')
     const depth = target ? depthOf(target) : -1
     const item = open?.levels[depth]?.list[Number(target?.dataset.i)]
     if (!target || !item || !('label' in item) || item.disabled) {
@@ -555,15 +561,15 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
     }
   })
   popup.addEventListener('keydown', e => {
-    const target = e.target as HTMLElement
+    const { target } = e
     const depth = depthOf(target)
-    if (!open || depth < 0) {
+    if (!open || depth < 0 || !(target instanceof HTMLElement)) {
       return
     }
     const level = open.levels[depth]!
     const typing = target instanceof HTMLInputElement
     const items = enabled(level.panel)
-    const at = items.indexOf(target as HTMLButtonElement)
+    const at = items.findIndex(b => b === target)
     const move = (to: HTMLButtonElement | undefined) => {
       closeFrom(depth + 1)
       to?.focus()
@@ -618,10 +624,13 @@ export function menuBar(bar: HTMLElement, given: Menu[]) {
     }
   })
   document.addEventListener('pointerdown', e => {
+    const { target } = e
     if (
       open &&
-      !popup.contains(e.target as Node) &&
-      !bar.contains(e.target as Node)
+      !(
+        target instanceof Node &&
+        (popup.contains(target) || bar.contains(target))
+      )
     ) {
       close()
     }

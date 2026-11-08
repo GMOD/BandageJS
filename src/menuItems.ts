@@ -63,6 +63,16 @@ const ENGINE_NAMES: readonly (readonly [LayoutEngineKind, string])[] = [
   ['stress', 'stress'],
 ]
 
+function chooseLayout(mode: LayoutModeValue, engine?: LayoutEngineKind) {
+  settings.mode = mode
+  if (engine) {
+    settings.engine = engine
+  }
+  state.modeOverride = undefined
+  loadGenes()
+  applySettings('layout')
+}
+
 // The layouts the graph can take; force-directed comes once per engine
 export function layoutItems(): MenuItem[] {
   const graph = state.graph
@@ -70,15 +80,6 @@ export function layoutItems(): MenuItem[] {
     m => !graph || facts().drawable.has(m.value),
   )
   const drawn = drawnMode().value
-  const choose = (mode: LayoutModeValue, engine?: LayoutEngineKind) => {
-    settings.mode = mode
-    if (engine) {
-      settings.engine = engine
-    }
-    state.modeOverride = undefined
-    loadGenes()
-    applySettings('layout')
-  }
   return [
     ...modes.flatMap((m): MenuItem[] =>
       m.value === 'force'
@@ -87,7 +88,7 @@ export function layoutItems(): MenuItem[] {
             radio: true,
             checked: drawn === m.value && settings.engine === engine,
             onClick: () => {
-              choose(m.value, engine)
+              chooseLayout(m.value, engine)
             },
           }))
         : [
@@ -96,7 +97,7 @@ export function layoutItems(): MenuItem[] {
               radio: true,
               checked: drawn === m.value,
               onClick: () => {
-                choose(m.value)
+                chooseLayout(m.value)
               },
             },
           ],
@@ -352,17 +353,20 @@ export function helpItems(): MenuItem[] {
   ]
 }
 
-export function examplesItems(): MenuItem[] {
-  const item = (x: Example): MenuItem => ({
+function exampleItem(x: Example): MenuItem {
+  return {
     label: x.name,
     onClick: () => {
       openExample(x)
     },
-  })
+  }
+}
+
+export function examplesItems(): MenuItem[] {
   return [
     { header: 'Cut live from the HPRC walk file, a few seconds each' },
-    ...examples.filter(x => 'walks' in x).map(item),
+    ...examples.filter(x => 'walks' in x).map(exampleItem),
     { header: 'Bundled GFA files' },
-    ...examples.filter(x => 'file' in x).map(item),
+    ...examples.filter(x => 'file' in x).map(exampleItem),
   ]
 }

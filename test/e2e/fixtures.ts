@@ -6,6 +6,12 @@ import type { Locator, Page, Route } from '@playwright/test'
 
 export { expect }
 
+declare global {
+  interface Window {
+    said?: string[]
+  }
+}
+
 const K12 = 'https://jbrowse.org/hubs/genark/GCF/000/005/845/GCF_000005845.2/'
 
 // The files of the hubs the page reads, as test/e2e/data/fixtures.mjs cuts
@@ -150,6 +156,18 @@ export async function withBubbles(page: Page) {
   })
 }
 
+// Every line the spinner shows from now on
+export async function spinnerLines(page: Page) {
+  await page.evaluate(() => {
+    const text = document.getElementById('loading-text')!
+    window.said = []
+    new MutationObserver(() => {
+      window.said!.push(text.textContent)
+    }).observe(text, { childList: true, characterData: true, subtree: true })
+  })
+  return () => page.evaluate(() => window.said!)
+}
+
 export async function waitForDrawing(page: Page, stats: RegExp | string) {
   await expect(page.locator('#stats')).toContainText(stats, { timeout: 20_000 })
   await expect(page.locator('#loading')).toBeHidden({ timeout: 20_000 })
@@ -211,7 +229,6 @@ export async function findNode(page: Page) {
       const onCanvas = (p: { x: number; y: number }) =>
         document.elementFromPoint(p.x, p.y) === c
       const info = document.getElementById('info')!
-      const frame = () => new Promise(r => requestAnimationFrame(r))
       const step = Math.max(1, Math.round(4 * dpr))
       const candidates: { x: number; y: number }[] = []
       for (let y = 0; y < height; y += step) {
@@ -240,9 +257,9 @@ export async function findNode(page: Page) {
             bubbles: true,
           }),
         )
-        await frame()
-        await frame()
-        if (!info.hidden && /bp, depth/.test(info.textContent ?? '')) {
+        await new Promise(r => requestAnimationFrame(r))
+        await new Promise(r => requestAnimationFrame(r))
+        if (!info.hidden && info.textContent.includes('bp, depth')) {
           found = p
           break
         }

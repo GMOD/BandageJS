@@ -86,10 +86,11 @@ export const THICKNESSES = [
 
 const KEY = 'bandagejs-settings'
 
-export function stored<T>(key: string, fallback: T): T {
+export function stored<T>(key: string, fallback: T) {
   try {
     const raw = localStorage.getItem(key)
-    return raw === null ? fallback : (JSON.parse(raw) as T)
+    const value: unknown = raw === null ? fallback : JSON.parse(raw)
+    return value
   } catch {
     return fallback
   }
@@ -101,68 +102,96 @@ export function store(key: string, value: unknown) {
   } catch {}
 }
 
-type Field<K extends keyof Settings = keyof Settings> = {
+interface Field<K extends keyof Settings = keyof Settings> {
   key: K
   // the setting's name in a link
   param: string
-} & (
-  | { choices: readonly { value: Settings[K] }[] }
-  | { flag: true }
-  | { count: true }
-)
+  read: (value: unknown) => Settings[K] | undefined
+  parse: (text: string) => unknown
+}
 
-const field = <K extends keyof Settings>(f: Field<K>) => f as Field
+type KeysWith<V> = {
+  [K in keyof Settings]: Settings[K] extends V ? K : never
+}[keyof Settings]
+
+const choice = <K extends keyof Settings>(
+  key: K,
+  param: string,
+  choices: readonly { value: Settings[K] }[],
+): Field<K> => ({
+  key,
+  param,
+  read: value => choices.find(c => c.value === value)?.value,
+  parse: text => choices.find(c => String(c.value) === text)?.value,
+})
+
+const flag = (
+  key: KeysWith<boolean>,
+  param: string,
+): Field<KeysWith<boolean>> => ({
+  key,
+  param,
+  read: value => (typeof value === 'boolean' ? value : undefined),
+  parse: text =>
+    text === '1' || text === 'true'
+      ? true
+      : text === '0' || text === 'false'
+        ? false
+        : undefined,
+})
+
+const count = (
+  key: KeysWith<number>,
+  param: string,
+): Field<KeysWith<number>> => ({
+  key,
+  param,
+  read: value =>
+    typeof value === 'number' && Number.isInteger(value) && value >= 0
+      ? value
+      : undefined,
+  parse: text => Number(text),
+})
 
 // Every setting, with its choices where it has a fixed set
 const FIELDS: readonly Field[] = [
-  field({ key: 'mode', param: 'layout', choices: LAYOUT_MODES }),
-  field({ key: 'colorScheme', param: 'color', choices: COLOR_SCHEMES }),
-  field({ key: 'nodeWidth', param: 'width', choices: NODE_WIDTHS }),
-  field({ key: 'engine', param: 'engine', choices: LAYOUT_ENGINES }),
-  field({ key: 'quality', param: 'quality', choices: LAYOUT_QUALITIES }),
-  field({ key: 'bubbleSpread', param: 'spread', choices: BUBBLE_SPREADS }),
-  field({ key: 'showBubbles', param: 'bubbles', flag: true }),
-  field({ key: 'showDeletionEdges', param: 'deletions', flag: true }),
-  field({ key: 'drawPaths', param: 'paths', flag: true }),
-  field({ key: 'showGenes', param: 'genes', flag: true }),
-  field({ key: 'walkStrip', param: 'bars', flag: true }),
-  field({ key: 'facet', param: 'facet', choices: FACET_FIELDS }),
-  field({ key: 'facetColumns', param: 'columns', count: true }),
-  field({ key: 'spacing', param: 'spacing', choices: SPACINGS }),
-  field({
-    key: 'componentSeparation',
-    param: 'separation',
-    choices: SEPARATIONS,
-  }),
-  field({ key: 'nodeThickness', param: 'thickness', choices: THICKNESSES }),
+  choice('mode', 'layout', LAYOUT_MODES),
+  choice('colorScheme', 'color', COLOR_SCHEMES),
+  choice('nodeWidth', 'width', NODE_WIDTHS),
+  choice('engine', 'engine', LAYOUT_ENGINES),
+  choice('quality', 'quality', LAYOUT_QUALITIES),
+  choice('bubbleSpread', 'spread', BUBBLE_SPREADS),
+  flag('showBubbles', 'bubbles'),
+  flag('showDeletionEdges', 'deletions'),
+  flag('drawPaths', 'paths'),
+  flag('showGenes', 'genes'),
+  flag('walkStrip', 'bars'),
+  choice('facet', 'facet', FACET_FIELDS),
+  count('facetColumns', 'columns'),
+  choice('spacing', 'spacing', SPACINGS),
+  choice('componentSeparation', 'separation', SEPARATIONS),
+  choice('nodeThickness', 'thickness', THICKNESSES),
 ]
 
 export const SETTING_PARAMS = FIELDS.map(f => f.param)
 
-export function count(value: unknown, fallback: number) {
-  return Number.isInteger(value) && (value as number) >= 0
-    ? (value as number)
-    : fallback
-}
-
-// `value` where it is one the field takes, else `fallback`
-function valid<T>(f: Field, value: unknown, fallback: T): T {
-  if ('flag' in f) {
-    return (typeof value === 'boolean' ? value : fallback) as T
-  }
-  if ('count' in f) {
-    return count(value, fallback as number) as T
-  }
-  return (f.choices.find(c => c.value === value)?.value ?? fallback) as T
+function assign<K extends keyof Settings>(
+  s: Settings,
+  f: Field<K>,
+  value: unknown,
+) {
+  s[f.key] = f.read(value) ?? s[f.key]
 }
 
 // Stored settings with each value a choice this build offers, else its default
-export function validSettings(raw: unknown): Settings {
+export function validSettings(raw: unknown) {
   const s: Partial<Record<keyof Settings, unknown>> =
     typeof raw === 'object' && raw !== null ? raw : {}
-  return Object.fromEntries(
-    FIELDS.map(f => [f.key, valid(f, s[f.key], DEFAULTS[f.key])]),
-  ) as unknown as Settings
+  const settings = { ...DEFAULTS }
+  for (const f of FIELDS) {
+    assign(settings, f, s[f.key])
+  }
+  return settings
 }
 
 // The settings as a link states them: the layout always, and whatever else
@@ -177,29 +206,12 @@ export function settingsParams(s: Settings): [string, string][] {
   })
 }
 
-// `text` as the field's value where it spells one: 1 or 0 for a flag, a
-// choice's value otherwise
-function fromText(f: Field, text: string): unknown {
-  if ('flag' in f) {
-    return text === '1' || text === 'true'
-      ? true
-      : text === '0' || text === 'false'
-        ? false
-        : undefined
-  }
-  if ('count' in f) {
-    return Number(text)
-  }
-  return f.choices.find(c => String(c.value) === text)?.value
-}
-
 // Sets each setting a link names, leaving the rest as they were
 export function readSettingsParams(params: URLSearchParams, s: Settings) {
-  const settings = s as unknown as Record<string, unknown>
   for (const f of FIELDS) {
     const text = params.get(f.param)
     if (text !== null) {
-      settings[f.key] = valid(f, fromText(f, text), s[f.key])
+      assign(s, f, f.parse(text))
     }
   }
 }
@@ -208,36 +220,38 @@ export function readSettingsParams(params: URLSearchParams, s: Settings) {
 // only changes. A value there that was the default of its time says nothing
 // about what the reader chose, so the current default replaces it.
 const FORMAT = 2
-const WAS_DEFAULT: Partial<Record<keyof Settings, unknown>> = {
+const WAS_DEFAULT: Partial<Record<string, unknown>> = {
   showDeletionEdges: false,
   showBubbles: true,
 }
 
+const isRecord = (raw: unknown): raw is Record<string, unknown> =>
+  typeof raw === 'object' && raw !== null
+
 export function upgraded(raw: unknown) {
-  if (typeof raw !== 'object' || raw === null) {
+  if (!isRecord(raw)) {
     return raw
   }
-  const { format, ...s } = raw as Record<string, unknown>
+  const { format, ...s } = raw
   return format === FORMAT
     ? s
     : Object.fromEntries(
-        Object.entries(s).filter(
-          ([k, v]) => v !== WAS_DEFAULT[k as keyof Settings],
-        ),
+        Object.entries(s).filter(([k, v]) => v !== WAS_DEFAULT[k]),
       )
 }
 
 export function loadSettings() {
-  return validSettings(upgraded(stored<unknown>(KEY, {})))
+  return validSettings(upgraded(stored(KEY, {})))
 }
 
 // The settings that differ from the defaults, the only ones a save keeps, so
 // a changed default reaches a returning visitor
 export function changedSettings(settings: Settings) {
   return Object.fromEntries(
-    Object.entries(settings).filter(
-      ([k, v]) => v !== DEFAULTS[k as keyof Settings],
-    ),
+    FIELDS.filter(f => settings[f.key] !== DEFAULTS[f.key]).map(f => [
+      f.key,
+      settings[f.key],
+    ]),
   )
 }
 

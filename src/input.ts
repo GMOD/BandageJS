@@ -28,7 +28,7 @@ import {
   state,
   tube,
 } from './state'
-import { ui } from './ui'
+import { eventElement, ui } from './ui'
 import {
   bubbleAt,
   fitView,
@@ -292,8 +292,7 @@ ui.pane.addEventListener(
     e.preventDefault()
     const p = local(
       e,
-      (e.target as Element).closest('.facet')?.querySelector('canvas') ??
-        ui.canvas,
+      eventElement(e)?.closest('.facet')?.querySelector('canvas') ?? ui.canvas,
     )
     zoomAt(wheelZoomFactor(e), p.x, p.y)
   },
@@ -301,23 +300,27 @@ ui.pane.addEventListener(
 )
 
 ui.facets.addEventListener('click', e => {
-  const name = (e.target as Element)
-    .closest('[data-walk]')
+  const name = eventElement(e)
+    ?.closest('[data-walk]')
     ?.getAttribute('data-walk')
   if (name) {
     liftWalks([name])
   }
 })
 
-ui.zoomIn.addEventListener('click', () => zoomCentre(BUTTON_ZOOM))
-ui.zoomOut.addEventListener('click', () => zoomCentre(1 / BUTTON_ZOOM))
+ui.zoomIn.addEventListener('click', () => {
+  zoomCentre(BUTTON_ZOOM)
+})
+ui.zoomOut.addEventListener('click', () => {
+  zoomCentre(1 / BUTTON_ZOOM)
+})
 ui.zoomFit.addEventListener('click', fitView)
 
 document.addEventListener('keydown', e => {
-  const t = e.target as HTMLElement
+  const t = eventElement(e)
   // a tick box in the details still lets Escape close them
   const typing =
-    t.closest('input, dialog, .menu, [role="menubar"]') &&
+    t?.closest('input, dialog, .menu, [role="menubar"]') &&
     !(e.key === 'Escape' && t.closest('#details'))
   if (e.ctrlKey || e.metaKey || e.altKey || typing) {
     return

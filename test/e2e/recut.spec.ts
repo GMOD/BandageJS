@@ -3,6 +3,7 @@ import {
   expect,
   haplotypesMenu,
   openPage,
+  spinnerLines,
   test,
   waitForDrawing,
 } from './fixtures'
@@ -10,19 +11,6 @@ import {
 import type { Page } from '@playwright/test'
 
 const MICB = `gbz=${encodeURIComponent(MICB_DB)}&loc=chr6:31,500,000-31,501,000&ref=GRCh38&layout=force`
-
-// Every line the spinner shows from now on
-async function spinnerLines(page: Page) {
-  await page.evaluate(() => {
-    const text = document.getElementById('loading-text')!
-    const w = window as { said?: string[] }
-    w.said = []
-    new MutationObserver(() => {
-      w.said!.push(text.textContent ?? '')
-    }).observe(text, { childList: true, characterData: true, subtree: true })
-  })
-  return () => page.evaluate(() => (window as { said?: string[] }).said!)
-}
 
 async function toggleStrip(page: Page) {
   await (

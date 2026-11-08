@@ -6,11 +6,7 @@
   --line: #d9dee4;
   --accent: #2f6fd6;
   --error: #b3261e;
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 13px;
   color: var(--ink);
 }

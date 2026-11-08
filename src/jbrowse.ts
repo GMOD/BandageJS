@@ -170,6 +170,11 @@ function genesOf(t: Target, assembly: HubAssembly) {
     : geneTrackOf({ hub: t.hub, assembly })
 }
 
+function assemblyContig(contigs: Record<string, string>, contig: string) {
+  const named = contigs[contig]
+  return named === undefined || named === '' ? contig : named
+}
+
 // Where a node sits: on the reference assembly, or on the haplotype that
 // contributed it where the hub has that haplotype as an assembly
 export function nodeLink(
@@ -184,7 +189,7 @@ export function nodeLink(
   const contig = panSNContig(stable.refName)
   const pad = Math.max(0, (MIN_NODE_WINDOW - node.length) / 2)
   const span = {
-    refName: (stable.rank === 0 && contigs[contig]) || contig,
+    refName: stable.rank === 0 ? assemblyContig(contigs, contig) : contig,
     start: Math.max(0, Math.floor(stable.start - pad)),
     end: Math.ceil(stable.start + node.length + pad),
   }
@@ -229,15 +234,17 @@ export function rowLink(
   }
   const assembly = isReference
     ? t.assembly
-    : (row.haplotype !== undefined &&
-        assemblyNamed(t.hub, `${row.sample}#${row.haplotype}`)) ||
-      assemblyNamed(t.hub, row.sample)
+    : ((row.haplotype !== undefined
+        ? assemblyNamed(t.hub, `${row.sample}#${row.haplotype}`)
+        : undefined) ?? assemblyNamed(t.hub, row.sample))
   if (!assembly) {
     return undefined
   }
   const genes = genesOf(t, assembly)
   const span = {
-    refName: (isReference && contigs[row.axis.contig]) || row.axis.contig,
+    refName: isReference
+      ? assemblyContig(contigs, row.axis.contig)
+      : row.axis.contig,
     ...rowSpan(row.axis, row.bp),
   }
   return specUrl(t, {

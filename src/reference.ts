@@ -62,7 +62,10 @@ export function contigsFrom(text: string) {
   const pairs = text
     .split(/[\s,]+/)
     .filter(p => p.indexOf(':') > 0)
-    .map(p => [p.slice(0, p.indexOf(':')), p.slice(p.indexOf(':') + 1)])
+    .map(p => {
+      const at = p.indexOf(':')
+      return [p.slice(0, at), p.slice(at + 1)] satisfies [string, string]
+    })
   return pairs.length ? Object.fromEntries(pairs) : undefined
 }
 
@@ -130,6 +133,9 @@ async function candidatesFor(b: Backbone, hubs: Hub[]) {
   return named.flat()
 }
 
+const overlaid = (entry: OrderedHub, hub: Hub) =>
+  withOverlay(hub, mergeOverlays(entry.site, entry.user))
+
 async function resolve(
   b: Backbone,
   d: Declaration | undefined,
@@ -148,8 +154,6 @@ async function resolve(
       return undefined
     }
   }
-  const both = (entry: OrderedHub, hub: Hub) =>
-    withOverlay(hub, mergeOverlays(entry.site, entry.user))
   if (d) {
     const first = d.hub ? entries.filter(e => e.url === d.hub) : []
     const rest = d.hub
@@ -160,7 +164,7 @@ async function resolve(
       : entries
     for (const entry of [...first, ...rest]) {
       const raw = await load(entry)
-      const hub = raw && both(entry, raw)
+      const hub = raw && overlaid(entry, raw)
       const assembly = hub && assemblyNamed(hub, d.assembly)
       if (hub && assembly) {
         return { status: 'bound', how: 'declared', hub, assembly }
@@ -172,7 +176,7 @@ async function resolve(
       const assembly =
         raw && backboneAssembly(b, withOverlay(raw, entry.site).assemblies)
       if (raw && assembly) {
-        const hub = both(entry, raw)
+        const hub = overlaid(entry, raw)
         return {
           status: 'bound',
           how: 'named',
@@ -182,7 +186,7 @@ async function resolve(
       }
     }
     for (const { entry, hub: raw } of loaded) {
-      const hub = both(entry, raw)
+      const hub = overlaid(entry, raw)
       const assembly = backboneAssembly(b, hub.assemblies)
       if (assembly) {
         return { status: 'bound', how: 'remembered', hub, assembly }
@@ -194,8 +198,8 @@ async function resolve(
   const couldnt = failed.length ? ` (couldn't read ${failed.join(', ')})` : ''
   const order = new Map(entries.map((e, i) => [e.url, i]))
   const hubs = loaded
-    .sort((x, y) => order.get(x.entry.url)! - order.get(y.entry.url)!)
-    .map(({ entry, hub }) => both(entry, hub))
+    .toSorted((x, y) => order.get(x.entry.url)! - order.get(y.entry.url)!)
+    .map(({ entry, hub }) => overlaid(entry, hub))
   return {
     status: 'unknown',
     reason: d

@@ -26,14 +26,34 @@ function target(tracks: object[]) {
   return { host: 'https://jbrowse.example/', hub, assembly: hub.assemblies[0]! }
 }
 
+interface Spec {
+  views: {
+    tracks?: (string | { type?: string; trackId: string; rows?: unknown })[]
+    maxRegionBp?: number
+    layoutMode?: string
+  }[]
+}
+
+const isSpec = (spec: unknown): spec is Spec =>
+  typeof spec === 'object' &&
+  spec !== null &&
+  'views' in spec &&
+  Array.isArray(spec.views)
+
 function specOf(link: string) {
-  return JSON.parse(decodeURIComponent(link.split('session=spec-')[1]!))
+  const spec: unknown = JSON.parse(
+    decodeURIComponent(link.split('session=spec-')[1]!),
+  )
+  if (!isSpec(spec)) {
+    throw new Error(`No session spec in ${link}`)
+  }
+  return spec
 }
 
 function lanesDisplay(link: string) {
-  return specOf(link).views[0].tracks.find(
-    (x: { type?: string }) => x.type === 'MultiWaySyntenyDisplay',
-  )
+  return specOf(link)
+    .views[0]?.tracks?.filter(x => typeof x !== 'string')
+    .find(x => x.type === 'MultiWaySyntenyDisplay')
 }
 
 function lanesIn(link: string) {
@@ -100,7 +120,7 @@ test('the region link keeps the lanes asked for as rows.kept', () => {
   const t = target([
     { type: 'GraphTrack', trackId: 'lanes', assemblyNames: ['hg38'], adapter },
   ])
-  expect(lanesDisplay(regionLink(t, region, ['HG00097'])).rows).toEqual({
+  expect(lanesDisplay(regionLink(t, region, ['HG00097']))?.rows).toEqual({
     kept: ['HG00097#1', 'HG00097#2'],
   })
 })
@@ -120,9 +140,9 @@ test("the graph view link raises the plugin's region cap to a wide cut", () => {
         'tubemap',
       ),
     ).views[1]
-  expect(view(100).maxRegionBp).toBe(5_000_000)
-  expect(view(8_000_000).maxRegionBp).toBe(8_000_000)
-  expect(view(100).layoutMode).toBe('tubemap')
+  expect(view(100)?.maxRegionBp).toBe(5_000_000)
+  expect(view(8_000_000)?.maxRegionBp).toBe(8_000_000)
+  expect(view(100)?.layoutMode).toBe('tubemap')
 })
 
 const geneTrack = (trackId: string) => ({
@@ -133,8 +153,7 @@ const geneTrack = (trackId: string) => ({
 })
 
 function tracksIn(link: string | undefined) {
-  const spec = JSON.parse(decodeURIComponent(link!.split('session=spec-')[1]!))
-  return spec.views[0].tracks
+  return specOf(link!).views[0]?.tracks
 }
 
 test("a haplotype's links open the gene track the hub's overlay chose", () => {
@@ -160,13 +179,18 @@ test("a haplotype's links open the gene track the hub's overlay chose", () => {
     depth: 1,
     stable: { refName: 'HG00097#1#chr1', start: 5000, rank: 1 },
   }
-  const row = {
+  const row: WalkRow = {
     name: 'HG00097#1#chr1',
+    label: 'HG00097#1#chr1',
     sample: 'HG00097',
     haplotype: 1,
     bp: 100,
+    offReferenceBp: 0,
+    gapBp: 0,
+    complete: true,
+    runs: [],
     axis: { contig: 'chr1', start: 5000, reversed: false },
-  } as WalkRow
+  }
   expect(tracksIn(nodeLink(node, t))).toEqual(['chosen'])
   expect(tracksIn(rowLink(row, false, t))).toEqual(['chosen'])
 })

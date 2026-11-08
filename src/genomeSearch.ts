@@ -52,7 +52,7 @@ export function searchIndex(
     }
   }
   return hits
-    .sort((a, b) => a.rank - b.rank)
+    .toSorted((a, b) => a.rank - b.rank)
     .slice(0, limit)
     .map(h => h.genome)
 }

@@ -97,7 +97,7 @@ function referenceMenu(page: Page) {
   return openMenu(page, 'File')
 }
 
-async function title(page: Page, gene: string) {
+function title(page: Page, gene: string) {
   return genes(page).filter({ hasText: gene }).locator('title')
 }
 
@@ -353,7 +353,7 @@ test('CHM13 reads hs1 genes under their NCBI names, GRCh38 hg38 genes', async ({
 }) => {
   await openPage(page, 'gfa=examples/chr1_chm13_grch38_paths.gfa')
   await waitForDrawing(page, /nodes/)
-  await expect(await title(page, 'DENND1B')).toHaveText(
+  await expect(title(page, 'DENND1B')).toHaveText(
     /^DENND1B\nchr1:196,766,532-197,041,541, − strand/,
   )
   expect(geneRequests.some(u => u.includes('/hs1/hs1.gff.gz'))).toBe(true)
@@ -362,7 +362,7 @@ test('CHM13 reads hs1 genes under their NCBI names, GRCh38 hg38 genes', async ({
   await page.keyboard.press('Escape')
 
   await drawAlong(page, 'GRCh38#0#chr1')
-  await expect(await title(page, 'DENND1B')).toHaveText(
+  await expect(title(page, 'DENND1B')).toHaveText(
     /^DENND1B\nchr1:197,504,748-197,782,150, − strand/,
   )
 })
@@ -509,7 +509,7 @@ test('the E. coli example binds K-12 through the site config', async ({
 }) => {
   await openPage(page, 'gfa=examples/ecoli_pggb_subgraph.gfa')
   await waitForDrawing(page, /nodes/)
-  await expect(await title(page, 'ycbF')).toHaveText(
+  await expect(title(page, 'ycbF')).toHaveText(
     /^ycbF\nchr:1,003,947-1,004,657, \+ strand/,
   )
   await expect(genes(page).filter({ hasText: 'pyrD' })).toHaveCount(1)
@@ -701,10 +701,14 @@ test('the region link opens the hub with its gene and graph tracks', async ({
   expect(hash.get('config')).toBe(
     'https://jbrowse.org/pangenome/hprc-grch38/config.json',
   )
-  const view = JSON.parse(hash.get('session')!.replace(/^spec-/, '')).views[0]
-  expect(view.assembly).toBe('hg38')
-  expect(view.tracks).toContain('hg38_ncbiRefSeq_ucsc')
-  expect(view.tracks).toContain('hprc_minigraph_segments')
+  const session: unknown = JSON.parse(
+    hash.get('session')!.replace(/^spec-/, ''),
+  )
+  expect(session).toHaveProperty(['views', '0', 'assembly'], 'hg38')
+  expect(session).toHaveProperty(
+    ['views', '0', 'tracks'],
+    expect.arrayContaining(['hg38_ncbiRefSeq_ucsc', 'hprc_minigraph_segments']),
+  )
 })
 
 test('a graph with no reference fetches no genes and offers neither genes nor a reference genome', async ({

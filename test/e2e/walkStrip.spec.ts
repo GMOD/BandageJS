@@ -34,7 +34,7 @@ async function onRow(page: Page, row: number) {
             Number(r.getAttribute('y')) + Number(r.getAttribute('height')) / 2,
         ),
       ),
-    ].sort((a, b) => a - b)
+    ].toSorted((a, b) => a - b)
     const y = ys[i]!
     const widest = rects
       .filter(

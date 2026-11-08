@@ -37,7 +37,7 @@ import {
 import { genomeHubUrl, mergeOverlays } from './siteConfig'
 import { rememberSource, updateReferenceQuery } from './sources'
 import { settings, state } from './state'
-import { ui } from './ui'
+import { eventElement, ui } from './ui'
 import { scheduleDraw } from './view'
 
 import type { Genome } from './genomeSearch'
@@ -213,7 +213,7 @@ function suggestions(): Result[] {
       : []
   const likely =
     bound.status === 'unknown'
-      ? bound.candidates.map(choice => ({ kind: 'choice', choice }) as Result)
+      ? bound.candidates.map((choice): Result => ({ kind: 'choice', choice }))
       : []
   // with nothing likelier, the genomes of hubs of a few assemblies, which a
   // site likely offers on purpose
@@ -222,7 +222,7 @@ function suggestions(): Result[] {
       ? []
       : allChoices()
           .filter(c => c.hub.assemblies.length <= 5)
-          .map(choice => ({ kind: 'choice', choice }) as Result)
+          .map((choice): Result => ({ kind: 'choice', choice }))
   return b ? [...chosen, ...current, ...likely, ...offered] : []
 }
 
@@ -235,7 +235,7 @@ async function search(query: string): Promise<Result[]> {
       ),
     )
     .slice(0, 30)
-    .map(choice => ({ kind: 'choice', choice }) as Result)
+    .map((choice): Result => ({ kind: 'choice', choice }))
   const loadedUrls = new Set(hubs.map(h => h.url))
   const { genomes } = siteConfig()
   const direct = genomeHubUrl(query, genomes)
@@ -314,6 +314,14 @@ function drawResults() {
       : `Or search ${count.toLocaleString()} assemblies in ${hubs.filter(h => h.hub).length} hubs by name or accession.`
 }
 
+function showsNothing() {
+  return (
+    ui.referenceGenesRow.hidden &&
+    ui.referenceRememberRow.hidden &&
+    !ui.referenceContigs.childElementCount
+  )
+}
+
 async function drawChosen() {
   const b = backboneOf(state.graph)
   ui.referenceChosen.hidden = !picked || picked === 'auto' || !b
@@ -348,10 +356,6 @@ async function drawChosen() {
       sameChoice(choice, bound))
   ui.referenceRememberText.textContent = `Use it for every graph whose reference is ${sample}`
   ui.referenceContigs.innerHTML = ''
-  const showsNothing = () =>
-    ui.referenceGenesRow.hidden &&
-    ui.referenceRememberRow.hidden &&
-    !ui.referenceContigs.childElementCount
   ui.referenceChosen.hidden = showsNothing()
   const rows = choice.assembly.refNameAliases
     ? await loadAliases(choice.assembly.refNameAliases).catch(() => [])
@@ -484,7 +488,7 @@ ui.genomeSearch.addEventListener('keydown', e => {
 })
 
 ui.genomeResults.addEventListener('click', e => {
-  const button = (e.target as Element).closest<HTMLElement>('[data-i]')
+  const button = eventElement(e)?.closest<HTMLElement>('[data-i]')
   const r = button && results[Number(button.dataset.i)]
   if (r) {
     void pick(r)
@@ -492,8 +496,8 @@ ui.genomeResults.addEventListener('click', e => {
 })
 
 ui.hubList.addEventListener('click', e => {
-  const url = (e.target as Element).closest<HTMLElement>('[data-forget]')
-    ?.dataset.forget
+  const url =
+    eventElement(e)?.closest<HTMLElement>('[data-forget]')?.dataset.forget
   if (url) {
     forgetHub(url)
     void draw()

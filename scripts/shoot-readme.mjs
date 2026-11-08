@@ -11,7 +11,7 @@
 import { execFileSync } from 'node:child_process'
 
 import * as esbuild from 'esbuild'
-import puppeteer from 'puppeteer-core'
+import { launch } from 'puppeteer-core'
 
 const TIMEOUT = 120_000
 
@@ -131,14 +131,16 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const names = process.argv.slice(2)
 for (const name of names) {
   if (!(name in FIGURES)) {
-    throw new Error(`no figure ${name}; one of ${Object.keys(FIGURES)}`)
+    throw new Error(
+      `no figure ${name}; one of ${Object.keys(FIGURES).join(',')}`,
+    )
   }
 }
 
 execFileSync('node', ['build.mjs'], { stdio: 'inherit' })
 const ctx = await esbuild.context({})
 const { port } = await ctx.serve({ servedir: 'dist', port: 0 })
-const browser = await puppeteer.launch({
+const browser = await launch({
   executablePath: process.env.CHROME ?? '/usr/bin/google-chrome',
   headless: true,
 })
@@ -164,7 +166,7 @@ try {
     }, settings)
     await page.goto(`http://localhost:${port}/?${query}`)
     await page.waitForFunction(() =>
-      /nodes/.test(document.querySelector('#stats')?.textContent ?? ''),
+      (document.querySelector('#stats')?.textContent ?? '').includes('nodes'),
     )
     await page.waitForSelector('#loading', { hidden: true })
     // genes arrive after the drawing
@@ -181,7 +183,7 @@ try {
             ...new Set(
               rects.map(r => r.y.baseVal.value + r.height.baseVal.value / 2),
             ),
-          ].sort((a, b) => a - b),
+          ].toSorted((a, b) => a - b),
       )
       await page.mouse.move(
         box.x + box.width * strip.along,

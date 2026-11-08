@@ -34,22 +34,34 @@ export const workerEngine: LayoutEngine = (request: EngineRequest) => {
     type: 'module',
   })
   const w = worker
+  const replied = new AbortController()
+  const { signal } = replied
   return new Promise((resolve, fail) => {
     reject = fail
-    w.onmessage = (e: MessageEvent<Reply>) => {
-      reject = undefined
-      if (e.data.error === undefined) {
-        resolve(e.data)
-      } else {
+    w.addEventListener(
+      'message',
+      (e: MessageEvent<Reply>) => {
+        replied.abort()
+        reject = undefined
+        if (e.data.error === undefined) {
+          resolve(e.data)
+        } else {
+          drop()
+          fail(new Error(e.data.error))
+        }
+      },
+      { signal },
+    )
+    w.addEventListener(
+      'error',
+      e => {
+        replied.abort()
+        reject = undefined
         drop()
-        fail(new Error(e.data.error))
-      }
-    }
-    w.onerror = e => {
-      reject = undefined
-      drop()
-      fail(new Error(e.message || 'layout worker failed'))
-    }
+        fail(new Error(e.message || 'layout worker failed'))
+      },
+      { signal },
+    )
     w.postMessage(request)
   })
 }
