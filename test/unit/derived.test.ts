@@ -61,13 +61,9 @@ test('walkView lifts walks as lanes, and side by side a lift of each alone', () 
   })
 })
 
-test("an abridged walk's block counts the steps and bp it left out", () => {
-  expect(abridgedText('HG00097#1', { steps: 140_000, bp: 2_100_000 })).toBe(
-    'HG00097#1: 140 k steps, 2.1 Mb off reference',
-  )
-  expect(abridgedText('Sakai#1', { steps: 35, bp: 460 })).toBe(
-    'Sakai#1: 35 steps, 460 bp off reference',
-  )
+test("an abridged walk's block counts the steps it left out", () => {
+  expect(abridgedText('HG00097#1', 140_000)).toBe('HG00097#1: 140 k steps')
+  expect(abridgedText('Sakai#1', 35)).toBe('Sakai#1: 35 steps')
 })
 
 test('the notice names the lifted walks a cut left abridged', () => {

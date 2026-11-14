@@ -18,7 +18,7 @@ gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
 
 - The run writes `graph.GRCh38.walks.gz` and its directory
   `graph.GRCh38.walks.gz.idx`
-- BandageJS needs walk format 7, from gfa-to-tabix 4.0 or later, and asks for a
+- BandageJS needs walk format 8, from gfa-to-tabix 5.0 or later, and asks for a
   rebuild of an older file
 - A graph shipped as `.gbz` converts first:
   `vg convert -f graph.gbz > graph.gfa`
@@ -75,8 +75,7 @@ haplotype's bp:
 - Coloured stretches follow the reference; dark stretches are sequence GRCh38
   lacks
 - The label after each bar gives the walk's length and its difference from the
-  reference: HG00133#1 runs about 117 kb longer than GRCh38's 33 kb, an estimate
-  (≈) because the file abridges that walk
+  reference: HG00133#1 runs about 117 kb longer than GRCh38's 33 kb
 - A haplotype with no step in the window has no walk in the cut. The file's
   departure records name where it leaves the reference and where it rejoins, and
   BandageJS draws a hairline under that stretch of the reference's bar, read as
@@ -105,11 +104,11 @@ your own file holds its url.
 
 - gfa-to-tabix moves the costliest walks of a costly tile, usually a satellite
   array, into detail rows that a window read skips
-- BandageJS reads each such walk as two steps, where it leaves and rejoins the
-  reference
-- The Haplotypes menu lists each as a block, such as
-  `HG00133#1: 11 k steps, 171 kb off reference`. Walk rows draw its missing
-  steps in amber
+- BandageJS reads such a walk's steps on the reference, and each run of its
+  steps off the reference as one placeholder of the run's bp, which a node
+  layout draws hollow
+- The Haplotypes menu lists each as a block, such as `HG00133#1: 11 k steps`,
+  the steps reading it in full decodes
 - Clicking the block, or **Load its steps** on a selected walk row, cuts again
   with the walk read in full
 - A highlighted walk is read in full, since BandageJS needs its steps to draw

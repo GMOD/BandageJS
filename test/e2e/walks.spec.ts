@@ -290,7 +290,7 @@ test("a lifted walk's key says how much of it lies outside the extracted subgrap
   )
   await waitForDrawing(page, /nodes/)
   await expect(page.locator('#legends .walk-key')).toContainText(
-    '10 bp outside the extracted subgraph',
+    '10 bp out of view',
   )
 })
 

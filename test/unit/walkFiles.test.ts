@@ -97,45 +97,44 @@ const ABRIDGED = 'ecoli_pggb_abridged.K12.walks.gz'
 const WHOLE = 'ecoli_pggb.K12.walks.gz'
 const K12 = 'K12#1#chr:1004500-1004961'
 
-function stepCounts(text: string) {
-  return Object.fromEntries(
-    lines(text, 'W').map(
-      w =>
-        [w[1] ?? '', w[6]!.split(/[<>]/).length - 1] satisfies [string, number],
-    ),
-  )
+function wLine(text: string, sample: string) {
+  return lines(text, 'W').find(w => w[1] === sample)
 }
 
-test('a walk file cut gives an abridged walk two steps and its counts', async () => {
-  const { text, gfa, expanded } = await cut({ region: K12 }, ABRIDGED)
-  expect(stepCounts(text)).toMatchObject({ IAI39: 2, Sakai: 2 })
+const abridgedOf = (gfa: Parameters<typeof loadGraph>[0]) =>
+  Object.fromEntries(abridgedWalks(loadGraph(gfa, 'cut')))
+
+test('a walk file cut gives an abridged walk a placeholder for each run off the reference, and its counts', async () => {
+  const { gfa, expanded } = await cut({ region: K12 }, ABRIDGED)
+  const placeholders = gfa.nodes.names.filter(
+    (_, i) => gfa.nodes.placeholders?.[i] === 1,
+  )
+  expect(new Set(placeholders.map(name => name.split(':')[0]))).toEqual(
+    new Set(['IAI39#1#chr', 'Sakai#1#chr']),
+  )
   expect(expanded).toEqual([])
-  const graph = loadGraph(gfa, 'cut')
-  expect(Object.fromEntries(abridgedWalks(graph.paths))).toEqual({
-    'IAI39#1#chr': { steps: 35, bp: 460 },
-    'Sakai#1#chr': { steps: 35, bp: 460 },
-  })
+  expect(abridgedOf(gfa)).toEqual({ 'IAI39#1#chr': 35, 'Sakai#1#chr': 35 })
 })
 
 test('a walk file cut reads the abridged walks it expands in full', async () => {
-  const { text, expanded } = await cut(
+  const { text, gfa, expanded } = await cut(
     { region: K12, expand: ['Sakai#1#chr', 'CFT073#1#chr'] },
     ABRIDGED,
   )
   const whole = await cut({ region: K12 }, WHOLE)
   expect(expanded).toEqual(['Sakai#1#chr'])
-  expect(stepCounts(text)).toEqual({ ...stepCounts(whole.text), IAI39: 2 })
-  expect(stepCounts(text).Sakai).toBe(35)
+  expect(wLine(text, 'Sakai')).toEqual(wLine(whole.text, 'Sakai'))
+  expect(abridgedOf(gfa)).toEqual({ 'IAI39#1#chr': 35 })
 })
 
 // Sakai read in full takes this cut from 39 nodes to 45, and IAI39 as well
 // to 54
 test('a walk file cut leaves a lifted walk abridged where reading it would go over the node limit', async () => {
-  const { text, expanded, tooLarge } = await cut(
+  const { gfa, expanded, tooLarge } = await cut(
     { region: K12, lifted: ['Sakai#1#chr', 'K12#1#chr'], nodeLimit: 40 },
     ABRIDGED,
   )
-  expect(stepCounts(text).Sakai).toBe(2)
+  expect(abridgedOf(gfa)).toHaveProperty(['Sakai#1#chr'])
   expect(expanded).toEqual([])
   expect(tooLarge).toEqual(['Sakai#1#chr'])
 })

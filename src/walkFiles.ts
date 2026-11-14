@@ -82,9 +82,15 @@ export async function cutWalksRegion(
     }
   }
   const cut = await cutReading(walks, src, expand, signal)
-  const { names, abridgedSteps } = cut.gfa.walks
+  const { walks: rows, departures } = cut.gfa
   const abridged = new Set(
-    names.filter((_, i) => !Number.isNaN(abridgedSteps?.[i] ?? Number.NaN)),
+    rows.names
+      .filter((_, i) => (rows.abridgedSteps?.[i] ?? 0) > 0)
+      .concat(
+        departures.names.filter(
+          (_, k) => (departures.abridgedSteps?.[k] ?? 0) > 0,
+        ),
+      ),
   )
   return { ...cut, tooLarge: lifted.filter(name => abridged.has(name)) }
 }

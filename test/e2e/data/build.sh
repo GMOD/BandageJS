@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Rebuilds the walk-file fixtures from their GFAs with gfa-to-tabix 4.0, in
-# walk format 7. Usage: test/e2e/data/build.sh <gfa-to-tabix binary> <hprc-chrM.GRCh38.gfa>
+# Rebuilds the walk-file fixtures from their GFAs with gfa-to-tabix 5.0, in
+# walk format 8. Usage: test/e2e/data/build.sh <gfa-to-tabix binary> <hprc-chrM.GRCh38.gfa>
 # The chrM GFA is graph-walks' test_data/hprc-chrM.GRCh38.gfa, the graph
 # hprc-chrM.gbz.db holds.
 set -euo pipefail
