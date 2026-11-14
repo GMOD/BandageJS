@@ -4,6 +4,10 @@ import {
   HALO_FACTOR,
   LABEL_PAD,
   LABEL_PX,
+  NOT_LOADED_CSS,
+  NOT_LOADED_FILL_CSS,
+  NOT_LOADED_RIM_PX,
+  NOT_LOADED_TEXT,
   RAMP_GRADIENT_CSS,
   encodingSwatchCss,
   exonOutlineTree,
@@ -349,13 +353,17 @@ export function walkRowsKeyHtml(entries: KeyEntry[]) {
 }
 
 // the exon outline's key, as the plugin's gene legend and a figure draw it
-const EXON_SWATCH = `<svg class="swatch-exon" width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="1" y="1" width="16" height="10" rx="4" fill="none" stroke="${EXON_COLOR}" stroke-width="2"/></svg>`
+const EXON_SWATCH = `<svg class="swatch-outline" width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="1" y="1" width="16" height="10" rx="4" fill="none" stroke="${EXON_COLOR}" stroke-width="2"/></svg>`
+
+const NOT_LOADED_SWATCH = `<svg class="swatch-outline" width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="1" y="2" width="16" height="8" rx="4" fill="${NOT_LOADED_FILL_CSS}" stroke="${NOT_LOADED_CSS}" stroke-width="${NOT_LOADED_RIM_PX}"/></svg>`
 
 export function legendsHtml(o: {
   ramp: { start: number; end: number; refName?: string } | undefined
   // what the marks across the backbone are, exons or whole genes where the
   // genes have none, and where they come from
   exons: { kind: 'Exon' | 'Gene'; from: string } | undefined
+  // whether the nodes drawn hold a stretch whose own nodes the cut didn't load
+  notLoaded: boolean
   paths: { name: string; label: string; color: string }[]
   walkBars: WalkRows | undefined
   // the walk rows' gene key, with the rows it couldn't read genes for
@@ -381,6 +389,11 @@ export function legendsHtml(o: {
   if (o.exons) {
     out.push(
       `<div class="legend"><div class="legend-row">${EXON_SWATCH}<span>${o.exons.kind}, from ${esc(o.exons.from)}</span></div></div>`,
+    )
+  }
+  if (o.notLoaded) {
+    out.push(
+      `<div class="legend"><div class="legend-row">${NOT_LOADED_SWATCH}<span>${NOT_LOADED_TEXT}</span></div></div>`,
     )
   }
   if (o.paths.length > 0) {

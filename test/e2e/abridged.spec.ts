@@ -12,6 +12,7 @@ import type { Page } from '@playwright/test'
 const CUT = `walks=${encodeURIComponent(ABRIDGED_WALKS)}&loc=K12%231%23chr:1004501-1004961&layout=force`
 const IAI39 = 'IAI39: 35 steps'
 const SAKAI = 'Sakai: 35 steps'
+const NOT_SHOWN = 'nodes not shown'
 
 const expanded = (page: Page) => new URL(page.url()).searchParams.get('expand')
 
@@ -34,6 +35,21 @@ test('an abridged walk shows as a block that loads its steps', async ({
   await waitForDrawing(page, /5 paths/)
   await expect(await blocks(page)).toHaveText([IAI39])
   expect(consoleErrors).toEqual([])
+})
+
+test("the key names the stretches whose nodes the cut didn't load, while nodes draw them", async ({
+  page,
+}) => {
+  const key = page.locator('#legends')
+  await openPage(page, CUT)
+  await waitForDrawing(page, /5 paths/)
+  await expect(key).toContainText(NOT_SHOWN)
+  await openPage(page, `${CUT}&expand=IAI39%231%23chr,Sakai%231%23chr`)
+  await waitForDrawing(page, /5 paths/)
+  await expect(key).not.toContainText(NOT_SHOWN)
+  await openPage(page, CUT.replace('layout=force', 'layout=walkrows'))
+  await waitForDrawing(page, /5 paths/)
+  await expect(key).not.toContainText(NOT_SHOWN)
 })
 
 test("a link's lifted walk is read in full, and its expanded walks stay so", async ({

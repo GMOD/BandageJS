@@ -227,6 +227,7 @@ export const drawnExtras = memo(
         showGenes && bars ? rowGenesOf(bars, genes, walkGenes) : undefined,
       rowLabels: walkRowLabels(bars, layout),
       deletions: drawing.shown,
+      notLoaded: onNodes && !!graph?.nodes.some(n => n.placeholder),
       drawing,
       ramp:
         resolved === 'reference-position' && graph && !tubeMap

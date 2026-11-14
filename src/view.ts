@@ -784,6 +784,7 @@ function drawOverlays() {
             ? { ...ramp, refName: referenceName() ?? referenceAssembly() }
             : undefined,
         exons: exonKey(d.genePins),
+        notLoaded: d.notLoaded,
         paths: drawPaths() && graph?.paths ? pathLegend(graph.paths) : [],
         walkBars: d.bars,
         rowGenes: d.rowGenes?.size ? state.walkGeneNote : undefined,
