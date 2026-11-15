@@ -5,7 +5,7 @@ import { LocalFile } from 'generic-filehandle2'
 
 import { formatLocus, loadGraph } from '@jbrowse/bandage-core'
 import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
-import { abridgedWalks, rowsOf } from '../../src/derived'
+import { abridgedWalks, labelledLengths, rowsOf } from '../../src/derived'
 import { rowHtml } from '../../src/describe'
 import { coreRegion, parseRegion } from '../../src/region'
 import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
@@ -119,6 +119,19 @@ test('a walk file cut gives an abridged walk a placeholder for each run off the 
     'IAI39#1#chr': { steps: 35, bp: 11 },
     'Sakai#1#chr': { steps: 35, bp: 6 },
   })
+})
+
+test("a placeholder's length is labelled with node lengths off, and every node's with them on", async () => {
+  const { gfa } = await cut({ region: K12 }, ABRIDGED)
+  const graph = loadGraph(gfa, 'cut')
+  const placeholders = graph.nodes.filter(n => n.placeholder)
+  expect(placeholders.length).toBeGreaterThan(0)
+  expect(labelledLengths(graph, false)).toEqual(
+    new Map(placeholders.map(n => [n.id, n.length])),
+  )
+  expect(labelledLengths(graph, true)).toEqual(
+    new Map(graph.nodes.map(n => [n.id, n.length])),
+  )
 })
 
 test('a walk file cut reads the abridged walks it expands in full', async () => {
