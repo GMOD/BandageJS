@@ -905,7 +905,7 @@ function drawInfo() {
       ref && rowLink(selectedRow, isReference, targetOf(ref), ref.contigs)
     const abridged = f.abridged.get(selectedRow.name)
     html = `${rowHtml(selectedRow, bars?.reference)}${
-      abridged ? `<br>${esc(abridgedCounts(abridged))} not loaded` : ''
+      abridged ? `<br>${esc(abridgedCounts(abridged))}` : ''
     }<div class="info-actions">${
       link
         ? `<a href="${esc(link)}" target="_blank" rel="noopener">Show in JBrowse ↗</a>`

@@ -104,6 +104,8 @@ function wLine(text: string, sample: string) {
 const abridgedOf = (gfa: Parameters<typeof loadGraph>[0]) =>
   Object.fromEntries(abridgedWalks(loadGraph(gfa, 'cut')))
 
+// IAI39's ten placeholders hold 11 bp and Sakai's six 6 bp; each fragment and
+// the departure off it hold the same placeholder, counted once
 test('a walk file cut gives an abridged walk a placeholder for each run off the reference, and its counts', async () => {
   const { gfa, expanded } = await cut({ region: K12 }, ABRIDGED)
   const placeholders = gfa.nodes.names.filter(
@@ -113,7 +115,10 @@ test('a walk file cut gives an abridged walk a placeholder for each run off the 
     new Set(['IAI39#1#chr', 'Sakai#1#chr']),
   )
   expect(expanded).toEqual([])
-  expect(abridgedOf(gfa)).toEqual({ 'IAI39#1#chr': 35, 'Sakai#1#chr': 35 })
+  expect(abridgedOf(gfa)).toEqual({
+    'IAI39#1#chr': { steps: 35, bp: 11 },
+    'Sakai#1#chr': { steps: 35, bp: 6 },
+  })
 })
 
 test('a walk file cut reads the abridged walks it expands in full', async () => {
@@ -124,7 +129,7 @@ test('a walk file cut reads the abridged walks it expands in full', async () => 
   const whole = await cut({ region: K12 }, WHOLE)
   expect(expanded).toEqual(['Sakai#1#chr'])
   expect(wLine(text, 'Sakai')).toEqual(wLine(whole.text, 'Sakai'))
-  expect(abridgedOf(gfa)).toEqual({ 'IAI39#1#chr': 35 })
+  expect(abridgedOf(gfa)).toEqual({ 'IAI39#1#chr': { steps: 35, bp: 11 } })
 })
 
 // Sakai read in full takes this cut from 39 nodes to 45, and IAI39 as well

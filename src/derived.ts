@@ -6,6 +6,7 @@ import {
   deletionDrawing,
   deletionEdges,
   facetLifts,
+  formatBp,
   genePins,
   genesOnRow,
   nodeInk,
@@ -56,22 +57,56 @@ export const depthVaries = memo(
   (graph: Graph) => new Set(graph.nodes.map(n => n.depth)).size > 1,
 )
 
+export interface Abridged {
+  steps: number
+  bp: number
+}
+
 // Each walk a walk file cut abridged, by name, with the steps it did not load
-// across the walk's fragments and departures
+// across the walk's fragments and departures, and the bp of the placeholders
+// standing for them, each counted once though a fragment and its departure
+// both hold it
 export function abridgedWalks(graph: Graph | undefined) {
-  const walks = new Map<string, number>()
-  const add = (name: string, steps = Number.NaN) => {
-    if (steps > 0) {
-      walks.set(name, (walks.get(name) ?? 0) + steps)
+  const steps = new Map<string, number>()
+  const placeholders = new Map<string, Set<GraphNode>>()
+  const add = (name: string, nodes: (GraphNode | undefined)[], count = 0) => {
+    if (count > 0) {
+      steps.set(name, (steps.get(name) ?? 0) + count)
+    }
+    for (const node of nodes) {
+      if (node?.placeholder) {
+        placeholders.set(name, (placeholders.get(name) ?? new Set()).add(node))
+      }
     }
   }
-  for (const { name, abridgedSteps } of graph?.paths ?? []) {
-    add(name, abridgedSteps)
+  const nodeById = new Map(graph?.nodes.map(n => [n.id, n]))
+  for (const { name, abridgedSteps, nodeIds } of graph?.paths ?? []) {
+    add(
+      name,
+      nodeIds.map(id => nodeById.get(id)),
+      abridgedSteps,
+    )
   }
   const departures = graph?.departures
   departures?.names.forEach((name, k) => {
-    add(name, departures.abridgedSteps?.[k])
+    const { offsets } = departures
+    add(
+      name,
+      Array.from(
+        departures.steps.subarray(offsets[k], offsets[k + 1]),
+        i => graph?.nodes[i],
+      ),
+      departures.abridgedSteps?.[k],
+    )
   })
+  const walks = new Map<string, Abridged>()
+  for (const [name, count] of steps) {
+    let bp = 0
+    for (const node of placeholders.get(name) ?? []) {
+      bp += node.length
+    }
+    walks.set(name, { steps: count, bp })
+  }
   return walks
 }
 
@@ -95,13 +130,16 @@ export function deletionKeyFor(
     : undefined
 }
 
-export function abridgedCounts(steps: number) {
-  return `${stepsText(steps)} steps`
+// `140 k steps, 2.1 Mb not loaded`: the steps the walk file abridged and the
+// bp of the walk's runs off the reference the cut did not load
+export function abridgedCounts({ steps, bp }: Abridged) {
+  return `${stepsText(steps)} steps, ${formatBp(bp)} not loaded`
 }
 
-// What an abridged walk's block says: `HG00097#1: 140 k steps`
-export function abridgedText(label: string, steps: number) {
-  return `${label}: ${abridgedCounts(steps)}`
+// What an abridged walk's block says: `HG00097#1: 140 k steps, 2.1 Mb not
+// loaded`
+export function abridgedText(label: string, abridged: Abridged) {
+  return `${label}: ${abridgedCounts(abridged)}`
 }
 
 // The notice for lifted walks a cut left abridged, by their labels
