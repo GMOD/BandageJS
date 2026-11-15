@@ -739,6 +739,7 @@ function drawOverlays() {
     nodePositions: layout?.nodePositions,
     labelsNodeSizes: !layout?.tubeMap && !lift,
     nodeLengths: labelledLengths(graph, settings.nodeLengthLabels),
+    nodeById: f.nodeById,
     alleleDeletions: layout?.alleleDeletions ?? [],
     positionsVersion: state.positionsVersion,
   })
