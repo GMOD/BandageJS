@@ -1,14 +1,23 @@
 import { cutGbzRegion, openGbz } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
-import { RegionTooLargeError } from '@jbrowse/graph-walks'
+import {
+  CUT_PRESETS,
+  RegionTooLargeError,
+  abridgedText,
+} from '@jbrowse/graph-walks'
 import { LocalFile } from 'generic-filehandle2'
 
 import { formatLocus, loadGraph } from '@jbrowse/bandage-core'
+import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
 import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
-import { abridgedWalks, labelledLengths, rowsOf } from '../../src/derived'
+import { abridgedOf, labelledLengths, rowsOf } from '../../src/derived'
 import { rowHtml } from '../../src/describe'
 import { coreRegion, parseRegion } from '../../src/region'
-import { cutWalksRegion, openWalkFiles } from '../../src/walkFiles'
+import {
+  cutWalksRegion,
+  openWalkFiles,
+  walkCutOptions,
+} from '../../src/walkFiles'
 
 import type { WalkCutSource } from '../../src/walkFiles'
 
@@ -101,8 +110,13 @@ function wLine(text: string, sample: string) {
   return lines(text, 'W').find(w => w[1] === sample)
 }
 
-const abridgedOf = (gfa: Parameters<typeof loadGraph>[0]) =>
-  Object.fromEntries(abridgedWalks(loadGraph(gfa, 'cut')))
+const abridgedCounts = (gfa: Parameters<typeof abridgedOf>[0]) =>
+  Object.fromEntries(
+    Array.from(abridgedOf(gfa).values(), ({ name, steps, bp }) => [
+      name,
+      { steps, bp },
+    ]),
+  )
 
 // IAI39's ten placeholders hold 11 bp and Sakai's six 6 bp; each fragment and
 // the departure off it hold the same placeholder, counted once
@@ -115,10 +129,30 @@ test('a walk file cut gives an abridged walk a placeholder for each run off the 
     new Set(['IAI39#1#chr', 'Sakai#1#chr']),
   )
   expect(expanded).toEqual([])
-  expect(abridgedOf(gfa)).toEqual({
+  expect(abridgedCounts(gfa)).toEqual({
     'IAI39#1#chr': { steps: 35, bp: 11 },
     'Sakai#1#chr': { steps: 35, bp: 6 },
   })
+})
+
+test("an abridged walk's not-loaded text is graph-walks' wording", async () => {
+  const { gfa } = await cut({ region: K12 }, ABRIDGED)
+  expect(
+    Array.from(abridgedOf(gfa).values(), walk => abridgedText(walk)),
+  ).toEqual([
+    'IAI39#1#chr: 35 steps not loaded, 11 bp off the reference',
+    'Sakai#1#chr: 35 steps not loaded, 6 bp off the reference',
+  ])
+})
+
+test("a walk file cut takes the browser preset, with this viewer's node limit", () => {
+  expect(walkCutOptions({ region: K12 })).toEqual({
+    ...CUT_PRESETS.browser,
+    haplotypes: undefined,
+    referenceSample: undefined,
+    nodeLimit: GBZ_CUT_DEFAULTS.limit,
+  })
+  expect(walkCutOptions({ region: K12, context: 0 }).context).toBe(0)
 })
 
 test("a placeholder's length is labelled with node lengths off, and every node's with them on", async () => {
@@ -142,7 +176,7 @@ test('a walk file cut reads the abridged walks it expands in full', async () => 
   const whole = await cut({ region: K12 }, WHOLE)
   expect(expanded).toEqual(['Sakai#1#chr'])
   expect(wLine(text, 'Sakai')).toEqual(wLine(whole.text, 'Sakai'))
-  expect(abridgedOf(gfa)).toEqual({ 'IAI39#1#chr': { steps: 35, bp: 11 } })
+  expect(abridgedCounts(gfa)).toEqual({ 'IAI39#1#chr': { steps: 35, bp: 11 } })
 })
 
 // Sakai read in full takes this cut from 39 nodes to 45, and IAI39 as well
@@ -152,7 +186,7 @@ test('a walk file cut leaves a lifted walk abridged where reading it would go ov
     { region: K12, lifted: ['Sakai#1#chr', 'K12#1#chr'], nodeLimit: 40 },
     ABRIDGED,
   )
-  expect(abridgedOf(gfa)).toHaveProperty(['Sakai#1#chr'])
+  expect(abridgedCounts(gfa)).toHaveProperty(['Sakai#1#chr'])
   expect(expanded).toEqual([])
   expect(tooLarge).toEqual(['Sakai#1#chr'])
 })

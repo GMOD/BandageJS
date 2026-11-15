@@ -5,9 +5,9 @@ import {
   pathColorsLegible,
   resolveColorScheme,
 } from '@jbrowse/bandage-core'
+import { abridgedText } from '@jbrowse/graph-walks'
 
 import { linkable } from './address'
-import { abridgedText } from './derived'
 import { layoutName } from './describe'
 import { showAbout, showGuide, showOpenDialog } from './dialogs'
 import { exportBlocked, exportSvg } from './figure'
@@ -20,7 +20,15 @@ import { copyLink } from './linkView'
 import { backboneOf, binding, referenceAssembly } from './reference'
 import { choiceLabel, showReferenceDialog } from './referenceDialog'
 import { examples, expandWalks, openExample, recut, reparse } from './sources'
-import { drawnMode, facts, saveSettings, settings, state, tube } from './state'
+import {
+  abridged as abridgedWalks,
+  drawnMode,
+  facts,
+  saveSettings,
+  settings,
+  state,
+  tube,
+} from './state'
 import { rebuild, scheduleDraw } from './view'
 import { liftWalks, setFacet, toggleWalk } from './walks'
 
@@ -341,14 +349,15 @@ export function haplotypeItems(): MenuItem[] {
 
 // A block per walk the cut abridged, which reads that walk in full
 function abridgedItems(): MenuItem[] {
-  const { abridged, walkLabels } = facts()
+  const abridged = abridgedWalks()
+  const { walkLabels } = facts()
   if (abridged.size === 0 || state.stack.length > 0) {
     return []
   }
   return [
     { header: 'Abridged: click one to load its steps' },
     ...[...abridged].map(([name, a]): MenuItem => ({
-      label: abridgedText(walkLabels.get(name) ?? name, a),
+      label: abridgedText(a, walkLabels.get(name)),
       onClick: () => {
         expandWalks([name])
       },

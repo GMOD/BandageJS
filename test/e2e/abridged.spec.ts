@@ -10,15 +10,15 @@ import {
 import type { Page } from '@playwright/test'
 
 const CUT = `walks=${encodeURIComponent(ABRIDGED_WALKS)}&loc=K12%231%23chr:1004501-1004961&layout=force`
-const IAI39 = 'IAI39: 35 steps, 11 bp not loaded'
-const SAKAI = 'Sakai: 35 steps, 6 bp not loaded'
+const IAI39 = 'IAI39: 35 steps not loaded, 11 bp off the reference'
+const SAKAI = 'Sakai: 35 steps not loaded, 6 bp off the reference'
 const NOT_SHOWN = 'nodes not shown'
 
 const expanded = (page: Page) => new URL(page.url()).searchParams.get('expand')
 
 async function blocks(page: Page) {
   return (await haplotypesMenu(page)).getByRole('menuitem', {
-    name: / steps, .+ not loaded$/,
+    name: / steps? not loaded/,
   })
 }
 
@@ -83,7 +83,7 @@ test("a selected walk row offers to load an abridged walk's steps", async ({
   const label = (await sakai.boundingBox())!
   await page.mouse.click(600, label.y + label.height / 2)
   const info = page.locator('#info')
-  await expect(info).toContainText('35 steps, 6 bp not loaded')
+  await expect(info).toContainText(SAKAI)
   await info.getByRole('button', { name: 'Load its steps' }).click()
   await expect.poll(() => expanded(page)).toBe('Sakai#1#chr')
 })

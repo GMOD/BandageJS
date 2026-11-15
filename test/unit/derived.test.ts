@@ -1,13 +1,7 @@
 import { deletionEdges, loadGraph, walkLift } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
-import {
-  abridgedText,
-  deletionKeyFor,
-  memo,
-  tooLargeText,
-  walkView,
-} from '../../src/derived'
+import { deletionKeyFor, memo, tooLargeText, walkView } from '../../src/derived'
 
 test('memo recomputes only when a key changes identity', () => {
   let calls = 0
@@ -59,15 +53,6 @@ test('walkView lifts walks as lanes, and side by side a lift of each alone', () 
     lift: undefined,
     panels: undefined,
   })
-})
-
-test("an abridged walk's block counts the steps and bp it left out", () => {
-  expect(abridgedText('HG00097#1', { steps: 140_000, bp: 2_100_000 })).toBe(
-    'HG00097#1: 140 k steps, 2.1 Mb not loaded',
-  )
-  expect(abridgedText('Sakai#1', { steps: 35, bp: 6 })).toBe(
-    'Sakai#1: 35 steps, 6 bp not loaded',
-  )
 })
 
 test('the notice names the lifted walks a cut left abridged', () => {

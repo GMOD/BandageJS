@@ -33,6 +33,7 @@ import {
   referenceWindow,
 } from './reference'
 import {
+  abridged as abridgedWalks,
   clearInteraction,
   cutsWholeWalks,
   facts,
@@ -407,7 +408,7 @@ function recutAbridged(
   expand: (gbz: GbzSource, abridged: string[]) => GbzSource,
 ) {
   const source = state.source
-  const abridged = names.filter(name => facts().abridged.has(name))
+  const abridged = names.filter(name => abridgedWalks().has(name))
   if (!source?.gbz || abridged.length === 0 || state.stack.length > 0) {
     return
   }

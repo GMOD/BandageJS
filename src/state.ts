@@ -7,6 +7,7 @@ import {
 } from '@jbrowse/bandage-core'
 
 import {
+  abridgedOf,
   bubblesOf,
   drawnExtras,
   graphFacts,
@@ -131,6 +132,8 @@ export function effectiveMode() {
 }
 
 export const facts = () => graphFacts(state.graph)
+
+export const abridged = () => abridgedOf(state.source?.gfa)
 
 export const derivedBubbles = () =>
   bubblesOf(state.graph, state.stack.at(-1)?.bubble)

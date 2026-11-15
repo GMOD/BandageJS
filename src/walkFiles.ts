@@ -1,6 +1,11 @@
 import { parseRegion } from '@jbrowse/bandage-core'
 import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
-import { RegionTooLargeError, WalkReader } from '@jbrowse/graph-walks'
+import {
+  CUT_PRESETS,
+  RegionTooLargeError,
+  WalkReader,
+  abridgedWalks,
+} from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
 import type { WalkFilehandle } from '@jbrowse/graph-walks'
@@ -33,6 +38,14 @@ export interface WalkCutSource {
   nodeLimit?: number
 }
 
+export const walkCutOptions = (src: WalkCutSource) => ({
+  ...CUT_PRESETS.browser,
+  haplotypes: src.haplotypes,
+  referenceSample: src.referenceSample,
+  context: src.context ?? CUT_PRESETS.browser.context,
+  nodeLimit: src.nodeLimit ?? GBZ_CUT_DEFAULTS.limit,
+})
+
 async function cutReading(
   walks: WalkFiles,
   src: WalkCutSource,
@@ -43,11 +56,8 @@ async function cutReading(
   const wanted = new Set(expand)
   const expanded = new Set<string>()
   const { tables, sample } = await walks.cutRegion(region, {
+    ...walkCutOptions(src),
     signal,
-    haplotypes: src.haplotypes,
-    referenceSample: src.referenceSample,
-    context: src.context ?? GBZ_CUT_DEFAULTS.context,
-    nodeLimit: src.nodeLimit ?? GBZ_CUT_DEFAULTS.limit,
     expand: name => {
       if (wanted.has(name)) {
         expanded.add(name)
@@ -59,8 +69,8 @@ async function cutReading(
 }
 
 /**
- * A window of a walk file set as graph tables, cut the way the gbz-base cut
- * is: the reference sample's path over the region with `context` bp either
+ * A window of a walk file set as graph tables, cut by the browser's rules:
+ * the reference sample's path over the region with `context` bp either
  * side, and the walks of the haplotypes asked for, every one when none are.
  * `expanded` names the abridged walks the cut read in full. Where reading the
  * lifted walks in full takes the cut over a budget, it cuts again with them
@@ -82,15 +92,6 @@ export async function cutWalksRegion(
     }
   }
   const cut = await cutReading(walks, src, expand, signal)
-  const { walks: rows, departures } = cut.gfa
-  const abridged = new Set(
-    rows.names
-      .filter((_, i) => (rows.abridgedSteps?.[i] ?? 0) > 0)
-      .concat(
-        departures.names.filter(
-          (_, k) => (departures.abridgedSteps?.[k] ?? 0) > 0,
-        ),
-      ),
-  )
+  const abridged = new Set(abridgedWalks(cut.gfa).map(walk => walk.name))
   return { ...cut, tooLarge: lifted.filter(name => abridged.has(name)) }
 }

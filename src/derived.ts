@@ -6,7 +6,6 @@ import {
   deletionDrawing,
   deletionEdges,
   facetLifts,
-  formatBp,
   genePins,
   genesOnRow,
   labelledNodeLengths,
@@ -24,6 +23,7 @@ import {
   dashedDeletions,
   deletionKey,
 } from '@jbrowse/bandage-core/deletionEdges'
+import { abridgedWalks } from '@jbrowse/graph-walks'
 
 import type { Region } from './jbrowse'
 import type { Facet } from './settings'
@@ -34,6 +34,7 @@ import type {
   GeneModel,
   Graph,
   GraphNode,
+  GraphTables,
   LayoutResult,
   MinigraphBubble,
   NodeWidth,
@@ -41,6 +42,7 @@ import type {
   WalkLift,
   WalkRows,
 } from '@jbrowse/bandage-core'
+import type { AbridgedWalk } from '@jbrowse/graph-walks'
 
 // The last value of `fn`, recomputed when any of `keys` changes identity.
 export function memo<K extends unknown[], T>(fn: (...keys: K) => T) {
@@ -58,66 +60,11 @@ export const depthVaries = memo(
   (graph: Graph) => new Set(graph.nodes.map(n => n.depth)).size > 1,
 )
 
-export interface Abridged {
-  steps: number
-  bp: number
-}
-
-// Each walk a walk file cut abridged, by name, with the steps it did not load
-// across the walk's fragments and departures, and the bp of the placeholders
-// standing for them, each counted once though a fragment and its departure
-// both hold it
-export function abridgedWalks(graph: Graph | undefined) {
-  const steps = new Map<string, number>()
-  const placeholders = new Map<string, Set<GraphNode>>()
-  const add = (name: string, nodes: (GraphNode | undefined)[], count = 0) => {
-    if (count > 0) {
-      steps.set(name, (steps.get(name) ?? 0) + count)
-    }
-    for (const node of nodes) {
-      if (node?.placeholder) {
-        placeholders.set(name, (placeholders.get(name) ?? new Set()).add(node))
-      }
-    }
-  }
-  const nodeById = new Map(graph?.nodes.map(n => [n.id, n]))
-  for (const { name, abridgedSteps, nodeIds } of graph?.paths ?? []) {
-    add(
-      name,
-      nodeIds.map(id => nodeById.get(id)),
-      abridgedSteps,
-    )
-  }
-  const departures = graph?.departures
-  departures?.names.forEach((name, k) => {
-    const { offsets } = departures
-    add(
-      name,
-      Array.from(
-        departures.steps.subarray(offsets[k], offsets[k + 1]),
-        i => graph?.nodes[i],
-      ),
-      departures.abridgedSteps?.[k],
-    )
-  })
-  const walks = new Map<string, Abridged>()
-  for (const [name, count] of steps) {
-    let bp = 0
-    for (const node of placeholders.get(name) ?? []) {
-      bp += node.length
-    }
-    walks.set(name, { steps: count, bp })
-  }
-  return walks
-}
-
-function stepsText(steps: number) {
-  return steps < 1000
-    ? `${steps}`
-    : steps < 999_500
-      ? `${Math.round(steps / 1000)} k`
-      : `${+(steps / 1e6).toFixed(1)} M`
-}
+export const abridgedOf = memo((gfa: string | GraphTables | undefined) =>
+  typeof gfa === 'object'
+    ? new Map(abridgedWalks(gfa).map(walk => [walk.name, walk]))
+    : new Map<string, AbridgedWalk>(),
+)
 
 // The dashed-deletion key, only where the drawing leaves a deletion dashed: a
 // lifted walk's lane draws each deletion it takes solid
@@ -129,18 +76,6 @@ export function deletionKeyFor(
   return dashedDeletions(deletions, lift).length > 0
     ? deletionKey(reference)
     : undefined
-}
-
-// `140 k steps, 2.1 Mb not loaded`: the steps the walk file abridged and the
-// bp of the walk's runs off the reference the cut did not load
-export function abridgedCounts({ steps, bp }: Abridged) {
-  return `${stepsText(steps)} steps, ${formatBp(bp)} not loaded`
-}
-
-// What an abridged walk's block says: `HG00097#1: 140 k steps, 2.1 Mb not
-// loaded`
-export function abridgedText(label: string, abridged: Abridged) {
-  return `${label}: ${abridgedCounts(abridged)}`
 }
 
 // The notice for lifted walks a cut left abridged, by their labels
@@ -160,7 +95,6 @@ export const graphFacts = memo((graph: Graph | undefined) => {
     allDeletions: deletions,
     walkChoices,
     walkLabels: walkLabelsOf(walkChoices),
-    abridged: abridgedWalks(graph),
     drawable: new Set<string>(
       graph
         ? LAYOUT_MODES.filter(m => m.available(graph)).map(m => m.value)

@@ -27,9 +27,9 @@ import {
   walkPosition,
   walkRowsExtent,
 } from '@jbrowse/bandage-core'
+import { abridgedText } from '@jbrowse/graph-walks'
 
 import {
-  abridgedCounts,
   deletionKeyFor,
   inkOf,
   labelledLengths,
@@ -55,6 +55,7 @@ import {
 } from './reference'
 import { expandWalks } from './sources'
 import {
+  abridged as abridgedWalks,
   axis,
   current,
   drawPaths,
@@ -904,9 +905,11 @@ function drawInfo() {
     const isReference = selectedRow === bars?.reference
     const link =
       ref && rowLink(selectedRow, isReference, targetOf(ref), ref.contigs)
-    const abridged = f.abridged.get(selectedRow.name)
+    const abridged = abridgedWalks().get(selectedRow.name)
     html = `${rowHtml(selectedRow, bars?.reference)}${
-      abridged ? `<br>${esc(abridgedCounts(abridged))}` : ''
+      abridged
+        ? `<br>${esc(abridgedText(abridged, f.walkLabels.get(abridged.name)))}`
+        : ''
     }<div class="info-actions">${
       link
         ? `<a href="${esc(link)}" target="_blank" rel="noopener">Show in JBrowse ↗</a>`
