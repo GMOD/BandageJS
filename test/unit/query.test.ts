@@ -51,6 +51,13 @@ test("the HPRC database without the preset's index keeps its url", () => {
   })
 })
 
+test('walks=hprc opens the format 8 HPRC walk file', () => {
+  const params = new URLSearchParams({ walks: 'hprc', loc: 'chr1:100-200' })
+  expect(gbzFromQuery(params)?.db).toBe(
+    'https://jbrowse.org/demos/hprc/hprc-v2.1-mc-grch38-f8.GRCh38.walks.gz',
+  )
+})
+
 test('the HPRC walk file goes into the query as walks=hprc', () => {
   const src = { db: HPRC_WALKS, region: 'chr1:100-200' }
   expect(gbzQuery(src)).toEqual({ walks: 'hprc', loc: src.region })
