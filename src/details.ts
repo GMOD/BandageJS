@@ -1,9 +1,4 @@
-import {
-  BUBBLE_KIND_NAMES,
-  bubbleSegmentIds,
-  classifyBubble,
-  formatBp,
-} from '@jbrowse/bandage-core'
+import { bubbleLabel, bubbleSegmentIds, formatBp } from '@jbrowse/bandage-core'
 
 import { popBubble } from './bubbles'
 import { depthVaries, memo } from './derived'
@@ -147,7 +142,7 @@ function bubblesOf(
     : derivedBubbles()
         .filter(b => bubbleSegmentIds(b).includes(node.name))
         .map(bubble => ({
-          label: BUBBLE_KIND_NAMES[classifyBubble(bubble).kind],
+          label: bubbleLabel(bubble),
           bubble,
         }))
   return shown.filter(s => !s.bubble.covering)

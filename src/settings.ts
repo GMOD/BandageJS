@@ -2,6 +2,7 @@ import {
   BUBBLE_SPREADS,
   COLOR_SCHEMES,
   FACET_FIELDS,
+  LABEL_DEFAULTS,
   LAYOUT_ENGINES,
   LAYOUT_MODES,
   LAYOUT_QUALITIES,
@@ -29,6 +30,8 @@ export interface Settings {
   showDeletionEdges: boolean
   drawPaths: boolean
   showGenes: boolean
+  // each node's length written on it
+  nodeLengthLabels: boolean
   // walk rows in a strip under a layout that draws nodes, linked to it
   walkStrip: boolean
   // lifted walks drawn side by side, a panel per walk or a row per sample,
@@ -54,6 +57,7 @@ export const DEFAULTS: Settings = {
   showDeletionEdges: true,
   drawPaths: false,
   showGenes: true,
+  nodeLengthLabels: LABEL_DEFAULTS.nodeLengths,
   walkStrip: false,
   facet: '',
   facetColumns: 0,
@@ -165,6 +169,7 @@ const FIELDS: readonly Field[] = [
   flag('showDeletionEdges', 'deletions'),
   flag('drawPaths', 'paths'),
   flag('showGenes', 'genes'),
+  flag('nodeLengthLabels', 'lengths'),
   flag('walkStrip', 'bars'),
   choice('facet', 'facet', FACET_FIELDS),
   count('facetColumns', 'columns'),

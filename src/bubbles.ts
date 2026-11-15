@@ -1,8 +1,7 @@
 import {
-  BUBBLE_KIND_NAMES,
+  bubbleLabel,
   bubbleSegmentIds,
   bubbleSubgraph,
-  classifyBubble,
 } from '@jbrowse/bandage-core'
 
 import { notify } from './feedback'
@@ -32,12 +31,12 @@ export function popBubble(bubble: MinigraphBubble) {
     return
   }
   state.stack.push({ graph, mode: effectiveMode(), bubble })
-  const kind = BUBBLE_KIND_NAMES[classifyBubble(bubble).kind]
+  const label = bubbleLabel(bubble)
   state.graph = {
     ...sub,
     name: bubble.offReference
-      ? `${kind} in ${graph.name}`
-      : `${kind} at ${bubble.refName}:${(bubble.start + 1).toLocaleString()}`,
+      ? `${label} in ${graph.name}`
+      : `${label} at ${bubble.refName}:${(bubble.start + 1).toLocaleString()}`,
   }
   state.layout = undefined
   keepingSelection(clearInteraction)

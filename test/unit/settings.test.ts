@@ -21,6 +21,7 @@ test('validSettings keeps stored values that are choices this build offers', () 
     showDeletionEdges: true,
     drawPaths: true,
     showGenes: false,
+    nodeLengthLabels: true,
     walkStrip: true,
     facet: 'sample',
     facetColumns: 2,
@@ -170,4 +171,15 @@ test('every setting a link states comes back as it went', () => {
   const back = { ...DEFAULTS }
   readSettingsParams(new URLSearchParams(settingsParams(s)), back)
   expect(back).toEqual(s)
+})
+
+test('node lengths are written only where a save or a link turns them on', () => {
+  expect(DEFAULTS.nodeLengthLabels).toBe(false)
+  expect(settingsParams({ ...DEFAULTS, nodeLengthLabels: true })).toEqual([
+    ['layout', 'force'],
+    ['lengths', '1'],
+  ])
+  const s = { ...DEFAULTS }
+  readSettingsParams(new URLSearchParams('lengths=1'), s)
+  expect(s.nodeLengthLabels).toBe(true)
 })

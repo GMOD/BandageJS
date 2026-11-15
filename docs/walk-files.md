@@ -62,7 +62,7 @@ message gives a window size that fits.
 
 - Colour runs along the GRCh38 path, red to purple; grey nodes lie off it
 - Gold rings mark RefSeq exons, read for the reference genome BandageJS matched
-- Dashed edges labelled `22.2 kb del` skip that much of the reference
+- Dashed edges skip a stretch of the reference; hovering one gives its length
 - The grey loops lie off the GRCh38 path: KIV-2 copies GRCh38 lacks
 
 ## 6. Compare the haplotypes

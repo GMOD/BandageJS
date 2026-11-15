@@ -40,6 +40,7 @@ function toggle(
     | 'showDeletionEdges'
     | 'drawPaths'
     | 'showGenes'
+    | 'nodeLengthLabels'
     | 'walkStrip',
   disabled?: string,
   applied = () => {
@@ -174,6 +175,15 @@ export function viewItems(): MenuItem[] {
           ),
         ]
       : []),
+    toggle(
+      'Node lengths',
+      'nodeLengthLabels',
+      mode.drawsNodes ? undefined : `Not drawn in the ${mode.label} layout`,
+      () => {
+        saveSettings()
+        scheduleDraw()
+      },
+    ),
   ]
 }
 

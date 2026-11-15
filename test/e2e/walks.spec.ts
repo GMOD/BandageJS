@@ -37,8 +37,9 @@ test('walks highlight from the menu as lanes, each keyed in one short row', asyn
   await page.keyboard.press('Escape')
   const key = page.locator('#legends .legend.walks')
   await expect(key.locator('.walk-key')).toHaveCount(2)
-  await expect(key).toContainText('449 bp reversed')
+  await expect(key.locator('.walk-key').nth(1)).toContainText('IAI39')
   await expect(key).toContainText('only in other haplotypes')
+  await expect(key).not.toContainText('reversed')
   expect(new URL(page.url()).searchParams.getAll('walk')).toEqual([K12, IAI39])
 })
 
@@ -151,8 +152,9 @@ test('side by side draws a panel per walk on one view, titled by its key', async
   await waitForDrawing(page, /nodes/)
   const panels = page.locator('#facets .facet')
   await expect(panels).toHaveCount(2)
-  await expect(panels.nth(1).locator('.facet-title')).toContainText(
-    '449 bp reversed',
+  await expect(panels.nth(1).locator('.facet-title')).toContainText('IAI39')
+  await expect(panels.nth(1).locator('.facet-title')).not.toContainText(
+    'reversed',
   )
   await expect(panels.nth(1).locator('.facet-title')).toContainText(
     'chr:2,249,413-2,249,872 (460 bp)',
@@ -382,8 +384,9 @@ test('by sample, a sample takes a row and its haplotypes the columns', async ({
     ['2', '1'],
     ['2', '2'],
   ])
-  await expect(page.locator('#facets .facet').nth(2)).toContainText(
-    '9 bp reversed',
+  await expect(page.locator('#facets .facet').nth(2)).toContainText('alt#2')
+  await expect(page.locator('#facets .facet').nth(2)).not.toContainText(
+    'reversed',
   )
 })
 

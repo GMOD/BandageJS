@@ -1,5 +1,5 @@
 import {
-  BUBBLE_KIND_COLORS,
+  BUBBLE_HALO_COLOR,
   EXON_COLOR,
   HALO_FACTOR,
   LABEL_PAD,
@@ -180,7 +180,7 @@ function halos(p: Pane) {
     .filter(h => !h.whole && !h.tick)
     .map(
       h =>
-        `<path d="${h.path}" fill="none" stroke="${BUBBLE_KIND_COLORS[h.kind]}" stroke-opacity="${
+        `<path d="${h.path}" fill="none" stroke="${BUBBLE_HALO_COLOR}" stroke-opacity="${
           dimmed(p, h) ? 0.06 : 0.22
         }" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`,
     )
@@ -192,30 +192,21 @@ function ticks(p: Pane) {
   return p.labels.ticks
     .map(
       ({ item: h, x, y }) =>
-        `<rect class="tick clickable" data-halo="${index.get(h)}" x="${x - TICK_WIDTH / 2}" y="${y - TICK_PX}" width="${TICK_WIDTH}" height="${TICK_PX}" rx="${TICK_WIDTH / 2}" fill="${BUBBLE_KIND_COLORS[h.kind]}" opacity="${
+        `<rect class="tick clickable" data-halo="${index.get(h)}" x="${x - TICK_WIDTH / 2}" y="${y - TICK_PX}" width="${TICK_WIDTH}" height="${TICK_PX}" rx="${TICK_WIDTH / 2}" fill="${BUBBLE_HALO_COLOR}" opacity="${
           dimmed(p, h) ? 0.35 : 1
         }"><title>${esc(`${h.label} · click to open`)}</title></rect>`,
     )
     .join('')
 }
 
-function leaders(p: Pane) {
-  return p.labels.sizes
-    .flatMap(({ leader }) =>
-      leader
-        ? [
-            `<line x1="${leader.arcX}" y1="${leader.arcY}" x2="${leader.labelX}" y2="${leader.labelY}" stroke="#18181c" stroke-width="1"/>`,
-          ]
-        : [],
-    )
-    .join('')
-}
-
 function geneLabels(p: Pane) {
   return p.labels.genes.map(({ item: pin, x, y, w, text }) => {
-    const { y1, y2 } = geneLeader(
-      { y },
-      pin.at.y * p.scaleY + p.translateY,
+    const { x1, y1, x2, y2 } = geneLeader(
+      { x, y },
+      {
+        x: pin.at.x * p.scaleX + p.translateX,
+        y: pin.at.y * p.scaleY + p.translateY,
+      },
       p.contigThickness,
     )
     const name = chip({
@@ -228,7 +219,7 @@ function geneLabels(p: Pane) {
       italic: true,
       title: geneText(pin.gene, pin.covered),
     })
-    return `<g class="gene"><line x1="${x}" x2="${x}" y1="${y1}" y2="${y2}" stroke="${GENE_INK}" stroke-width="0.8" stroke-opacity="0.6"/>${name}</g>`
+    return `<g class="gene"><line x1="${x1}" x2="${x2}" y1="${y1}" y2="${y2}" stroke="${GENE_INK}" stroke-width="0.8" stroke-opacity="0.6"/>${name}</g>`
   })
 }
 
@@ -240,7 +231,7 @@ function chips(p: Pane) {
       y,
       w,
       text,
-      color: BUBBLE_KIND_COLORS[h.kind],
+      color: BUBBLE_HALO_COLOR,
       dimmed: dimmed(p, h),
       title: `${h.label}\n${h.bubble.segmentCount} segments${h.bubble.covering ? '' : ' · click to open'}`,
       // the bubble the drawing is would open into this same drawing
@@ -277,7 +268,6 @@ export function overlaySvg(p: Pane) {
     alongNodes(p, halos(p)) +
     exonOutlines(p) +
     alongNodes(p, rings(p)) +
-    leaders(p) +
     ticks(p) +
     chips(p)
   )
@@ -292,10 +282,8 @@ export function overlayHtml(p: Pane) {
         `<div class="row-label" style="top:${screenY}px">${esc(label)}</div>`,
     )
   const sizes = p.labels.sizes.map(
-    ({ text, x, y, kind }) =>
-      `<div class="size-label${kind === 'deletion' ? ' deletion' : ''}" style="left:${x}px;top:${y}px">${esc(
-        text,
-      )}</div>`,
+    ({ text, x, y }) =>
+      `<div class="size-label" style="left:${x}px;top:${y}px">${esc(text)}</div>`,
   )
   return rows.join('') + sizes.join('')
 }
@@ -321,7 +309,7 @@ export function walkKeyHtml(
   return `<div class="walk-key"${title ? ` title="${esc(title)}"` : ''}><div class="legend-row"><div class="swatch walk${
     key.shades ? ' scale' : ''
   }" style="background:${encodingSwatchCss(walk.encoding)}"></div><span><strong>${esc(label)}</strong>${esc(
-    key.delta + key.gaps + key.reversed,
+    key.gaps,
   )}</span></div><div class="walk-at">${esc(at ?? key.scale ?? '')}</div></div>`
 }
 

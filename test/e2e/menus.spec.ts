@@ -121,6 +121,20 @@ test('a checkbox keeps the menu open so it can be toggled back', async ({
   await expect(bubbles).toHaveAttribute('aria-checked', before!)
 })
 
+test('node lengths are written only once View turns them on', async ({
+  page,
+}) => {
+  const lengths = page.locator('#overlay-html .size-label')
+  await expect(lengths).toHaveCount(0)
+  const popup = await viewMenu(page)
+  const item = popup.getByRole('menuitemcheckbox', { name: 'Node lengths' })
+  await expect(item).toHaveAttribute('aria-checked', 'false')
+  await item.click()
+  await expect(lengths.first()).toBeVisible()
+  await item.click()
+  await expect(lengths).toHaveCount(0)
+})
+
 test('ArrowRight moves to the next menu', async ({ page }) => {
   const file = menuButton(page, 'File')
   const examples = menuButton(page, 'Examples')

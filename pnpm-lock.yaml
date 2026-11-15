@@ -12,11 +12,11 @@ importers:
         specifier: ^3.13.1
         version: 3.13.1
       '@jbrowse/bandage-core':
-        specifier: ^13.1.0
-        version: 13.1.0
+        specifier: file:../vendor/walks8-pack/jbrowse-bandage-core-14.0.0.tgz
+        version: file:../vendor/walks8-pack/jbrowse-bandage-core-14.0.0.tgz
       '@jbrowse/graph-walks':
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: file:../vendor/walks8-pack/jbrowse-graph-walks-7.0.0.tgz
+        version: file:../vendor/walks8-pack/jbrowse-graph-walks-7.0.0.tgz
       '@playwright/test':
         specifier: ^1.64.0
         version: 1.64.0
@@ -216,8 +216,9 @@ packages:
   '@gmod/tabix@3.13.1':
     resolution: {integrity: sha512-usyBxD1EQ/wfIzeT/wQsqJBT6aGZwgaIFG94lBYFhWdK+csHjQU7t9i/iIjDSCIcZFTFiQ1TFp3McCMf4aH/4A==}
 
-  '@jbrowse/bandage-core@13.1.0':
-    resolution: {integrity: sha512-hs/bw7AeH+PK8i1Vvi2/BRTOio+lLeSETD5q5M4QFlnpr1XaF8culuSrT0oluPJUMeOw7CT8uExG7rIhv2udMw==}
+  '@jbrowse/bandage-core@file:../vendor/walks8-pack/jbrowse-bandage-core-14.0.0.tgz':
+    resolution: {integrity: sha512-RQus/MqSKzrr2XOuX02t/shgWFS/ASgHvRV62UlMbCvc8GayixjVek6oIqfSo96USGk6/AZ1x14PzIcPsvLSCQ==, tarball: file:../vendor/walks8-pack/jbrowse-bandage-core-14.0.0.tgz}
+    version: 14.0.0
     engines: {node: '>=20'}
     hasBin: true
 
@@ -229,8 +230,9 @@ packages:
     resolution: {integrity: sha512-Yw0aMopfOIvHftmHnTP+jPL0uINCt+fdWxHQvrGeektL5KOAvrMBrUyBB1FcNizQZCSnAtYplIoXCL5K0qN7og==}
     engines: {node: '>=20'}
 
-  '@jbrowse/graph-walks@6.0.0':
-    resolution: {integrity: sha512-LuDbMk0cNrm/R4iYezTzPisY6ySutFi39GE8FeqTcOgPUiD9vs5DT0p2yXp6+p/u1tafJ0I2SSOQu9+8chcbWQ==}
+  '@jbrowse/graph-walks@file:../vendor/walks8-pack/jbrowse-graph-walks-7.0.0.tgz':
+    resolution: {integrity: sha512-CzGeExVJlzZpRUSBurtSuoL7UKIKRrVO4kGAqVSuzOMUDAFuZ+nbWZbo0JPjuzc3Sf7IwFEE45N2Ija7+ziUlg==, tarball: file:../vendor/walks8-pack/jbrowse-graph-walks-7.0.0.tgz}
+    version: 7.0.0
     engines: {node: '>=20'}
 
   '@jbrowse/quick-lru@8.0.0':
@@ -932,7 +934,7 @@ snapshots:
       '@jbrowse/quick-lru': 8.0.0
       generic-filehandle2: 2.5.1
 
-  '@jbrowse/bandage-core@13.1.0':
+  '@jbrowse/bandage-core@file:../vendor/walks8-pack/jbrowse-bandage-core-14.0.0.tgz':
     dependencies:
       '@gmod/gbz-base': 7.4.1
       '@gmod/tabix': 3.13.1
@@ -944,7 +946,7 @@ snapshots:
 
   '@jbrowse/graph-stress-layout@1.0.0': {}
 
-  '@jbrowse/graph-walks@6.0.0':
+  '@jbrowse/graph-walks@file:../vendor/walks8-pack/jbrowse-graph-walks-7.0.0.tgz':
     dependencies:
       '@gmod/bgzf-filehandle': 6.8.2
       generic-filehandle2: 2.5.1

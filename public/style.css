@@ -689,11 +689,6 @@ canvas.dragging {
   white-space: nowrap;
 }
 
-.size-label.deletion {
-  color: #18181c;
-  font-weight: 600;
-}
-
 #facets {
   position: absolute;
   inset: 0;

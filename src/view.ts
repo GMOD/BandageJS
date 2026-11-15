@@ -737,10 +737,8 @@ function drawOverlays() {
     poppedFrom: backLabel ? { label: backLabel } : undefined,
     nodePositions: layout?.nodePositions,
     labelsNodeSizes: !layout?.tubeMap && !lift,
+    nodeLengthLabels: settings.nodeLengthLabels,
     nodeLengths: f.nodeLengths,
-    deletions: d.deletions,
-    deletionRoutes: layout?.deletionRoutes,
-    stranded: layout?.stranded,
     alleleDeletions: layout?.alleleDeletions ?? [],
     positionsVersion: state.positionsVersion,
   })
