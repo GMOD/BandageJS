@@ -6,7 +6,7 @@ import { genesOn } from './describe'
 import { notify } from './feedback'
 import { selectNode } from './find'
 import { nodeLink } from './jbrowse'
-import { nodeLinks, ownStrand, walksThrough } from './nodeDetails'
+import { nodeLinks, ownStrand, placedWalks } from './nodeDetails'
 import { esc } from './overlays'
 import { referenceWindow, targetOf } from './reference'
 import {
@@ -39,7 +39,7 @@ const SHOWN_WALKS = 12
 const linksOf = memo((graph: Graph, id: string) => nodeLinks(graph, id))
 
 const walksOf = memo((graph: Graph, node: GraphNode) =>
-  walksThrough(graph, node, id => facts().nodeById.get(id)?.length ?? 0),
+  placedWalks(graph, node, id => facts().nodeById.get(id)?.length ?? 0),
 )
 
 const deletionsOf = memo(
@@ -96,7 +96,7 @@ function linksHtml(node: GraphNode, links: NodeLink[]) {
 
 function walksHtml(node: GraphNode) {
   const graph = state.graph!
-  const all = graph.paths?.length ?? 0
+  const all = new Set(graph.paths?.map(p => p.name)).size
   if (all === 0) {
     return ''
   }

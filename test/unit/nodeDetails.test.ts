@@ -1,7 +1,7 @@
 import { PathVisits } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
-import { linkSides, nodeLinks, walksThrough } from '../../src/nodeDetails'
+import { linkSides, nodeLinks, placedWalks } from '../../src/nodeDetails'
 
 import type { Graph } from '@jbrowse/bandage-core'
 
@@ -63,7 +63,7 @@ test('nodeLinks reads a node drawn reversed by its drawn ends, and a hairpin onc
   })
 })
 
-test('walksThrough places a node on each walk’s own contig', () => {
+test('placedWalks places a node on each walk’s own contig', () => {
   const graph: Graph = {
     name: 'g',
     nodes: [node('a', 5), node('b', 3), node('c', 4)],
@@ -89,7 +89,7 @@ test('walksThrough places a node on each walk’s own contig', () => {
     ],
   ])
   const length = (id: string) => graph.nodes.find(n => n.id === id)!.length
-  expect(walksThrough(graph, graph.nodes[1]!, length)).toEqual([
+  expect(placedWalks(graph, graph.nodes[1]!, length)).toEqual([
     {
       name: 'x#1#chr',
       visits: 2,
@@ -100,6 +100,43 @@ test('walksThrough places a node on each walk’s own contig', () => {
       name: 'y#1#ctg:10-22',
       visits: 1,
       at: { contig: 'y#1#ctg', start: 14, end: 17 },
+      strand: '+',
+    },
+  ])
+})
+
+test('placedWalks lists a walk that reaches a node only through a departure, where its own step lies', () => {
+  const graph: Graph = {
+    name: 'g',
+    nodes: [
+      node('a', 5),
+      {
+        ...node('d', 3),
+        depth: 2,
+        departureVisits: [
+          { path: 'x#1#chr', sample: 'x', start: 200, strand: '-' },
+          { path: 'y#1#ctg', sample: 'y', start: 40, strand: '+' },
+        ],
+      },
+    ],
+    edges: [],
+    paths: [
+      { name: 'x#1#chr', nodeIds: ['a'], start: 100, contig: 'chr' },
+      { name: 'z#1#chr', nodeIds: ['a'], start: 0, contig: 'chr' },
+    ],
+  }
+  const length = (id: string) => graph.nodes.find(n => n.id === id)!.length
+  expect(placedWalks(graph, graph.nodes[1]!, length)).toEqual([
+    {
+      name: 'x#1#chr',
+      visits: 1,
+      at: { contig: 'chr', start: 200, end: 203 },
+      strand: '-',
+    },
+    {
+      name: 'y#1#ctg',
+      visits: 1,
+      at: { contig: 'y#1#ctg', start: 40, end: 43 },
       strand: '+',
     },
   ])

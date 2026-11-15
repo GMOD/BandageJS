@@ -1,4 +1,7 @@
+import { walksThrough } from '@jbrowse/bandage-core'
+
 import type { Graph, GraphEdge, GraphNode } from '@jbrowse/bandage-core'
+import type { GraphPath, PathVisit } from '@jbrowse/bandage-core/types'
 
 export type Side = 'start' | 'end'
 
@@ -61,36 +64,60 @@ export function nodeLinks(graph: Graph, id: string) {
 // a P line's name states the stretch it covers, `K12#1#chr:1004500-1004961`
 const RANGE_SUFFIX = /:\d+-\d+$/
 
-// The walks through a node, and where each first passes it on its own contig
-export function walksThrough(
+// The walks through a node, each once, and where each first passes it on its
+// own contig: on a fragment, or on a departure's own steps
+export function placedWalks(
   graph: Graph,
   node: GraphNode,
   lengthOf: (id: string) => number,
 ): WalkThrough[] {
-  const out: WalkThrough[] = []
-  for (const path of graph.paths ?? []) {
-    const first = path.nodeIds.indexOf(node.id)
-    if (first < 0) {
-      continue
-    }
-    let offset = path.start ?? 0
-    for (let i = 0; i < first; i++) {
-      offset += lengthOf(path.nodeIds[i]!)
-    }
-    const named = path.name.replace(RANGE_SUFFIX, '')
-    const visit = graph.pathVisits
-      ?.get(node.name)
-      ?.find(v => v.start === offset && v.path === named)
-    out.push({
-      name: path.name,
-      visits: path.nodeIds.filter(id => id === node.id).length,
-      at: {
-        contig: path.contig ?? named,
-        start: offset,
-        end: offset + node.length,
-      },
-      strand: visit?.strand,
-    })
+  return walksThrough(graph, node).flatMap(({ name, passes }) => {
+    const path = graph.paths?.find(
+      p => p.name === name && p.nodeIds.includes(node.id),
+    )
+    const departed = node.departureVisits?.find(v => v.path === name)
+    const place = path
+      ? fragmentPlace(graph, node, path, lengthOf)
+      : departed
+        ? departurePlace(graph, node, departed)
+        : undefined
+    return place ? [{ name, visits: passes, ...place }] : []
+  })
+}
+
+function fragmentPlace(
+  graph: Graph,
+  node: GraphNode,
+  path: GraphPath,
+  lengthOf: (id: string) => number,
+) {
+  const first = path.nodeIds.indexOf(node.id)
+  let offset = path.start ?? 0
+  for (let i = 0; i < first; i++) {
+    offset += lengthOf(path.nodeIds[i]!)
   }
-  return out
+  const named = path.name.replace(RANGE_SUFFIX, '')
+  const visit = graph.pathVisits
+    ?.get(node.name)
+    ?.find(v => v.start === offset && v.path === named)
+  return {
+    at: {
+      contig: path.contig ?? named,
+      start: offset,
+      end: offset + node.length,
+    },
+    strand: visit?.strand,
+  }
+}
+
+function departurePlace(graph: Graph, node: GraphNode, visit: PathVisit) {
+  return {
+    at: {
+      contig:
+        graph.paths?.find(p => p.name === visit.path)?.contig ?? visit.path,
+      start: visit.start,
+      end: visit.start + node.length,
+    },
+    strand: visit.strand,
+  }
 }
