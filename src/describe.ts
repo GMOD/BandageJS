@@ -2,6 +2,7 @@ import {
   PLACEMENT_CHOICE_TEXT,
   formatBp,
   panSNContig,
+  placeholderHoverText,
   rowSpan,
   walkRowReadout,
 } from '@jbrowse/bandage-core'
@@ -79,6 +80,13 @@ export function genesOn(node: GraphNode, genes: GeneModel[] = []) {
 const MAX_HOVER_GENES = 3
 
 export function nodeHtml(node: GraphNode, genes?: GeneModel[]) {
+  const placeholder = placeholderHoverText(node)
+  return placeholder === undefined
+    ? graphNodeHtml(node, genes)
+    : esc(placeholder)
+}
+
+function graphNodeHtml(node: GraphNode, genes?: GeneModel[]) {
   let html = `<strong>${esc(node.name)}</strong> — ${node.length.toLocaleString()} bp, depth ${node.depth.toFixed(1)}`
   if (node.stable) {
     html += `<br>${esc(node.stable.refName)}:${(node.stable.start + 1).toLocaleString()} (rank ${node.stable.rank})`

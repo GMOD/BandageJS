@@ -1,3 +1,4 @@
+import { placeholderHoverText } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
 import {
@@ -144,5 +145,20 @@ test('rowHtml gives a walk row its length and contig span, and says where a depa
   )
   expect(rowHtml({ ...row, placementChoice: true }, undefined)).toBe(
     '<strong>HG00097#1</strong> 12.3 kb · placement choice',
+  )
+})
+
+test("hovering a placeholder says bandage-core's placeholder text, as the plugin does", () => {
+  const placeholder = {
+    id: 'p',
+    name: 'IAI39#1#chr:1004600-1004611',
+    length: 11,
+    depth: 1,
+    placeholder: true as const,
+    stable: { refName: 'IAI39#1#chr', start: 1004600, rank: 1 },
+  }
+  expect(nodeHtml(placeholder)).toBe(placeholderHoverText(placeholder))
+  expect(nodeHtml(placeholder)).toBe(
+    "11 bp of IAI39#1's route, nodes not shown",
   )
 })
