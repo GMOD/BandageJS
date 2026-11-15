@@ -32,6 +32,7 @@ import {
   abridgedCounts,
   deletionKeyFor,
   inkOf,
+  labelledLengths,
   memo,
   rampInterval,
 } from './derived'
@@ -737,8 +738,7 @@ function drawOverlays() {
     poppedFrom: backLabel ? { label: backLabel } : undefined,
     nodePositions: layout?.nodePositions,
     labelsNodeSizes: !layout?.tubeMap && !lift,
-    nodeLengthLabels: settings.nodeLengthLabels,
-    nodeLengths: f.nodeLengths,
+    nodeLengths: labelledLengths(graph, settings.nodeLengthLabels),
     alleleDeletions: layout?.alleleDeletions ?? [],
     positionsVersion: state.positionsVersion,
   })

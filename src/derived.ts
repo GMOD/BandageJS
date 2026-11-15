@@ -9,6 +9,7 @@ import {
   formatBp,
   genePins,
   genesOnRow,
+  labelledNodeLengths,
   nodeInk,
   pathLegend,
   resolveColorScheme,
@@ -156,7 +157,6 @@ export const graphFacts = memo((graph: Graph | undefined) => {
   const walkChoices = graph?.paths?.length ? pathLegend(graph.paths) : []
   return {
     nodeById: new Map<string, GraphNode>(graph?.nodes.map(n => [n.id, n])),
-    nodeLengths: new Map(graph?.nodes.map(n => [n.id, n.length])),
     allDeletions: deletions,
     walkChoices,
     walkLabels: walkLabelsOf(walkChoices),
@@ -168,6 +168,10 @@ export const graphFacts = memo((graph: Graph | undefined) => {
     ),
   }
 })
+
+export const labelledLengths = memo((graph: Graph | undefined, on: boolean) =>
+  labelledNodeLengths(graph?.nodes ?? [], on),
+)
 
 // The bubbles of the graph on screen, `span` the one it was popped out of
 export const bubblesOf = memo(
