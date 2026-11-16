@@ -1,5 +1,4 @@
 import {
-  RAMP_GRADIENT_CSS,
   WALK_STRIP_CEILING_PX,
   segmentAt,
   stripGeneGaps,
@@ -7,13 +6,11 @@ import {
   stripRowAt,
   walkMarksTree,
   walkRowReadout,
-  walkRowsKey,
-  walkRowsTree,
   walkStripFrame,
   walkStripLabelsTree,
 } from '@jbrowse/bandage-core'
 
-import { memo, rampInterval } from './derived'
+import { memo, rampInterval, stripKey, stripTree } from './derived'
 import { svgDom } from './elDom'
 import { walkRowsKeyHtml } from './overlays'
 import { axis, current, facts, state, stripGenes, stripRows } from './state'
@@ -49,14 +46,7 @@ const barsOf = memo(
     frame: StripFrame,
     ramp: Ramp,
     rowGenes: Map<string, RowGene[]> | undefined,
-  ) =>
-    svgDom(
-      walkRowsTree(bars, frame, {
-        ramp: rampInterval(ramp),
-        rowGenes,
-        idPrefix: 'strip',
-      }),
-    ),
+  ) => svgDom(stripTree(bars, frame, rampInterval(ramp), rowGenes)),
 )
 
 const marksOf = memo(
@@ -88,13 +78,7 @@ const labelsOf = memo(
 
 const keyOf = memo(
   (bars: WalkRows, ramp: Ramp, genes: GeneGaps | undefined) =>
-    walkRowsKeyHtml(
-      walkRowsKey(bars, {
-        ramp: rampInterval(ramp),
-        rampCss: RAMP_GRADIENT_CSS,
-        genes,
-      }),
-    ) +
+    walkRowsKeyHtml(stripKey(bars, rampInterval(ramp), genes)) +
     '<span>▮ ticks: where each walk passes the node under the pointer · click a bar to highlight its walk</span>',
 )
 

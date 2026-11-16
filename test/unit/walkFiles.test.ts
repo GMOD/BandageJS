@@ -7,10 +7,24 @@ import {
 } from '@jbrowse/graph-walks'
 import { LocalFile } from 'generic-filehandle2'
 
-import { formatLocus, loadGraph } from '@jbrowse/bandage-core'
+import {
+  NOT_LOADED_CSS,
+  NOT_LOADED_TEXT,
+  formatLocus,
+  loadGraph,
+  serializeEl,
+  walkRowsTree,
+  walkStripFrame,
+} from '@jbrowse/bandage-core'
 import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
 import { graphTablesGFA } from '@jbrowse/bandage-core/gfa/graphTables'
-import { abridgedOf, labelledLengths, rowsOf } from '../../src/derived'
+import {
+  abridgedOf,
+  labelledLengths,
+  rowsOf,
+  stripKey,
+  stripTree,
+} from '../../src/derived'
 import { rowHtml } from '../../src/describe'
 import { coreRegion, parseRegion } from '../../src/region'
 import {
@@ -161,6 +175,22 @@ test("a placeholder's length is labelled with node lengths off, and every node's
   )
   expect(labelledLengths(graph, true)).toEqual(
     new Map(graph.nodes.map(n => [n.id, n.length])),
+  )
+})
+
+test("the strip under a node layout draws an abridged walk's runs not loaded hollow, as the layout draws their placeholders, and keys them", async () => {
+  const { gfa, region } = await cut({ region: K12 }, ABRIDGED)
+  const bars = rowsOf(loadGraph(gfa, 'cut'), region)!
+  const frame = walkStripFrame(bars, { width: 800 })
+  expect(
+    bars.rows.filter(r => r.runs.some(run => run.unloaded)).map(r => r.name),
+  ).toEqual(['IAI39#1#chr', 'Sakai#1#chr'])
+  expect(serializeEl(walkRowsTree(bars, frame))).not.toContain(NOT_LOADED_CSS)
+  expect(serializeEl(stripTree(bars, frame, undefined, undefined))).toContain(
+    NOT_LOADED_CSS,
+  )
+  expect(stripKey(bars, undefined, undefined).map(e => e.label)).toContain(
+    NOT_LOADED_TEXT,
   )
 })
 

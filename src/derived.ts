@@ -1,5 +1,6 @@
 import {
   LAYOUT_MODES,
+  RAMP_GRADIENT_CSS,
   bubbleHalos,
   graphBubbles,
   computeReferenceRamp,
@@ -17,6 +18,8 @@ import {
   walkLift,
   walkRowLabels,
   walkRows,
+  walkRowsKey,
+  walkRowsTree,
   placeRowGenes,
 } from '@jbrowse/bandage-core'
 import {
@@ -31,6 +34,7 @@ import type {
   ColorScheme,
   DeletionDrawing,
   DeletionEdge,
+  GeneGaps,
   GeneModel,
   Graph,
   GraphNode,
@@ -38,6 +42,8 @@ import type {
   LayoutResult,
   MinigraphBubble,
   NodeWidth,
+  RowGene,
+  StripFrame,
   WalkLayer,
   WalkLift,
   WalkRows,
@@ -154,6 +160,33 @@ export const rowGenesOf = memo(
 export const rampInterval = (
   ramp: { start: number; span: number } | undefined,
 ) => ramp && { start: ramp.start, end: ramp.start + ramp.span }
+
+// The strip under a node layout draws runs not loaded hollow and keys them,
+// as the layout above draws their placeholders
+export const stripTree = (
+  bars: WalkRows,
+  frame: StripFrame,
+  ramp: { start: number; end: number } | undefined,
+  rowGenes: Map<string, RowGene[]> | undefined,
+) =>
+  walkRowsTree(bars, frame, {
+    ramp,
+    rowGenes,
+    idPrefix: 'strip',
+    markUnloaded: true,
+  })
+
+export const stripKey = (
+  bars: WalkRows,
+  ramp: { start: number; end: number } | undefined,
+  genes: GeneGaps | undefined,
+) =>
+  walkRowsKey(bars, {
+    ramp,
+    rampCss: RAMP_GRADIENT_CSS,
+    genes,
+    markUnloaded: true,
+  })
 
 // A graph that isn't open yet draws no deletions, so the drawing reads the
 // same way as one with none.
