@@ -10,15 +10,15 @@ import {
 import type { Page } from '@playwright/test'
 
 const CUT = `walks=${encodeURIComponent(ABRIDGED_WALKS)}&loc=K12%231%23chr:1004501-1004961&layout=force`
-const IAI39 = 'IAI39: 35 steps not loaded, 11 bp off the reference'
-const SAKAI = 'Sakai: 35 steps not loaded, 6 bp off the reference'
+const IAI39 = 'IAI39: 11 bp off the reference not loaded'
+const SAKAI = 'Sakai: 6 bp off the reference not loaded'
 const NOT_SHOWN = 'nodes not shown'
 
 const expanded = (page: Page) => new URL(page.url()).searchParams.get('expand')
 
 async function blocks(page: Page) {
   return (await haplotypesMenu(page)).getByRole('menuitem', {
-    name: / steps? not loaded/,
+    name: / off the reference not loaded/,
   })
 }
 

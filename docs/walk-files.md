@@ -107,10 +107,9 @@ to your own file holds its url.
 - BandageJS reads such a walk's steps on the reference, and each run of its
   steps off the reference as one placeholder of the run's bp, which a node
   layout draws hollow
-- The Haplotypes menu lists each as a block that gives the steps reading it in
-  full decodes as `not loaded`, then the bp its placeholders stand for as
-  `off the reference`, in the words graph-walks' `abridgedText` gives every
-  reader
+- The Haplotypes menu lists each as a block that gives the bp its placeholders
+  stand for as `off the reference not loaded`, in the words graph-walks'
+  `abridgedText` gives every reader
 - Clicking the block, or **Load its steps** on a selected walk row, cuts again
   with the walk read in full
 - A highlighted walk is read in full, since BandageJS needs its steps to draw
