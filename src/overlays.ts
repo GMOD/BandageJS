@@ -4,22 +4,25 @@ import {
   HALO_FACTOR,
   LABEL_PAD,
   LABEL_PX,
-  NOT_LOADED_CSS,
-  NOT_LOADED_FILL_CSS,
-  NOT_LOADED_RIM_PX,
-  NOT_LOADED_TEXT,
   RAMP_GRADIENT_CSS,
-  encodingSwatchCss,
+  abgrToCssRgba,
   exonOutlineTree,
   exonStretches,
-  formatBp,
   geneLeader,
-  walkKey,
+  walkKeyEntry,
   el,
   serializeEl,
   walkRowsKey,
   walkRowsTree,
 } from '@jbrowse/bandage-core'
+import { arrowheadOutline } from '@jbrowse/bandage-core/renderer/Canvas2DRenderer'
+import {
+  LANE_HEAD_HALO_PX,
+  LANE_HEAD_LENGTH,
+  LANE_HEAD_MIN_PX,
+  laneHeadInk,
+} from '@jbrowse/bandage-core/renderer/laneHeads'
+import { THREAD_PX } from '@jbrowse/bandage-core/renderer/walkLanes'
 
 import { geneText } from './describe'
 
@@ -27,7 +30,11 @@ import type {
   BubbleHalo,
   GeneGaps,
   GenePin,
+  GraphKeyEntry,
+  GraphKeySection,
+  GraphKeySwatch,
   KeyEntry,
+  KeyStop,
   LabelLayout,
   LiftedWalk,
   RowGene,
@@ -288,10 +295,100 @@ export function overlayHtml(p: Pane) {
   return rows.join('') + sizes.join('')
 }
 
-// a node off the lifted walks: grey at the fade's alpha
-const FADED_SWATCH = 'rgba(160, 160, 160, 0.18)'
-const FADED_DASHES = 'rgb(160, 160, 160)'
-const DELETION_DASHES = 'rgb(24, 24, 28)'
+const css = abgrToCssRgba
+
+const gradientCss = (stops: readonly KeyStop[]) =>
+  `linear-gradient(to right, ${stops.map(s => `${css(s.ink)} ${+(s.offset * 100).toFixed(2)}%`).join(', ')})`
+
+const SWATCH_PX = 18
+const SWATCH_LANE_PX = 8
+
+const svgSwatch = (body: string) =>
+  `<svg class="swatch-outline" width="${SWATCH_PX}" height="12" viewBox="0 0 ${SWATCH_PX} 12" aria-hidden="true">${body}</svg>`
+
+// heads along a lane, as bandage-core's figure keys them: one inside a lane,
+// or two on a thread, each wider than the thread and on a white halo
+function headsSwatch(ink: number, haloed: boolean) {
+  const width = haloed ? LANE_HEAD_MIN_PX : SWATCH_LANE_PX
+  const length = width * LANE_HEAD_LENGTH
+  const d = (haloed ? [length, SWATCH_PX] : [SWATCH_PX - 1])
+    .map(x => {
+      const outline = arrowheadOutline(
+        { x, y: 6, angle: 0, length, halfWidth: width / 2, color: ink },
+        { scaleX: 1, scaleY: 1, translateX: 0, translateY: 0, dpr: 1 },
+      )
+      return `M${outline.map(p => `${+p.x.toFixed(1)},${+p.y.toFixed(1)}`).join('L')}Z`
+    })
+    .join('')
+  return svgSwatch(
+    `<line x2="${SWATCH_PX}" y1="6" y2="6" stroke="${css(ink)}" stroke-width="${haloed ? THREAD_PX : SWATCH_LANE_PX}"/>${
+      haloed
+        ? `<path d="${d}" fill="none" stroke="#ffffff" stroke-width="${2 * LANE_HEAD_HALO_PX}" stroke-linejoin="round"/>`
+        : ''
+    }<path d="${d}" fill="${css(laneHeadInk(ink, !haloed))}"/>`,
+  )
+}
+
+// bandage-core's swatch as markup, beside its words in a legend row
+function swatchHtml(swatch: GraphKeySwatch) {
+  switch (swatch.kind) {
+    case 'scale':
+      return `<div class="swatch walk scale" style="background:${gradientCss(swatch.stops)}"></div>`
+    case 'swatch':
+      return `<div class="swatch walk" style="background:${css(swatch.ink)}"></div>`
+    case 'chip':
+      return `<div class="swatch chip" style="background:${css(swatch.ink)}"></div>`
+    case 'width':
+      return `<div class="swatch thick" style="background:${css(swatch.ink)};height:${+swatch.px.toFixed(2)}px"></div>`
+    case 'hollow':
+      return svgSwatch(
+        `<rect x="1" y="2" width="16" height="8" rx="4" fill="${css(swatch.ink)}" stroke="${css(swatch.rim)}" stroke-width="${swatch.rimPx}"/>`,
+      )
+    case 'line':
+      return swatch.dashed
+        ? `<div class="swatch dashes" style="color:${css(swatch.ink)}"></div>`
+        : svgSwatch(
+            `<line x1="5" x2="13" y1="6" y2="6" stroke="${css(swatch.ink)}" stroke-width="1.5"/>`,
+          )
+    case 'outline':
+      return svgSwatch(
+        `<rect x="1" y="1" width="16" height="10" rx="4" fill="none" stroke="${css(swatch.ink)}" stroke-width="2"/>`,
+      )
+    case 'halo':
+      return svgSwatch(
+        `<line x1="5" x2="13" y1="6" y2="6" stroke="${css(swatch.ink)}" stroke-opacity="0.35" stroke-width="8" stroke-linecap="round"/>`,
+      )
+    case 'threads':
+      return svgSwatch(
+        [3, 6, 9]
+          .map(
+            y =>
+              `<line x2="18" y1="${y}" y2="${y}" stroke="${css(swatch.ink)}" stroke-width="1.5"/>`,
+          )
+          .join(''),
+      )
+    case 'heads':
+      return headsSwatch(swatch.ink, swatch.haloed)
+    default:
+      return svgSwatch(
+        '<path d="M0,6 L8,1 L8,11 Z M18,6 L10,1 L10,11 Z" fill="#18181c"/>',
+      )
+  }
+}
+
+// One entry of the key: its swatch, its bold name and words, and under them
+// the stretch its scale runs over, or `at` while it stands in
+function entryHtml(entry: GraphKeyEntry, hint?: string, at?: string) {
+  const title = [entry.hover, hint].filter(Boolean).join(' · ')
+  const words = `${entry.strong ? `<strong>${esc(entry.strong)}</strong>` : ''}${esc(entry.text)}`
+  const row = entry.swatch
+    ? `<div class="legend-row">${swatchHtml(entry.swatch)}<span>${words}</span></div>`
+    : `<div class="legend-note">${words}</div>`
+  const under = at ?? entry.under
+  return entry.walk || under
+    ? `<div class="walk-key"${title ? ` title="${esc(title)}"` : ''}>${row}<div class="walk-at">${esc(under ?? '')}</div></div>`
+    : row
+}
 
 // One walk's key: a swatch, or a short bar of the scale its lane shades by,
 // then its name, with the stretch that scale runs over under it. `at`, where
@@ -304,13 +401,26 @@ export function walkKeyHtml(
   hint?: string,
   at?: string,
 ) {
-  const key = walkKey(walk, reference)
-  const title = [key.hover, hint].filter(Boolean).join(' · ')
-  return `<div class="walk-key"${title ? ` title="${esc(title)}"` : ''}><div class="legend-row"><div class="swatch walk${
-    key.shades ? ' scale' : ''
-  }" style="background:${encodingSwatchCss(walk.encoding)}"></div><span><strong>${esc(label)}</strong>${esc(
-    key.gaps,
-  )}</span></div><div class="walk-at">${esc(at ?? key.scale ?? '')}</div></div>`
+  return entryHtml(walkKeyEntry(walk, label, reference), hint, at)
+}
+
+const HEADED = new Set(['Node thickness', 'Link thickness'])
+
+// bandage-core's graph key, a box per section
+export function graphKeyHtml(
+  key: readonly GraphKeySection[],
+  at: (walk: LiftedWalk) => string | undefined,
+) {
+  return key
+    .map(
+      ({ id, group, entries }) =>
+        `<div class="legend key-${id}">${group && HEADED.has(group) ? `<div class="legend-title">${group}</div>` : ''}${entries
+          .map(entry =>
+            entryHtml(entry, undefined, entry.walk && at(entry.walk)),
+          )
+          .join('')}</div>`,
+    )
+    .join('')
 }
 
 export function walkRowsKeyHtml(entries: KeyEntry[]) {
@@ -340,87 +450,35 @@ export function walkRowsKeyHtml(entries: KeyEntry[]) {
   )
 }
 
-// the exon outline's key, as the plugin's gene legend and a figure draw it
-const EXON_SWATCH = `<svg class="swatch-outline" width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="1" y="1" width="16" height="10" rx="4" fill="none" stroke="${EXON_COLOR}" stroke-width="2"/></svg>`
-
-const NOT_LOADED_SWATCH = `<svg class="swatch-outline" width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="1" y="2" width="16" height="8" rx="4" fill="${NOT_LOADED_FILL_CSS}" stroke="${NOT_LOADED_CSS}" stroke-width="${NOT_LOADED_RIM_PX}"/></svg>`
-
 export function legendsHtml(o: {
-  ramp: { start: number; end: number; refName?: string } | undefined
-  // what the marks across the backbone are, exons or whole genes where the
-  // genes have none, and where they come from
-  exons: { kind: 'Exon' | 'Gene'; from: string } | undefined
-  // whether the nodes drawn hold a stretch whose own nodes the cut didn't load
-  notLoaded: boolean
+  // bandage-core's graph key (graphKey)
+  key: readonly GraphKeySection[]
+  // where the hovered node sits on a lifted walk, while one is hovered
+  at: (walk: LiftedWalk) => string | undefined
   paths: { name: string; label: string; color: string }[]
   walkBars: WalkRows | undefined
   // the walk rows' gene key, with the rows it couldn't read genes for
   rowGenes: GeneGaps | undefined
   walkRamp: { start: number; end: number } | undefined
-  walks: { walk: LiftedWalk; label: string; at?: string }[]
-  // what the lift's faded drawing is, from bandage-core's fadedKey
-  faded: string
-  // what the dashed links are, from bandage-core's deletionKey, when any draw
-  deletions: string | undefined
-  reference: { name?: string; start: number; end: number } | undefined
 }) {
-  const out: string[] = []
-  if (o.ramp) {
-    const start = Math.round(o.ramp.start)
-    const end = Math.round(o.ramp.end)
-    out.push(
-      `<div class="legend"><div class="legend-title">${esc(o.ramp.refName ? `${o.ramp.refName} position` : 'Reference position')}</div><div class="ramp" style="background:${RAMP_GRADIENT_CSS}"></div><div class="ramp-ends"><span>${start.toLocaleString()}</span><span>(${formatBp(
-        end - start,
-      )})</span><span>${end.toLocaleString()}</span></div></div>`,
-    )
-  }
-  if (o.exons) {
-    out.push(
-      `<div class="legend"><div class="legend-row">${EXON_SWATCH}<span>${o.exons.kind}, from ${esc(o.exons.from)}</span></div></div>`,
-    )
-  }
-  if (o.notLoaded) {
-    out.push(
-      `<div class="legend"><div class="legend-row">${NOT_LOADED_SWATCH}<span>${NOT_LOADED_TEXT}</span></div></div>`,
-    )
-  }
-  if (o.paths.length > 0) {
-    out.push(
-      `<div class="legend">${o.paths
-        .map(
-          ({ label, color }) =>
-            `<div class="legend-row"><div class="swatch" style="background:${color}"></div><span>${esc(label)}</span></div>`,
+  return [
+    graphKeyHtml(o.key, o.at),
+    o.paths.length > 0
+      ? `<div class="legend">${o.paths
+          .map(
+            ({ label, color }) =>
+              `<div class="legend-row"><div class="swatch" style="background:${color}"></div><span>${esc(label)}</span></div>`,
+          )
+          .join('')}</div>`
+      : '',
+    o.walkBars
+      ? walkRowsKeyHtml(
+          walkRowsKey(o.walkBars, {
+            ramp: o.walkRamp,
+            rampCss: RAMP_GRADIENT_CSS,
+            genes: o.rowGenes,
+          }),
         )
-        .join('')}</div>`,
-    )
-  }
-  if (o.walkBars) {
-    out.push(
-      walkRowsKeyHtml(
-        walkRowsKey(o.walkBars, {
-          ramp: o.walkRamp,
-          rampCss: RAMP_GRADIENT_CSS,
-          genes: o.rowGenes,
-        }),
-      ),
-    )
-  }
-  // a lift fades the dashes it doesn't run along, as it fades the rest
-  const dashes = o.deletions
-    ? `<div class="legend-row"><div class="swatch dashes" style="color:${o.walks.length > 0 ? FADED_DASHES : DELETION_DASHES}"></div><span>${esc(o.deletions)}</span></div>`
-    : ''
-  if (o.walks.length > 0) {
-    out.push(
-      `<div class="legend walks">${o.walks
-        .map(({ walk, label, at }) =>
-          walkKeyHtml(walk, label, o.reference, undefined, at),
-        )
-        .join(
-          '',
-        )}<div class="legend-row"><div class="swatch walk" style="background:${FADED_SWATCH}"></div><span>${esc(o.faded)}</span></div>${dashes}</div>`,
-    )
-  } else if (dashes) {
-    out.push(`<div class="legend">${dashes}</div>`)
-  }
-  return out.join('')
+      : '',
+  ].join('')
 }

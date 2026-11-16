@@ -48,8 +48,8 @@ test('a layout the graph cannot draw falls back to force-directed with halos', a
 test('the colour key counts whole bases between its ends', async ({ page }) => {
   await openPage(page, 'gfa=examples/ecoli_pggb_subgraph.gfa&layout=force')
   await waitForDrawing(page, /nodes/)
-  await expect(page.locator('#legends .ramp-ends')).toHaveText(
-    /^1,004,501\(429 bp\)1,004,930$/,
+  await expect(page.locator('#legends .legend.key-ramp .walk-at')).toHaveText(
+    '1,004,502-1,004,930 (429 bp)',
   )
 })
 

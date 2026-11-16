@@ -1,7 +1,7 @@
-import { deletionEdges, loadGraph, walkLift } from '@jbrowse/bandage-core'
+import { loadGraph } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
-import { deletionKeyFor, memo, tooLargeText, walkView } from '../../src/derived'
+import { memo, tooLargeText, walkView } from '../../src/derived'
 
 test('memo recomputes only when a key changes identity', () => {
   let calls = 0
@@ -62,31 +62,4 @@ test('the notice names the lifted walks a cut left abridged', () => {
   expect(tooLargeText(['IAI39', 'Sakai'])).toBe(
     'IAI39 and Sakai are too large to read in full here together, so they are drawn abridged',
   )
-})
-
-test('the deletion key is there only while a deletion stays dashed', () => {
-  const graph = loadGraph(
-    [
-      ...[100, 10, 100].map((n, id) => `S\t${id}\t${'A'.repeat(n)}`),
-      'P\tref#0#chr\t0+,1+,2+\t*',
-      'P\ta#1#c\t0+,2+\t*',
-      ...['0 1', '1 2', '0 2'].map(pair => {
-        const [from, to] = pair.split(' ')
-        return `L\t${from}\t+\t${to}\t+\t0M`
-      }),
-    ].join('\n'),
-    'skip',
-    { referencePath: 'ref#0#chr' },
-  )
-  const deletions = deletionEdges(graph)
-  expect(deletions).toHaveLength(1)
-  const keyFor = (walk?: string) =>
-    deletionKeyFor(
-      deletions,
-      walk ? walkLift(graph, [{ walk }]) : undefined,
-      'chr',
-    )
-  expect(keyFor()).toMatch(/^skips chr sequence/)
-  expect(keyFor('ref#0#chr')).toMatch(/^skips chr sequence/)
-  expect(keyFor('a#1#c')).toBeUndefined()
 })

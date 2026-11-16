@@ -35,7 +35,7 @@ test('walks highlight from the menu as lanes, each keyed in one short row', asyn
     popup.getByRole('menuitemcheckbox', { name: /^IAI39/ }),
   ).toHaveAttribute('aria-checked', 'true')
   await page.keyboard.press('Escape')
-  const key = page.locator('#legends .legend.walks')
+  const key = page.locator('#legends .legend.key-walks')
   await expect(key.locator('.walk-key')).toHaveCount(2)
   await expect(key.locator('.walk-key').nth(1)).toContainText('IAI39')
   await expect(key).toContainText('only in other haplotypes')

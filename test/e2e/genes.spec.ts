@@ -129,9 +129,11 @@ test('RefSeq genes pin to the backbone of the LPA graph', async ({
   ).toHaveText(/^LPA\nchr6:160,531,482-160,664,275, − strand/)
   expect(geneRequests.some(u => u.endsWith('.csi'))).toBe(true)
   await expect(page.locator('#legends')).toContainText(
-    'Exon, from NCBI RefSeq genes (hg38)',
+    'exon, from NCBI RefSeq genes (hg38)',
   )
-  await expect(page.locator('#legends')).toContainText('GRCh38 chr6 position')
+  await expect(page.locator('#legends')).toContainText(
+    'position on GRCh38 chr6',
+  )
 })
 
 // GRCh38 through LPA, and HG00099#1 through the one gene on its CTGX

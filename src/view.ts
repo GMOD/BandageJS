@@ -10,11 +10,12 @@ import {
   drawTubeMap,
   drawTubeMapHighlight,
   drawingBounds,
+  drawnMarks,
   facetCells,
-  fadedKey,
   facetGrid,
   fitTransform,
   getDpr,
+  graphKey,
   layoutGeometryInputs,
   layoutLabels,
   padded,
@@ -28,13 +29,7 @@ import {
 } from '@jbrowse/bandage-core'
 import { abridgedText } from '@jbrowse/graph-walks'
 
-import {
-  deletionKeyFor,
-  inkOf,
-  labelledLengths,
-  memo,
-  rampInterval,
-} from './derived'
+import { inkOf, labelledLengths, memo, rampInterval } from './derived'
 import { edgeHtml, layoutName, nodeHtml, nodeText, rowHtml } from './describe'
 import { svgDom } from './elDom'
 import { rowLink } from './jbrowse'
@@ -74,7 +69,6 @@ import type { Pane } from './overlays'
 import type { Facet } from './settings'
 import type {
   FacetGrid,
-  GenePin,
   LayoutResult,
   LiftedWalk,
   MinigraphBubble,
@@ -771,42 +765,31 @@ function drawOverlays() {
   setHtml(ui.html, layout ? overlayHtml(pane) : '')
   overlayBubbles = d.halos.map(h => h.bubble)
 
-  const keyed = (lift?.walks ?? []).map(walk => ({
-    walk,
-    label: f.walkLabels.get(walk.name) ?? walk.name,
-    at: hoveredOn(walk),
-  }))
-  const legends = layout
-    ? legendsHtml({
-        // a lifted walk's key states its own scale, and the rest is grey
-        ramp:
-          ramp && !lift
-            ? { ...ramp, refName: referenceName() ?? referenceAssembly() }
-            : undefined,
-        exons: exonKey(d.genePins),
-        notLoaded: d.notLoaded,
-        paths: drawPaths() && graph?.paths ? pathLegend(graph.paths) : [],
-        walkBars: d.bars,
-        rowGenes: d.rowGenes?.size ? state.walkGeneNote : undefined,
-        walkRamp,
-        walks: keyed,
-        faded:
-          (lift &&
-            graph &&
-            fadedKey(
-              graph,
-              lift,
-              keyed.length === 1 ? keyed[0]!.label : 'these walks',
-            )) ??
-          '',
-        deletions: deletionKeyFor(
-          d.deletions,
-          lift,
-          referenceName() ?? referenceAssembly(),
-        ),
-        reference: walkReference(lift),
-      })
-    : ''
+  const legends =
+    layout && graph
+      ? legendsHtml({
+          key: graphKey(graph, layout, {
+            region: state.region,
+            referenceName: referenceName() ?? referenceAssembly(),
+            referenceRamp: d.ramp,
+            lift,
+            walkLabel: name => f.walkLabels.get(name) ?? name,
+            nodeWidth: settings.nodeWidth,
+            contigThickness: settings.nodeThickness,
+            connectorThickness: CONNECTOR_THICKNESS,
+            drawsNodes: !d.bars && !layout.tubeMap,
+            marks: drawnMarks([paneBatch]),
+            genePins: d.genePins,
+            genesFrom: state.genesFrom,
+            halos: d.halos,
+          }),
+          at: hoveredOn,
+          paths: drawPaths() && graph.paths ? pathLegend(graph.paths) : [],
+          walkBars: d.bars,
+          rowGenes: d.rowGenes?.size ? state.walkGeneNote : undefined,
+          walkRamp,
+        })
+      : ''
   if (setHtml(ui.legends, legends)) {
     state.legendSize = {
       width: ui.legends.offsetWidth,
@@ -818,20 +801,6 @@ function drawOverlays() {
   ui.back.textContent = backLabel ?? ''
   // the hint teaches the bubble chips only while they are on screen
   ui.hint.classList.toggle('no-bubbles', !settings.showBubbles)
-}
-
-// Genes with no exons inside them draw each as one mark, a whole gene
-function exonKey(pins: GenePin[]) {
-  const marked = pins.filter(pin => pin.exons)
-  const whole = marked.every(({ gene: g }) =>
-    g.exons.every(e => e.start <= g.start && e.end >= g.end),
-  )
-  return marked.length && state.genesFrom
-    ? {
-        kind: whole ? ('Gene' as const) : ('Exon' as const),
-        from: state.genesFrom,
-      }
-    : undefined
 }
 
 const shownGenes = () => (settings.showGenes ? state.genes : undefined)

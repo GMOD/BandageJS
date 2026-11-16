@@ -22,10 +22,6 @@ import {
   walkRowsTree,
   placeRowGenes,
 } from '@jbrowse/bandage-core'
-import {
-  dashedDeletions,
-  deletionKey,
-} from '@jbrowse/bandage-core/deletionEdges'
 import { abridgedWalks } from '@jbrowse/graph-walks'
 
 import type { Region } from './jbrowse'
@@ -33,7 +29,6 @@ import type { Facet } from './settings'
 import type {
   ColorScheme,
   DeletionDrawing,
-  DeletionEdge,
   GeneGaps,
   GeneModel,
   Graph,
@@ -45,7 +40,6 @@ import type {
   RowGene,
   StripFrame,
   WalkLayer,
-  WalkLift,
   WalkRows,
 } from '@jbrowse/bandage-core'
 import type { AbridgedWalk } from '@jbrowse/graph-walks'
@@ -71,18 +65,6 @@ export const abridgedOf = memo((gfa: string | GraphTables | undefined) =>
     ? new Map(abridgedWalks(gfa).map(walk => [walk.name, walk]))
     : new Map<string, AbridgedWalk>(),
 )
-
-// The dashed-deletion key, only where the drawing leaves a deletion dashed: a
-// lifted walk's lane draws each deletion it takes solid
-export function deletionKeyFor(
-  deletions: DeletionEdge[],
-  lift: WalkLift | undefined,
-  reference: string | undefined,
-) {
-  return dashedDeletions(deletions, lift).length > 0
-    ? deletionKey(reference)
-    : undefined
-}
 
 // The notice for lifted walks a cut left abridged, by their labels
 export function tooLargeText(labels: string[]) {
@@ -236,7 +218,6 @@ export const drawnExtras = memo(
         showGenes && bars ? rowGenesOf(bars, genes, walkGenes) : undefined,
       rowLabels: walkRowLabels(bars, layout),
       deletions: drawing.shown,
-      notLoaded: onNodes && !!graph?.nodes.some(n => n.placeholder),
       drawing,
       ramp:
         resolved === 'reference-position' && graph && !tubeMap
