@@ -1,5 +1,6 @@
 import {
   PLACEMENT_CHOICE_TEXT,
+  edgeHoverText,
   formatBp,
   panSNContig,
   placeholderHoverText,
@@ -11,7 +12,13 @@ import { HPRC, HPRC_WALKS } from './gbz'
 import { esc } from './overlays'
 
 import type { Recent } from './recent'
-import type { GeneModel, GraphNode, WalkRow } from '@jbrowse/bandage-core'
+import type {
+  DeletionEdge,
+  GeneModel,
+  GraphEdge,
+  GraphNode,
+  WalkRow,
+} from '@jbrowse/bandage-core'
 
 // `Force-directed` for `Force-directed layout`, where the context says layout
 export const layoutName = (label: string) => label.replace(/ layout$/, '')
@@ -106,6 +113,20 @@ export function nodeText(node: GraphNode) {
     ? `, ${node.stable.refName}:${(node.stable.start + 1).toLocaleString()} (rank ${node.stable.rank})`
     : ''
   return `${node.name}, ${node.length.toLocaleString()} bp, depth ${node.depth.toFixed(1)}${at}`
+}
+
+// A link that skips reference sequence says how much, naming the reference as
+// the key does, and no event
+export function edgeHtml(
+  edge: GraphEdge,
+  skip: DeletionEdge | undefined,
+  nameOf: (id: string) => string,
+  reference: string | undefined,
+) {
+  const text = edgeHoverText(edge, skip, nameOf)
+  return text.deletion
+    ? `${esc(`skips ${text.deletion.bp} of ${reference ?? 'the reference'} sequence`)}<br>${esc(text.deletion.where)}`
+    : `Edge: ${esc(text.ends)}`
 }
 
 // A gene's name, its span in 1-based closed coordinates and its strand, and

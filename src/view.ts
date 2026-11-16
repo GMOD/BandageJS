@@ -10,7 +10,6 @@ import {
   drawTubeMap,
   drawTubeMapHighlight,
   drawingBounds,
-  edgeHoverText,
   facetCells,
   fadedKey,
   facetGrid,
@@ -36,7 +35,7 @@ import {
   memo,
   rampInterval,
 } from './derived'
-import { layoutName, nodeHtml, nodeText, rowHtml } from './describe'
+import { edgeHtml, layoutName, nodeHtml, nodeText, rowHtml } from './describe'
 import { svgDom } from './elDom'
 import { rowLink } from './jbrowse'
 import {
@@ -892,14 +891,12 @@ function drawInfo() {
   if (hovered && (state.pointer || state.stripHover)) {
     html = nodeHtml(hovered, shownGenes())
   } else if (edge) {
-    const text = edgeHoverText(
+    html = edgeHtml(
       edge,
       current().deletions.find(x => x.edgeIndex === state.hoveredEdge),
       id => f.nodeById.get(id)?.name ?? id,
+      referenceName() ?? referenceAssembly(),
     )
-    html = text.deletion
-      ? `<strong>Deletion</strong> ${esc(text.deletion.bp)}<br>${esc(text.deletion.where)}`
-      : `Edge: ${esc(text.ends)}`
   } else if (selectedRow) {
     const ref = referenceWindow()
     const isReference = selectedRow === bars?.reference
