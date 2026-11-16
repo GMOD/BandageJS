@@ -538,3 +538,30 @@ test('each pass of a walk lifted by pass is named on the graph beside its thread
   await dialog.getByRole('button', { name: 'Done' }).click()
   await expect(passes).toHaveCount(0)
 })
+
+test("a walk lifted by pass gets bandage-core's pass bar under the drawing, its passes along its own length", async ({
+  page,
+}) => {
+  await liftByPass(page)
+  const bars = page.locator('#pass-bars svg')
+  await expect(bars).toHaveCount(1)
+  await expect(bars).toContainText(/along its length/)
+  for (const name of ['pass 1', 'pass 2', 'pass 3']) {
+    await expect(bars.getByText(name, { exact: false }).first()).toBeVisible()
+  }
+  const drawing = await page.locator('#pane').boundingBox()
+  const bar = await bars.boundingBox()
+  expect(bar!.y).toBeGreaterThanOrEqual(drawing!.y + drawing!.height - 1)
+  await (
+    await haplotypesMenu(page)
+  )
+    .getByRole('menuitem', { name: 'Colour highlighted…' })
+    .click()
+  const dialog = page.locator('#highlight-dialog')
+  await dialog
+    .getByRole('combobox', { name: /^Colour alt/ })
+    .selectOption('walk')
+  await dialog.getByRole('button', { name: 'Done' }).click()
+  await expect(page.locator('#pass-bars')).toBeHidden()
+  await expect(bars).toHaveCount(0)
+})

@@ -825,6 +825,12 @@ main.faceted #back {
   background: rgba(255, 255, 255, 0.92);
 }
 
+#pass-bars svg {
+  display: block;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
 #walk-strip {
   position: relative;
   border-top: 1px solid var(--line);

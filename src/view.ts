@@ -18,10 +18,14 @@ import {
   graphKey,
   layoutGeometryInputs,
   layoutLabels,
+  PASS_BAR_HEIGHT,
+  passBarTree,
+  passBars,
   passLabelCandidates,
   padded,
   pathLegend,
   resolveColorScheme,
+  serializeEl,
   tubeMapFrame,
   viewportOf,
   walkKey,
@@ -605,10 +609,37 @@ function drawHover() {
   }
 }
 
+// Each walk lifted by pass along its own length, under a drawing of nodes
+// on one canvas, as bandage-core's figure stacks it
+function drawPassBars() {
+  const { lift } = walks()
+  const bars =
+    facets.length === 0 && state.layout && !tube() && !current().bars
+      ? passBars(lift)
+      : []
+  ui.passBars.hidden = bars.length === 0
+  setHtml(
+    ui.passBars,
+    bars
+      .map(
+        bar =>
+          `<svg width="${state.width}" height="${PASS_BAR_HEIGHT}" xmlns="http://www.w3.org/2000/svg">${serializeEl(
+            passBarTree(
+              bar,
+              facts().walkLabels.get(bar.walk) ?? bar.walk,
+              state.width,
+            ),
+          )}</svg>`,
+      )
+      .join(''),
+  )
+}
+
 function draw() {
   drawBase()
   drawHover()
   drawOverlays()
+  drawPassBars()
   drawFacetTitles()
   drawInfo()
   drawStats()

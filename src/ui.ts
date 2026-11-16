@@ -11,6 +11,7 @@ export const ui = {
   marks: el<SVGGElement>('overlay-marks'),
   walkRows: el<SVGGElement>('walk-rows'),
   stripLocator: el<SVGGElement>('strip-locator'),
+  passBars: el<HTMLElement>('pass-bars'),
   strip: el<HTMLElement>('walk-strip'),
   stripSvg: el<SVGSVGElement>('strip-svg'),
   stripBars: el<SVGGElement>('strip-bars'),

@@ -79,7 +79,10 @@ The Haplotypes menu highlights walks, and the rest of the graph fades to grey.
 - **A panel per walk** draws one panel per walk on a shared gradient, yellow at
   the start and red at the end
 - **A row per sample** puts each sample in a row and each haplotype in a column
-- **Colour highlighted…** picks what a lane shows and the palette
+- **Colour highlighted…** picks what a lane shows and the palette. **Each pass
+  through repeated nodes** splits a walk's lane into one thread per visit, names
+  each pass beside its thread, and draws the walk along its own length under the
+  drawing with each pass's stretches in its colour
 - **Clear highlights** removes them
 
 Panels share one view, so a pan, zoom or hover in one applies to all. Click a
