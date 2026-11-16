@@ -311,3 +311,21 @@ test('a strip point on a folded node lights no ring in the drawing', async ({
     await expect(page.locator('#strip-locator circle')).toHaveCount(drawn)
   }
 })
+
+test('a reference node inside a folded site is ringed as wide as the stroke the drawing runs through it', async ({
+  page,
+}) => {
+  await openGfa(page, SNP, '6 nodes')
+  const view = await fitView(page)
+  const ringPx = async (query: string, node: string) => {
+    await openGfa(page, SNP, '6 nodes', `${query}&node=${node}&view=${view}`)
+    await expect(rings(page)).toHaveCount(1)
+    return Number(await rings(page).getAttribute('stroke-width'))
+  }
+  // drawn, m is as thin as the one walk stepping it
+  expect(await ringPx('&smallsites=1', 'm')).toBeLessThan(
+    await ringPx('&smallsites=1', 'r1'),
+  )
+  // folded, the reference runs through m at r1 and r2's thickness
+  expect(await ringPx('', 'm')).toBe(await ringPx('', 'r1'))
+})

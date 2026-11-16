@@ -424,6 +424,17 @@ export function drawnFold() {
   return paneBatch.collapsed ?? facets[0]?.batch.collapsed
 }
 
+// how wide the drawing on the canvas draws each node, which the hit test
+// and every mark round a node reach
+export function drawnInk() {
+  return inkOf(
+    state.graph,
+    settings.nodeWidth,
+    settings.nodeThickness,
+    drawnFold()?.through,
+  )
+}
+
 function uploadPane(batch: Batch) {
   paneBatch = batch
   renderer.uploadGeometry(batch)
@@ -730,7 +741,7 @@ function drawOverlays() {
   const { scaleX, scaleY } = axis()
   const back = state.stack.at(-1)
   const backLabel = back && `◀ Back to ${back.graph.name}`
-  const ink = inkOf(state.graph, settings.nodeWidth, settings.nodeThickness)
+  const ink = drawnInk()
   const halos = drawnHalos(
     d.halos,
     graph,

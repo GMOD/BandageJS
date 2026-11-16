@@ -12,26 +12,18 @@ import {
 } from '@jbrowse/bandage-core'
 
 import { popBubble, unpopBubble } from './bubbles'
-import { inkOf } from './derived'
 import { showGuide } from './dialogs'
 import { focusFind, revealNode } from './find'
 import { focusLocate } from './locate'
 import { droppedHandle } from './recent'
 import { store, stored } from './settings'
 import { openFile } from './sources'
-import {
-  axis,
-  current,
-  drawPaths,
-  pixelRows,
-  settings,
-  state,
-  tube,
-} from './state'
+import { axis, current, drawPaths, pixelRows, state, tube } from './state'
 import { eventElement, ui } from './ui'
 import {
   bubbleAt,
   drawnFold,
+  drawnInk,
   fitView,
   onSurface,
   placeInfo,
@@ -100,7 +92,7 @@ function nodeAtScreen(sx: number, sy: number) {
     y,
     axis(),
     state.positionsVersion,
-    inkOf(state.graph, settings.nodeWidth, settings.nodeThickness),
+    drawnInk(),
     drawnFold(),
   )
 }

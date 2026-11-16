@@ -104,11 +104,16 @@ export const bubblesOf = memo(
     graph ? graphBubbles(graph, span) : [],
 )
 
+// how wide each node is drawn, a node inside a run of folded sites as wide
+// as the run's one stroke
 export const inkOf = memo(
-  (graph: Graph | undefined, width: NodeWidth, thickness: number) =>
-    nodeInk(graph, graphFacts(graph).nodeById, thickness, width),
+  (
+    graph: Graph | undefined,
+    width: NodeWidth,
+    thickness: number,
+    through: Fold['through'] | undefined,
+  ) => nodeInk(graph, graphFacts(graph).nodeById, thickness, width, 0, through),
 )
-
 // the rows the walk rows layout draws for the graph and window
 export const rowsOf = memo(
   (graph: Graph | undefined, region: Region | undefined) =>
