@@ -1,6 +1,7 @@
 import {
   CHRM_WALKS,
   expect,
+  haplotypesMenu,
   menuButton,
   openMenu,
   openPage,
@@ -477,4 +478,63 @@ test("an exon on a node the reference steps backwards is outlined at the referen
   const apart = (a: typeof r1End, b: typeof r1End) =>
     Math.hypot(a!.x - b!.x, a!.y - b!.y)
   expect(apart(nStart, r1End)).toBeLessThan(apart(nEnd, r1End))
+})
+
+// alt goes round the reference's a b c d three times
+const REPEAT = [
+  ...['r1', 'r2'].map(id => `S\t${id}\t${'A'.repeat(1000)}`),
+  ...['a', 'b', 'c', 'd'].map(id => `S\t${id}\t${'C'.repeat(200)}`),
+  ...['r1 a', 'a b', 'b c', 'c d', 'd a', 'd r2'].map(pair => {
+    const [from, to] = pair.split(' ')
+    return `L\t${from}\t+\t${to}\t+\t0M`
+  }),
+  'W\tref\t0\tchr\t0\t2800\t>r1>a>b>c>d>r2',
+  `W\talt\t1\tchr\t0\t4400\t>r1${'>a>b>c>d'.repeat(3)}>r2`,
+].join('\n')
+
+async function liftByPass(page: Page, query = '') {
+  await openGfa(page, REPEAT, '6 nodes', `&walk=alt%231%23chr${query}`)
+  await (
+    await haplotypesMenu(page)
+  )
+    .getByRole('menuitem', { name: 'Colour highlighted…' })
+    .click()
+  const dialog = page.locator('#highlight-dialog')
+  await dialog
+    .getByRole('combobox', { name: /^Colour alt/ })
+    .selectOption('pass')
+  await dialog.getByRole('button', { name: 'Done' }).click()
+}
+
+test('each pass of a walk lifted by pass is named on the graph beside its thread, in its colour', async ({
+  page,
+}) => {
+  await liftByPass(page)
+  const passes = page.locator('#overlay-svg g.pass')
+  await expect(passes).toHaveCount(3)
+  await expect(passes.locator('text')).toHaveText([
+    'pass 1',
+    'pass 2',
+    'pass 3',
+  ])
+  const inks = await passes.evaluateAll(gs =>
+    gs.map(g => [
+      g.querySelector('line')!.getAttribute('stroke'),
+      g.querySelector('circle')!.getAttribute('fill'),
+      g.querySelector('text')!.getAttribute('fill'),
+    ]),
+  )
+  expect(inks.every(([a, b, c]) => a === b && b === c)).toBe(true)
+  expect(new Set(inks.map(([a]) => a)).size).toBe(3)
+  await (
+    await haplotypesMenu(page)
+  )
+    .getByRole('menuitem', { name: 'Colour highlighted…' })
+    .click()
+  const dialog = page.locator('#highlight-dialog')
+  await dialog
+    .getByRole('combobox', { name: /^Colour alt/ })
+    .selectOption('walk')
+  await dialog.getByRole('button', { name: 'Done' }).click()
+  await expect(passes).toHaveCount(0)
 })

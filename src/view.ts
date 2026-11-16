@@ -18,6 +18,7 @@ import {
   graphKey,
   layoutGeometryInputs,
   layoutLabels,
+  passLabelCandidates,
   padded,
   pathLegend,
   resolveColorScheme,
@@ -772,6 +773,20 @@ function drawOverlays() {
     nodeById: f.nodeById,
     alleleDeletions: layout?.alleleDeletions ?? [],
     positionsVersion: state.positionsVersion,
+    passLabels:
+      layout && lift?.walks.some(walk => walk.walkPasses)
+        ? passLabelCandidates(
+            paneBatch,
+            lift,
+            {
+              scaleX,
+              scaleY,
+              translateX: state.translateX,
+              translateY: state.translateY,
+            },
+            { width: state.width, height: state.height },
+          )
+        : [],
     folded: drawnFold()?.nodes,
   })
   const pane = {

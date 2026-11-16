@@ -9,6 +9,7 @@ import {
   exonOutlineTree,
   exonStretches,
   geneLeader,
+  passLeader,
   walkKeyEntry,
   el,
   serializeEl,
@@ -76,6 +77,8 @@ export interface Pane {
 
 const GENE_INK = '#1c1c22'
 
+const css = abgrToCssRgba
+
 export function esc(s: string) {
   return s
     .replaceAll('&', '&amp;')
@@ -104,6 +107,7 @@ function chip(o: {
   border?: string
   small?: boolean
   italic?: boolean
+  bold?: boolean
   dimmed?: boolean
   title?: string
   attrs?: string
@@ -120,7 +124,11 @@ function chip(o: {
   }" rx="3" fill="rgba(255,255,255,0.85)" stroke="${o.border ?? o.color}" stroke-width="${o.small ? 0.6 : 1}"/><text x="${o.x}" y="${o.y}" font-size="${
     o.small ? LABEL_PX - 1 : LABEL_PX
   }" fill="${o.color}"${
-    o.italic ? ' font-style="italic" font-weight="600"' : ''
+    o.italic
+      ? ' font-style="italic" font-weight="600"'
+      : o.bold
+        ? ' font-weight="bold"'
+        : ''
   } text-anchor="middle">${esc(o.text)}</text></g>`
 }
 
@@ -232,6 +240,16 @@ function geneLabels(p: Pane) {
   })
 }
 
+// Each pass of a walk lifted by pass named in its colour, with a leader to a
+// dot on its thread, as bandage-core's figure names it
+function passLabels(p: Pane) {
+  return p.labels.passes.map(({ item, x, y, w, text }) => {
+    const ink = css(item.ink)
+    const { x1, y1, x2, y2 } = passLeader({ x, y }, item.at)
+    return `<g class="pass"><line x1="${x1}" x2="${x2}" y1="${y1}" y2="${y2}" stroke="${ink}" stroke-width="1"/><circle cx="${item.at.x}" cy="${item.at.y}" r="2" fill="${ink}"/>${chip({ x, y, w, text, color: ink, bold: true })}</g>`
+  })
+}
+
 function chips(p: Pane) {
   const genes = geneLabels(p)
   const bubbles = p.labels.bubbles.map(({ item: h, x, y, w, text }) =>
@@ -249,7 +267,7 @@ function chips(p: Pane) {
         : `data-halo="${p.halos.indexOf(h)}"`,
     }),
   )
-  return genes.join('') + bubbles.join('')
+  return genes.join('') + passLabels(p).join('') + bubbles.join('')
 }
 
 // Walk rows as core's element tree, so they read the same here, in the plugin
@@ -296,8 +314,6 @@ export function overlayHtml(p: Pane) {
   )
   return rows.join('') + sizes.join('')
 }
-
-const css = abgrToCssRgba
 
 const gradientCss = (stops: readonly KeyStop[]) =>
   `linear-gradient(to right, ${stops.map(s => `${css(s.ink)} ${+(s.offset * 100).toFixed(2)}%`).join(', ')})`
