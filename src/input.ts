@@ -100,6 +100,7 @@ function nodeAtScreen(sx: number, sy: number) {
     axis(),
     state.positionsVersion,
     inkOf(state.graph, settings.nodeWidth, settings.nodeThickness),
+    undefined,
   )
 }
 
@@ -121,6 +122,7 @@ function edgeAtScreen(sx: number, sy: number) {
     current().drawing.hidden,
     layout.deletionRoutes,
     layout.stranded,
+    undefined,
   )
 }
 

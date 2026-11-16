@@ -200,7 +200,7 @@ function ticks(p: Pane) {
 }
 
 function geneLabels(p: Pane) {
-  return p.labels.genes.map(({ item: pin, x, y, w, text }) => {
+  return p.labels.genes.map(({ item: { pin }, x, y, w, text }) => {
     const { x1, y1, x2, y2 } = geneLeader(
       { x, y },
       {

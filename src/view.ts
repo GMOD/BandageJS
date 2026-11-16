@@ -742,6 +742,7 @@ function drawOverlays() {
     nodeById: f.nodeById,
     alleleDeletions: layout?.alleleDeletions ?? [],
     positionsVersion: state.positionsVersion,
+    folded: undefined,
   })
   const pane = {
     width: state.width,
@@ -790,13 +791,14 @@ function drawOverlays() {
         walkRamp,
         walks: keyed,
         faded:
-          lift && graph
-            ? fadedKey(
-                graph,
-                lift,
-                keyed.length === 1 ? keyed[0]!.label : 'these walks',
-              )
-            : '',
+          (lift &&
+            graph &&
+            fadedKey(
+              graph,
+              lift,
+              keyed.length === 1 ? keyed[0]!.label : 'these walks',
+            )) ??
+          '',
         deletions: deletionKeyFor(
           d.deletions,
           lift,

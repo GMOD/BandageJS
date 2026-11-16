@@ -20,8 +20,8 @@
   },
   "devDependencies": {
     "@gmod/tabix": "^3.13.1",
-    "@jbrowse/bandage-core": "file:../vendor/walks8-pack/jbrowse-bandage-core-14.0.0.tgz",
-    "@jbrowse/graph-walks": "file:../vendor/walks8-pack/jbrowse-graph-walks-7.0.0.tgz",
+    "@jbrowse/bandage-core": "file:../vendor/walks8-pack/jbrowse-bandage-core-14.0.0-92a72f4.tgz",
+    "@jbrowse/graph-walks": "file:../vendor/walks8-pack/jbrowse-graph-walks-7.0.0-730e752.tgz",
     "@playwright/test": "^1.64.0",
     "@types/node": "^26.6.5",
     "esbuild": "^0.28.2",
