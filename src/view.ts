@@ -782,6 +782,7 @@ function drawOverlays() {
     halos,
     genePins: d.genePins,
     halfWidthPx: ink.halfWidthPx,
+    folded: drawnFold()?.nodes,
     rings: d.bars ? [] : ringsOf(layout, ink.halfWidthPx),
     labels,
     rowLabels: d.rowLabels,

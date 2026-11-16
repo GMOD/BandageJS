@@ -58,6 +58,8 @@ export interface Pane {
   genePins: GenePin[]
   // each node's drawn half width, which its exons tick past
   halfWidthPx: (nodeId: string) => number
+  // the nodes the drawing folded as too small to draw, which carry no exon
+  folded: ReadonlySet<string> | undefined
   // rings round the selected node, strong, and a node named in its details
   rings: { d: string; halfWidthPx: number; strong: boolean }[]
   labels: LabelLayout
@@ -125,7 +127,7 @@ function chip(o: {
 // Each exon outlined round its stretch of node, as every host draws it
 function exonOutlines(p: Pane) {
   const tree = exonOutlineTree(
-    exonStretches(p.genePins, p.halfWidthPx, p.highlight),
+    exonStretches(p.genePins, p.halfWidthPx, p.highlight, undefined, p.folded),
     {
       id: 'exon-outline',
       width: p.width,

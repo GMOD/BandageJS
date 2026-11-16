@@ -2,6 +2,7 @@ import {
   CHRM_WALKS,
   expect,
   menuButton,
+  openMenu,
   openPage,
   test,
   viewMenu,
@@ -328,4 +329,45 @@ test('a reference node inside a folded site is ringed as wide as the stroke the 
   )
   // folded, the reference runs through m at r1 and r2's thickness
   expect(await ringPx('', 'm')).toBe(await ringPx('', 'r1'))
+})
+
+// SNP as rGFA, its allele x on the reference's own sequence at rank 1, so a
+// gene there lies over x as well as the reference
+const TAGGED = [
+  ...[
+    ['r0', 0],
+    ['r1', 1000],
+    ['r2', 2001],
+    ['r3', 3001],
+  ].map(
+    ([r, at]) => `S\t${r}\t${'A'.repeat(1000)}\tSN:Z:chr\tSO:i:${at}\tSR:i:0`,
+  ),
+  'S\tm\tA\tSN:Z:chr\tSO:i:2000\tSR:i:0',
+  'S\tx\tC\tSN:Z:chr\tSO:i:2000\tSR:i:1',
+  ...SNP.split('\n').filter(line => !line.startsWith('S\t')),
+].join('\n')
+
+test('an exon is outlined only on nodes the drawing draws', async ({
+  page,
+}) => {
+  await openGfa(page, TAGGED, '6 nodes', '&smallsites=1')
+  await openMenu(page, 'File')
+  const chooser = page.waitForEvent('filechooser')
+  await page
+    .locator('#menu-popup')
+    .getByRole('menuitem', { name: /^Open genes/ })
+    .click()
+  await (
+    await chooser
+  ).setFiles({
+    name: 'x.bed',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('chr\t1990\t2010\tXGENE\t0\t+\n'),
+  })
+  const exons = page.locator('#overlay-svg #exon-outline path[stroke="#000"]')
+  await expect(exons).toHaveCount(4)
+  await toggleSmallSites(page)
+  await expect(page.locator('#legends')).toContainText('1 node under')
+  await expect(exons).toHaveCount(3)
+  await expect(page.locator('#overlay-svg .gene')).toContainText('XGENE')
 })
