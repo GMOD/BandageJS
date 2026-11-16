@@ -61,6 +61,7 @@ import {
   drawPaths,
   drawnMode,
   facts,
+  layoutFit,
   pixelRows,
   settings,
   smallSites,
@@ -225,6 +226,7 @@ const labelGutterOf = memo((labels: { label: string }[]) => {
 export function fitted() {
   const b = bounds()
   const g = grid()
+  const room = layoutFit()
   return !b
     ? undefined
     : g
@@ -234,7 +236,7 @@ export function fitted() {
           padRight: FACET_PAD_PX,
           padBottom: FACET_PAD_PX,
         })
-      : fitTransform(b, state.width, state.height, pixelRows(), {
+      : fitTransform(b, room.width, room.height, pixelRows(), {
           padLeft: labelGutterOf(current().rowLabels),
         })
 }
@@ -825,11 +827,17 @@ function drawOverlays() {
         })
       : ''
   if (setHtml(ui.legends, legends)) {
+    const column = layoutFit().width
     state.legendSize = {
       width: ui.legends.offsetWidth,
       height: ui.legends.offsetHeight,
     }
-    scheduleDraw()
+    if (state.owner === 'fit' && layoutFit().width !== column) {
+      fit()
+      viewportMoved()
+    } else {
+      scheduleDraw()
+    }
   }
   ui.back.hidden = !backLabel
   ui.back.textContent = backLabel ?? ''

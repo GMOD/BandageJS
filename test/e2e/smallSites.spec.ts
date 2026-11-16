@@ -371,3 +371,38 @@ test('an exon is outlined only on nodes the drawing draws', async ({
   await expect(exons).toHaveCount(3)
   await expect(page.locator('#overlay-svg .gene')).toContainText('XGENE')
 })
+
+test('the fit leaves the key a column of its own down the right edge', async ({
+  page,
+}) => {
+  await openLoop(page)
+  const key = page.locator('#legends')
+  await expect(key.locator('.legend').last()).toHaveText(
+    /^8 nodes under \d+ bp not drawn$/,
+  )
+  await page.waitForTimeout(500)
+  const column = await key.evaluate(k => {
+    const pane = k.parentElement!.getBoundingClientRect()
+    return pane.right - k.getBoundingClientRect().left
+  })
+  const rightmost = await page
+    .locator('#graph')
+    .evaluate((c: HTMLCanvasElement) => {
+      const { data, width, height } = c
+        .getContext('2d')!
+        .getImageData(0, 0, c.width, c.height)
+      let right = 0
+      for (let y = 0; y < height; y++) {
+        for (let x = right; x < width; x++) {
+          const i = (y * width + x) * 4
+          if (data[i]! + data[i + 1]! + data[i + 2]! < 720) {
+            right = x
+          }
+        }
+      }
+      return { right: right / (c.width / c.clientWidth), width: c.clientWidth }
+    })
+  expect(column).toBeGreaterThan(100)
+  expect(rightmost.right).toBeLessThan(rightmost.width - column)
+  expect(rightmost.right).toBeGreaterThan(rightmost.width - column - 60)
+})

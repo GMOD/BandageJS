@@ -1,6 +1,7 @@
 import {
   axisScaleOf,
   cutsWholeWalks as wholeWalksRule,
+  fitBesideKey,
   layoutModeByValue,
   pathColorsLegible,
   walkStripApplies,
@@ -126,6 +127,17 @@ export const state = {
   built: undefined as { scale: number; bounds: Bounds } | undefined,
   layoutMs: undefined as number | undefined,
   geometryMs: undefined as number | undefined,
+}
+
+// The pane the fit maps the drawing into and a force layout is sized for: the
+// pane less the key's column down its right edge, so no node or gene pin
+// lies under the key
+export function layoutFit() {
+  return fitBesideKey({
+    paneWidth: state.width,
+    canvasHeight: state.height,
+    legendSize: state.legendSize,
+  })
 }
 
 export function effectiveMode() {

@@ -7,7 +7,7 @@ import {
 import { cancelLayout, isSuperseded, workerEngine } from './engine'
 import { done, fail, progress } from './feedback'
 import { takeAskedView } from './linkView'
-import { effectiveMode, settings, state } from './state'
+import { effectiveMode, layoutFit, settings, state } from './state'
 import { fit, rebuild } from './view'
 
 import type { Work } from './feedback'
@@ -29,6 +29,7 @@ function forceOf(graph: Graph) {
       showDeletionEdges: settings.showDeletionEdges,
     }),
     workerEngine,
+    layoutFit(),
   )
 }
 
