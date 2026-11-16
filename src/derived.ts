@@ -240,7 +240,7 @@ export const drawnExtras = memo(
           : [],
       genePins:
         showGenes && onNodes && graph && positions && genes
-          ? genePins(graph, genes, positions)
+          ? genePins(graph, genes, positions, layout.stranded)
           : [],
       bars,
       rowGenes:

@@ -430,3 +430,51 @@ test('Find zooms until the folded node it names is drawn, and so does a link nam
   await expect(key).not.toContainText('not drawn')
   await expect(rings(page)).toHaveCount(1)
 })
+
+// the reference steps n against its id, between r1 and r2
+const BACKWARDS = [
+  ...['r1', 'n', 'r2'].map(id => `S\t${id}\t${'A'.repeat(1000)}`),
+  'L\tr1\t+\tn\t-\t0M',
+  'L\tn\t-\tr2\t+\t0M',
+  'W\tref\t0\tchr\t0\t3000\t>r1<n>r2',
+].join('\n')
+
+test("an exon on a node the reference steps backwards is outlined at the reference's end of it", async ({
+  page,
+}) => {
+  await openGfa(page, BACKWARDS, '3 nodes')
+  await openMenu(page, 'File')
+  const chooser = page.waitForEvent('filechooser')
+  await page
+    .locator('#menu-popup')
+    .getByRole('menuitem', { name: /^Open genes/ })
+    .click()
+  await (
+    await chooser
+  ).setFiles({
+    name: 'ends.bed',
+    mimeType: 'text/plain',
+    buffer: Buffer.from(
+      [
+        'chr\t950\t1000\tR1END\t0\t+',
+        'chr\t1000\t1050\tNSTART\t0\t+',
+        'chr\t1950\t2000\tNEND\t0\t+',
+      ].join('\n'),
+    ),
+  })
+  const exons = page.locator('#overlay-svg #exon-outline path[stroke="#000"]')
+  await expect(exons).toHaveCount(3)
+  const [r1End, nStart, nEnd] = (
+    await exons.evaluateAll(paths =>
+      paths.map(p =>
+        p
+          .getAttribute('d')!
+          .match(/-?[\d.]+/g)!
+          .map(Number),
+      ),
+    )
+  ).map(([x, y]) => ({ x: x!, y: y! }))
+  const apart = (a: typeof r1End, b: typeof r1End) =>
+    Math.hypot(a!.x - b!.x, a!.y - b!.y)
+  expect(apart(nStart, r1End)).toBeLessThan(apart(nEnd, r1End))
+})
