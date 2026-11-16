@@ -49,7 +49,8 @@ View → **Small sites** draws every node and skip at any zoom. It is off by
 default: a site too small to see at the current zoom, a stretch off the
 reference or a skip only a few pixels long, is left out and the reference runs
 straight through it. The key's last line counts the nodes and skips left out and
-the bp they are under, and zooming in draws each site again.
+the bp they are under, and zooming in draws each site again. A site left out is
+neither hovered, selected nor labelled.
 
 ### Layout settings
 

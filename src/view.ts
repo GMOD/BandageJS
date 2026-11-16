@@ -412,6 +412,12 @@ export function rebuild() {
   draw()
 }
 
+// What the drawing on the canvas folded as too small to draw: the pane's,
+// or while side by side the first panel's, since every panel folds alike
+export function drawnFold() {
+  return paneBatch.collapsed ?? facets[0]?.batch.collapsed
+}
+
 function uploadPane(batch: Batch) {
   paneBatch = batch
   renderer.uploadGeometry(batch)
@@ -738,7 +744,7 @@ function drawOverlays() {
     nodeById: f.nodeById,
     alleleDeletions: layout?.alleleDeletions ?? [],
     positionsVersion: state.positionsVersion,
-    folded: undefined,
+    folded: drawnFold()?.nodes,
   })
   const pane = {
     width: state.width,
