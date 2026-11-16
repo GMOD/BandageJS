@@ -1,4 +1,5 @@
-import { FIT_PADDING } from '@jbrowse/bandage-core'
+import { FIT_PADDING, SMALL_SITE_PX } from '@jbrowse/bandage-core'
+import { NO_FOLD } from '@jbrowse/bandage-core/levelOfDetail'
 import { expect, test } from '@playwright/test'
 
 import {
@@ -6,7 +7,10 @@ import {
   NODE_SHARE,
   findNodes,
   frameScale,
+  unfoldScale,
 } from '../../src/search'
+
+import type { Site } from '@jbrowse/bandage-core'
 
 const nodes = ['s10', 'S1', 's100', 'as1', 'x', 's1b'].map(name => ({ name }))
 const names = (found: { name: string }[]) => found.map(n => n.name)
@@ -63,4 +67,35 @@ test('frameScale caps the zoom for a tiny node', () => {
 test('frameScale never zooms out past the fit', () => {
   expect(frameScale({ w: 1e6, h: 0 }, 1080, 480, true, 0.01)).toBe(0.01)
   expect(frameScale({ w: 0, h: 0 }, 1080, 480, true, 20)).toBe(20)
+})
+
+const site = (bp: number): Site => ({
+  nodes: [],
+  edges: [],
+  refName: 'chr',
+  start: 0,
+  end: 0,
+  bp,
+  x: 0,
+  y: 0,
+  count: 1,
+  total: 2,
+})
+
+test('unfoldScale zooms until each folded node asked for spans its site at SMALL_SITE_PX, and asks nothing for a drawn one', () => {
+  const fold = {
+    ...NO_FOLD,
+    siteOf: new Map([
+      ['x', site(2)],
+      ['y', site(1)],
+    ]),
+    pxPerBp: 0.5,
+  }
+  const x = unfoldScale(['x'], fold, 4)
+  expect(2 * fold.pxPerBp * (x / 4)).toBeGreaterThanOrEqual(SMALL_SITE_PX)
+  expect(2 * fold.pxPerBp * ((x / 4) * 0.9)).toBeLessThan(SMALL_SITE_PX)
+  expect(unfoldScale(['x', 'y'], fold, 4)).toBeCloseTo(2 * x)
+  expect(unfoldScale(['r1'], fold, 4)).toBe(0)
+  expect(unfoldScale(['x'], NO_FOLD, 4)).toBe(0)
+  expect(unfoldScale(['x'], undefined, 4)).toBe(0)
 })

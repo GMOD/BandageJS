@@ -406,3 +406,27 @@ test('the fit leaves the key a column of its own down the right edge', async ({
   expect(rightmost.right).toBeLessThan(rightmost.width - column)
   expect(rightmost.right).toBeGreaterThan(rightmost.width - column - 60)
 })
+
+// the loop between two 20 kb reference nodes, folded at any zoom the
+// framing of a 1 bp node reaches
+const LONG_LOOP = LOOP.replace(/\tA+\n/, '\t*\tLN:i:20000\n').replace(
+  /(S\tr2)\tC+\n/,
+  '$1\t*\tLN:i:20000\n',
+)
+
+test('Find zooms until the folded node it names is drawn, and so does a link naming one', async ({
+  page,
+}) => {
+  await openGfa(page, LONG_LOOP, '10 nodes')
+  const key = page.locator('#legends')
+  await expect(key).toContainText('8 nodes under')
+  await page.locator('#find').fill('a3')
+  await page.locator('#find').press('Enter')
+  await expect(page.locator('#details h2')).toHaveText('a3')
+  await expect(key).not.toContainText('not drawn')
+  await expect(rings(page)).toHaveCount(1)
+  await openGfa(page, LONG_LOOP, '10 nodes', '&node=a5')
+  await expect(page.locator('#details h2')).toHaveText('a5')
+  await expect(key).not.toContainText('not drawn')
+  await expect(rings(page)).toHaveCount(1)
+})

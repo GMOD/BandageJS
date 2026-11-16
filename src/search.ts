@@ -1,4 +1,6 @@
-import { FIT_PADDING, clampZoom } from '@jbrowse/bandage-core'
+import { FIT_PADDING, SMALL_SITE_PX, clampZoom } from '@jbrowse/bandage-core'
+
+import type { Fold } from '@jbrowse/bandage-core'
 
 // A found node takes up at most this much of the pane each way, leaving the
 // rest for its neighbours
@@ -64,4 +66,27 @@ export function frameScale(
       ? ((height - FIT_PADDING * 2) * NODE_SHARE) / unit.h
       : Infinity
   return clampZoom(Math.max(least, Math.min(byX, byY, MAX_FIND_ZOOM)))
+}
+
+// a site's px on the reference at the zoom unfoldScale gives, over
+// SMALL_SITE_PX, so rounding never leaves it a hair short
+const UNFOLD_MARGIN = 1.05
+
+// The least zoom at which the drawing draws each of `ids` that `fold`, built
+// at zoom `builtAt`, folds as too small: a site's px on the reference grow
+// with the zoom, and it is drawn from SMALL_SITE_PX
+export function unfoldScale(
+  ids: readonly string[],
+  fold: Fold | undefined,
+  builtAt: number,
+) {
+  return ids.reduce((least, id) => {
+    const site = fold?.siteOf.get(id)
+    return fold && site && fold.pxPerBp > 0
+      ? Math.max(
+          least,
+          (builtAt * SMALL_SITE_PX * UNFOLD_MARGIN) / (site.bp * fold.pxPerBp),
+        )
+      : least
+  }, 0)
 }

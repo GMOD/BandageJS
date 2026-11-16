@@ -1,11 +1,12 @@
-import { axisScaleOf, layoutExtent } from '@jbrowse/bandage-core'
+import { axisScaleOf, clampZoom, layoutExtent } from '@jbrowse/bandage-core'
 
 import { notify } from './feedback'
 import { esc } from './overlays'
-import { findNodes, frameScale } from './search'
+import { findNodes, frameScale, unfoldScale } from './search'
 import { facts, pixelRows, selectedNode, state, tube } from './state'
 import { ui } from './ui'
 import {
+  drawnFold,
   fitted,
   grid,
   onDraw,
@@ -89,8 +90,9 @@ function screenBoxes(ids: string[], t: PaneTransform): Bounds | undefined {
 }
 
 // Centres the nodes `ids` with room around them in the part of the pane the
-// details leave clear, as the zoom buttons would: the view is the user's from
-// then on. False where the layout draws none of them.
+// details leave clear, as the zoom buttons would, and zoomed in far enough
+// that the drawing draws any it folded as too small: the view is the user's
+// from then on. False where the layout draws none of them.
 export function frameNodes(ids: string[]) {
   const at = (scale: number) =>
     screenBoxes(ids, { scale, translateX: 0, translateY: 0 })
@@ -99,12 +101,17 @@ export function frameNodes(ids: string[]) {
     return false
   }
   const { width, height } = uncovered()
-  const scale = frameScale(
-    { w: unit.maxX - unit.minX, h: unit.maxY - unit.minY },
-    width,
-    height,
-    pixelRows(),
-    fitted()?.scale,
+  const scale = clampZoom(
+    Math.max(
+      frameScale(
+        { w: unit.maxX - unit.minX, h: unit.maxY - unit.minY },
+        width,
+        height,
+        pixelRows(),
+        fitted()?.scale,
+      ),
+      unfoldScale(ids, drawnFold(), state.built?.scale ?? state.scale),
+    ),
   )
   const box = at(scale)!
   state.owner = 'user'

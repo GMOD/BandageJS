@@ -60,8 +60,10 @@ export async function relayout() {
       state.owner = 'fit'
       state.positionsVersion++
       fit()
-      takeAskedView()
       rebuild()
+      if (takeAskedView()) {
+        rebuild()
+      }
     }
   } catch (e) {
     if (!isSuperseded(e) && request === liveLayout) {

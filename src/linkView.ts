@@ -40,12 +40,14 @@ function applyView(v: View) {
 }
 
 // Selects and shows what the link asked, once the graph it opened has a
-// layout; a view it states wins over framing the node
+// layout and a drawing, whose fold says how far a node it names needs
+// zooming to be drawn; a view it states wins over framing the node. Says
+// whether the link asked anything.
 export function takeAskedView() {
   const a = asked
   asked = undefined
   if (!a || !state.graph || !state.layout) {
-    return
+    return false
   }
   const node = a.node
     ? state.graph.nodes.find(n => n.name === a.node || n.id === a.node)
@@ -61,6 +63,7 @@ export function takeAskedView() {
   } else if (node) {
     selectNode(node.id)
   }
+  return a.view !== undefined || node !== undefined
 }
 
 let writtenNode = ''
