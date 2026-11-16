@@ -45,6 +45,12 @@ except walk rows and the tube maps.
 View → **Node lengths** writes each node's bp on it, where there is room, in the
 layouts that draw nodes. It is off by default.
 
+View → **Small sites** draws every node and skip at any zoom. It is off by
+default: a site too small to see at the current zoom, a stretch off the
+reference or a skip only a few pixels long, is left out and the reference runs
+straight through it. The key's last line counts the nodes and skips left out and
+the bp they are under, and zooming in draws each site again.
+
 ### Layout settings
 
 Layout → **Layout settings…** opens a dialog:
@@ -133,6 +139,7 @@ it differs from the default.
 | `view`                                                      | `x,y,scale` at the pane's centre; absent when fitted                                 |
 | `color`, `width`, `thickness`                               | Colour scheme, `depth` or `uniform` width, node width in px                          |
 | `bubbles`, `deletions`, `genes`, `lengths`, `paths`, `bars` | `1` or `0` for each drawn element                                                    |
+| `smallsites`                                                | `1` draws every node and skip at any zoom                                            |
 | `engine`, `quality`, `spacing`, `separation`, `spread`      | Force layout settings                                                                |
 | `gbz`, `index`                                              | Older links: a gbz-base `.gbz.db` cut and its haplotype index                        |
 

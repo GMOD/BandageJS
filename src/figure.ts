@@ -1,7 +1,14 @@
 import { figureSvg } from '@jbrowse/bandage-core'
 
 import { referenceName } from './reference'
-import { current, settings, state, stripGenes, stripRows } from './state'
+import {
+  current,
+  settings,
+  smallSites,
+  state,
+  stripGenes,
+  stripRows,
+} from './state'
 
 // the column count only a panel per walk takes
 function facetInput() {
@@ -36,6 +43,7 @@ export function exportSvg() {
     contigThickness: settings.nodeThickness,
     referenceName: referenceName(),
     showDeletionEdges: settings.showDeletionEdges,
+    smallSites: smallSites(),
     region: state.region,
     // a popped bubble is drawn to its own extent, as it is on screen
     fitToDrawing: state.stack.length > 0,

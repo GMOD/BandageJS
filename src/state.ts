@@ -36,6 +36,7 @@ import type {
   LayoutModeValue,
   LayoutResult,
   MinigraphBubble,
+  SmallSites,
   WalkLayer,
   WalkRows,
 } from '@jbrowse/bandage-core'
@@ -180,6 +181,9 @@ export const walks = () =>
     !!tube(),
     settings.facet,
   )
+
+export const smallSites = (): SmallSites =>
+  settings.showSmallSites ? 'nodes' : 'hidden'
 
 export const drawPaths = () =>
   (settings.drawPaths || !!tube()) &&

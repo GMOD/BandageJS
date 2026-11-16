@@ -57,6 +57,7 @@ import {
   facts,
   pixelRows,
   settings,
+  smallSites,
   state,
   stripRows,
   tube,
@@ -396,6 +397,7 @@ export function rebuild() {
       viewportBounds,
       referenceRamp: d.ramp,
       version: state.positionsVersion,
+      smallSites: smallSites(),
     })
   const g = grid()
   uploadPane(g ? EMPTY_BATCH : build(walks().lift, drawPaths()))

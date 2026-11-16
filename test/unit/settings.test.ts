@@ -19,6 +19,7 @@ test('validSettings keeps stored values that are choices this build offers', () 
     bubbleSpread: 'open',
     showBubbles: false,
     showDeletionEdges: true,
+    showSmallSites: true,
     drawPaths: true,
     showGenes: false,
     nodeLengthLabels: true,
@@ -159,6 +160,7 @@ test('every setting a link states comes back as it went', () => {
     bubbleSpread: 'open' as const,
     showBubbles: false,
     showDeletionEdges: false,
+    showSmallSites: true,
     drawPaths: true,
     showGenes: false,
     walkStrip: true,
@@ -182,4 +184,18 @@ test('node lengths are written only where a save or a link turns them on', () =>
   const s = { ...DEFAULTS }
   readSettingsParams(new URLSearchParams('lengths=1'), s)
   expect(s.nodeLengthLabels).toBe(true)
+})
+
+test('small sites are drawn only where a save or a link turns them on', () => {
+  expect(DEFAULTS.showSmallSites).toBe(false)
+  expect(settingsParams({ ...DEFAULTS, showSmallSites: true })).toEqual([
+    ['layout', 'force'],
+    ['smallsites', '1'],
+  ])
+  expect(changedSettings({ ...DEFAULTS, showSmallSites: true })).toEqual({
+    showSmallSites: true,
+  })
+  const s = { ...DEFAULTS }
+  readSettingsParams(new URLSearchParams('smallsites=1'), s)
+  expect(s.showSmallSites).toBe(true)
 })

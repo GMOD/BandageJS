@@ -46,6 +46,7 @@ function toggle(
   key:
     | 'showBubbles'
     | 'showDeletionEdges'
+    | 'showSmallSites'
     | 'drawPaths'
     | 'showGenes'
     | 'nodeLengthLabels'
@@ -167,6 +168,11 @@ export function viewItems(): MenuItem[] {
     toggle('Deletion edges', 'showDeletionEdges', undefined, () => {
       applySettings(state.layoutMode === 'force' ? 'layout' : 'geometry')
     }),
+    toggle(
+      'Small sites',
+      'showSmallSites',
+      mode.drawsNodes ? undefined : `Not drawn in the ${mode.label} layout`,
+    ),
     ...(backboneOf(state.graph)
       ? [
           toggle(

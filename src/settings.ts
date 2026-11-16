@@ -28,6 +28,9 @@ export interface Settings {
   bubbleSpread: BubbleSpread
   showBubbles: boolean
   showDeletionEdges: boolean
+  // every node and skip at any zoom, where off a site too small to see at
+  // the zoom is left out, counted in the key and drawn again on zooming in
+  showSmallSites: boolean
   drawPaths: boolean
   showGenes: boolean
   // each node's length written on it
@@ -55,6 +58,7 @@ export const DEFAULTS: Settings = {
   bubbleSpread: 'auto',
   showBubbles: false,
   showDeletionEdges: true,
+  showSmallSites: false,
   drawPaths: false,
   showGenes: true,
   nodeLengthLabels: LABEL_DEFAULTS.nodeLengths,
@@ -167,6 +171,7 @@ const FIELDS: readonly Field[] = [
   choice('bubbleSpread', 'spread', BUBBLE_SPREADS),
   flag('showBubbles', 'bubbles'),
   flag('showDeletionEdges', 'deletions'),
+  flag('showSmallSites', 'smallsites'),
   flag('drawPaths', 'paths'),
   flag('showGenes', 'genes'),
   flag('nodeLengthLabels', 'lengths'),
