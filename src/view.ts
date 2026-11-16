@@ -764,6 +764,7 @@ function drawOverlays() {
     drawnRowLabels: d.rowLabels,
     bubbleHalos: halos,
     genePins: d.genePins,
+    liftedWalks: lift?.walks.map(w => w.name),
     poppedFrom: backLabel ? { label: backLabel } : undefined,
     nodePositions: layout?.nodePositions,
     labelsNodeSizes: !layout?.tubeMap && !lift,
