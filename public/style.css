@@ -706,6 +706,22 @@ canvas.dragging {
   position: static;
 }
 
+.facet-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+  height: 18px;
+  overflow: hidden;
+}
+
+.facet-key .legend {
+  display: flex;
+  gap: 12px;
+  padding: 0;
+  background: none;
+}
+
 .facet-title {
   display: block;
   box-sizing: border-box;

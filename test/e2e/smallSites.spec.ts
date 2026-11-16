@@ -565,3 +565,41 @@ test("a walk lifted by pass gets bandage-core's pass bar under the drawing, its 
   await expect(page.locator('#pass-bars')).toBeHidden()
   await expect(bars).toHaveCount(0)
 })
+
+test('side by side, the key line under the panels ends with what the panels leave undrawn', async ({
+  page,
+}) => {
+  const both = `&walk=${encodeURIComponent('ref#0#chr')}&walk=${encodeURIComponent('alt#1#chr')}`
+  await openLoop(page, `&facet=walk${both}`)
+  await expect(page.locator('#facets .facet')).toHaveCount(2)
+  const key = page.locator('#facets .facet-key')
+  await expect(key.locator('.legend').last()).toHaveText(
+    /^8 nodes under \d+ bp not drawn$/,
+  )
+  await toggleSmallSites(page)
+  await expect(key).not.toContainText('not drawn')
+  // six panels of the loop down a wide pane fill its height, and leave the
+  // line its room
+  await page.setViewportSize({ width: 3000, height: 720 })
+  const samples = Array.from({ length: 4 }, (_, i) => `s${i}`)
+  const many = [
+    LOOP,
+    ...samples.map(
+      sample =>
+        `W\t${sample}\t1\tchr\t0\t4008\t>r1${CHAIN.map(a => `>${a}`).join('')}>r2`,
+    ),
+  ].join('\n')
+  await openGfa(
+    page,
+    many,
+    '10 nodes',
+    `&facet=walk&columns=1${both}${samples.map(sample => `&walk=${encodeURIComponent(`${sample}#1#chr`)}`).join('')}`,
+  )
+  await expect(page.locator('#facets .facet')).toHaveCount(6)
+  const pane = (await page.locator('#pane').boundingBox())!
+  const panel = (await page.locator('#facets .facet').last().boundingBox())!
+  const line = (await key.boundingBox())!
+  expect(panel.y + panel.height).toBeGreaterThan(pane.y + pane.height - 40)
+  expect(line.y).toBeGreaterThanOrEqual(panel.y + panel.height)
+  expect(line.y + line.height).toBeLessThanOrEqual(pane.y + pane.height)
+})

@@ -46,6 +46,7 @@ import { svgDom } from './elDom'
 import { rowLink } from './jbrowse'
 import {
   esc,
+  graphKeyHtml,
   legendsHtml,
   overlayHtml,
   overlaySvg,
@@ -82,6 +83,7 @@ import type { Pane } from './overlays'
 import type { Facet } from './settings'
 import type {
   FacetGrid,
+  Graph,
   LayoutResult,
   LiftedWalk,
   MinigraphBubble,
@@ -171,6 +173,9 @@ function placement() {
   return placementOf(walks().panels, settings.facet)
 }
 
+// The faceted pane's one key line under its panels, a gap and a line of text
+const FACET_KEY_PX = FACET_GAP_PX + 18
+
 const gridOf = memo(
   (
     place: ReturnType<typeof placement>,
@@ -186,7 +191,7 @@ const gridOf = memo(
           bounds: b,
           pixelRows: rows,
           width,
-          room: height,
+          room: height - FACET_KEY_PX,
           columns: place.columns ?? (columns || undefined),
         })
       : undefined,
@@ -328,6 +333,9 @@ function syncFacets() {
       )}</button><div class="facet-canvas"><canvas class="facet-drawing"></canvas><canvas class="facet-hover"></canvas></div></div>`
     })
     .join('')
+    .concat(
+      `<div class="facet-key" style="grid-row:${Math.floor(cells.reduce((a, b) => Math.max(a, b), 0) / g.columns) + 2};grid-column:1 / -1"></div>`,
+    )
   facets = [...ui.facets.querySelectorAll('.facet-canvas')].map((cell, i) => {
     const canvas = cell.querySelector<HTMLCanvasElement>('.facet-drawing')!
     surfaceHooks.forEach(fn => {
@@ -355,6 +363,33 @@ function hoveredOn(walk: LiftedWalk) {
     : undefined
 }
 
+const FACET_KEY_SECTIONS = new Set(['walks', 'skips', 'too-small'])
+
+// The faceted pane's key line: what every panel greys, the skips, and what
+// the panels leave undrawn, each panel's title keying its own walk. Read off
+// the panels' batches, so only a rebuild changes it.
+const facetKeyOf = memo(
+  (graph: Graph, layout: LayoutResult, panels: WalkLift[], _uploads: number) =>
+    graphKeyHtml(
+      graphKey(graph, layout, {
+        region: state.region,
+        referenceName: referenceName() ?? referenceAssembly(),
+        panels,
+        walkLabel: name => facts().walkLabels.get(name) ?? name,
+        marks: drawnMarks(facets.map(f => f.batch)),
+      }).filter(section => FACET_KEY_SECTIONS.has(section.id)),
+      () => undefined,
+    ),
+)
+
+function drawFacetKey(panels: WalkLift[]) {
+  const { graph, layout } = state
+  const key = ui.facets.querySelector('.facet-key')
+  if (key && graph && layout) {
+    setHtml(key, facetKeyOf(graph, layout, panels, uploads))
+  }
+}
+
 // The panels' titles are built once per set of panels, so the hover's line
 // under each is written in place
 function drawFacetTitles() {
@@ -362,6 +397,7 @@ function drawFacetTitles() {
   if (!panels || facets.length === 0) {
     return
   }
+  drawFacetKey(panels)
   const reference = walkReference(panels[0])
   ui.facets.querySelectorAll('.facet-title .walk-at').forEach((line, i) => {
     const walk = panels[i]!.walks[0]!
