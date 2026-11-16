@@ -214,3 +214,100 @@ test('a placeholder the drawing folds carries no length label', async ({
   )
   await expect(labels.filter({ hasText: /^5 bp$/ })).toHaveCount(0)
 })
+
+// ref steps m and alt x between 1 kb reference nodes, both 1 bp: a bubble
+// whose allele x folds at the fit, with the reference node m inside the site
+const SNP = [
+  ...['r0', 'r1', 'r2', 'r3'].map(r => `S\t${r}\t${'A'.repeat(1000)}`),
+  'S\tm\tA',
+  'S\tx\tC',
+  ...['r0 r1', 'r1 m', 'm r2', 'r1 x', 'x r2', 'r2 r3'].map(pair => {
+    const [from, to] = pair.split(' ')
+    return `L\t${from}\t+\t${to}\t+\t0M`
+  }),
+  'W\tref\t0\tchr\t0\t4001\t>r0>r1>m>r2>r3',
+  'W\talt\t1\tchr\t0\t4001\t>r0>r1>x>r2>r3',
+].join('\n')
+
+test('no bubble halo or tick lands on a site the drawing folds', async ({
+  page,
+}) => {
+  await openGfa(page, SNP, '6 nodes', '&bubbles=1&smallsites=1')
+  const marks = page.locator(
+    '#overlay-svg [data-halo], #overlay-svg path[stroke-opacity]',
+  )
+  await expect(page.locator('#overlay-svg rect.tick')).toHaveCount(1)
+  await toggleSmallSites(page)
+  await expect(page.locator('#legends')).toContainText(
+    /1 node under \d+ bp not drawn/,
+  )
+  await expect(page.locator('#overlay-svg rect.tick')).toHaveCount(0)
+  await expect(marks).toHaveCount(0)
+})
+
+// The view at the fit, as the address states it once the view is the user's
+async function fitView(page: Page) {
+  await page.keyboard.press('+')
+  await page.keyboard.press('-')
+  await expect(page).toHaveURL(/[?&]view=/)
+  return new URL(page.url()).searchParams.get('view')!
+}
+
+const rings = (page: Page) =>
+  page.locator('#overlay-svg g[mask] path[stroke="#2f6fd6"]')
+
+test('a folded node selected, or named in the details, is not ringed', async ({
+  page,
+}) => {
+  await openLoop(page)
+  const view = await fitView(page)
+  for (const [query, drawn] of [
+    ['&smallsites=1', 1],
+    ['', 0],
+  ] as const) {
+    await page.mouse.move(0, 0)
+    await openLoop(page, `${query}&node=a3&view=${view}`)
+    await expect(page.locator('#details h2')).toHaveText('a3')
+    await expect(rings(page)).toHaveCount(drawn)
+    await openLoop(page, `${query}&node=r1&view=${view}`)
+    await expect(rings(page)).toHaveCount(1)
+    await page.locator('#details [data-node^="a0"]').hover()
+    await expect(rings(page)).toHaveCount(1 + drawn)
+  }
+})
+
+test('a strip point on a folded node lights no ring in the drawing', async ({
+  page,
+}) => {
+  for (const [query, drawn] of [
+    ['&smallsites=1', 2],
+    ['', 0],
+  ] as const) {
+    await openLoop(page, `${query}&bars=1`)
+    await expect(page.locator('#walk-strip')).toBeVisible()
+    const at = await page.locator('#strip-svg').evaluate(svg => {
+      const runs = [
+        ...svg.querySelectorAll(
+          '#strip-bars [data-testid="graph-walk-row"] > rect',
+        ),
+      ].toSorted(
+        (a, b) => Number(a.getAttribute('x')) - Number(b.getAttribute('x')),
+      )
+      const chain = runs[1]!
+      const box = svg.getBoundingClientRect()
+      return {
+        x:
+          box.x +
+          Number(chain.getAttribute('x')) +
+          Number(chain.getAttribute('width')) / 2,
+        y:
+          box.y +
+          Number(chain.getAttribute('y')) +
+          Number(chain.getAttribute('height')) / 2,
+      }
+    })
+    await page.mouse.move(at.x, at.y)
+    await expect(page.locator('#info')).toContainText(/^a\d — 1 bp/)
+    await expect(page.locator('#strip-locator circle')).toHaveCount(drawn)
+  }
+})

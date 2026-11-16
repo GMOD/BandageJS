@@ -27,8 +27,10 @@ import { abridgedWalks } from '@jbrowse/graph-walks'
 import type { Region } from './jbrowse'
 import type { Facet } from './settings'
 import type {
+  BubbleHalo,
   ColorScheme,
   DeletionDrawing,
+  Fold,
   GeneGaps,
   GeneModel,
   Graph,
@@ -36,6 +38,7 @@ import type {
   GraphTables,
   LayoutResult,
   MinigraphBubble,
+  NodeSegment,
   NodeWidth,
   RowGene,
   StripFrame,
@@ -169,6 +172,27 @@ export const stripKey = (
     genes,
     markUnloaded: true,
   })
+
+// The halos along the nodes the drawing draws, and none for a bubble whose
+// every drawn node lies inside a site the drawing folds
+export const drawnHalos = memo(
+  (
+    halos: BubbleHalo[],
+    graph: Graph | undefined,
+    positions: Record<string, NodeSegment[]> | undefined,
+    _positions: number,
+    fold: Fold | undefined,
+  ) =>
+    !graph || !positions || !fold || fold.nodes.size === 0
+      ? halos
+      : bubbleHalos(
+          graph,
+          halos.map(h => h.bubble),
+          Object.fromEntries(
+            Object.entries(positions).filter(([id]) => !fold.nodes.has(id)),
+          ),
+        ).filter(h => !h.nodeIds.every(id => fold.within.has(id))),
+)
 
 // A graph that isn't open yet draws no deletions, so the drawing reads the
 // same way as one with none.

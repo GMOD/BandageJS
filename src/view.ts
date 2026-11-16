@@ -29,7 +29,13 @@ import {
 } from '@jbrowse/bandage-core'
 import { abridgedText } from '@jbrowse/graph-walks'
 
-import { inkOf, labelledLengths, memo, rampInterval } from './derived'
+import {
+  drawnHalos,
+  inkOf,
+  labelledLengths,
+  memo,
+  rampInterval,
+} from './derived'
 import { edgeHtml, layoutName, nodeHtml, nodeText, rowHtml } from './describe'
 import { svgDom } from './elDom'
 import { rowLink } from './jbrowse'
@@ -598,20 +604,21 @@ function draw() {
 }
 
 // The selected node, and a node its details name under the pointer, which the
-// overlay rings
+// overlay rings, unless the drawing folded it
 function ringsOf(
   layout: LayoutResult | undefined,
   halfWidthPx: (id: string) => number,
 ) {
   const fromDetails =
     !state.pointer && !state.stripHover ? state.hoveredNode : null
+  const folded = drawnFold()?.nodes
   return [
     ...(state.selectedNode ? [{ id: state.selectedNode, strong: true }] : []),
     ...(fromDetails && fromDetails !== state.selectedNode
       ? [{ id: fromDetails, strong: false }]
       : []),
   ].flatMap(({ id, strong }) => {
-    const segments = layout?.nodePositions[id]
+    const segments = folded?.has(id) ? undefined : layout?.nodePositions[id]
     return segments?.length
       ? [
           {
@@ -724,6 +731,13 @@ function drawOverlays() {
   const back = state.stack.at(-1)
   const backLabel = back && `◀ Back to ${back.graph.name}`
   const ink = inkOf(state.graph, settings.nodeWidth, settings.nodeThickness)
+  const halos = drawnHalos(
+    d.halos,
+    graph,
+    layout?.nodePositions,
+    state.positionsVersion,
+    drawnFold(),
+  )
   const ramp = rampInterval(d.ramp)
   const walkRamp = d.bars ? ramp : undefined
   const labels = layoutLabels({
@@ -735,7 +749,7 @@ function drawOverlays() {
     contigThickness: settings.nodeThickness,
     legendSize: state.legendSize,
     drawnRowLabels: d.rowLabels,
-    bubbleHalos: d.halos,
+    bubbleHalos: halos,
     genePins: d.genePins,
     poppedFrom: backLabel ? { label: backLabel } : undefined,
     nodePositions: layout?.nodePositions,
@@ -754,7 +768,7 @@ function drawOverlays() {
     translateX: state.translateX,
     translateY: state.translateY,
     contigThickness: settings.nodeThickness,
-    halos: d.halos,
+    halos,
     genePins: d.genePins,
     halfWidthPx: ink.halfWidthPx,
     rings: d.bars ? [] : ringsOf(layout, ink.halfWidthPx),
@@ -771,7 +785,7 @@ function drawOverlays() {
   setHtml(ui.marks, layout ? overlaySvg(pane) : '')
   drawWalkRows(layout && pane.walkBars ? pane : undefined)
   setHtml(ui.html, layout ? overlayHtml(pane) : '')
-  overlayBubbles = d.halos.map(h => h.bubble)
+  overlayBubbles = halos.map(h => h.bubble)
 
   const legends =
     layout && graph
@@ -789,7 +803,7 @@ function drawOverlays() {
             marks: drawnMarks([paneBatch]),
             genePins: d.genePins,
             genesFrom: state.genesFrom,
-            halos: d.halos,
+            halos,
           }),
           at: hoveredOn,
           paths: drawPaths() && graph.paths ? pathLegend(graph.paths) : [],

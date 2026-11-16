@@ -15,7 +15,7 @@ import { svgDom } from './elDom'
 import { walkRowsKeyHtml } from './overlays'
 import { axis, current, facts, state, stripGenes, stripRows } from './state'
 import { ui } from './ui'
-import { onDraw, scheduleDraw } from './view'
+import { drawnFold, onDraw, scheduleDraw } from './view'
 import { toggleWalk } from './walks'
 
 import type {
@@ -90,10 +90,14 @@ function frameFor(bars: WalkRows) {
   )
 }
 
-// Where the drawing has the node a strip point lights, in pane pixels
+// Where the drawing has the node a strip point lights, in pane pixels, unless
+// the drawing folded it
 function locatorAt() {
   const id = state.stripHover ? state.hoveredNode : null
-  const segments = id === null ? undefined : state.layout?.nodePositions[id]
+  const segments =
+    id === null || drawnFold()?.nodes.has(id)
+      ? undefined
+      : state.layout?.nodePositions[id]
   const p = segments?.[Math.floor(segments.length / 2)]
   if (!p || ui.pane.classList.contains('faceted')) {
     return undefined
