@@ -229,7 +229,10 @@ const labelGutterOf = memo((labels: { label: string }[]) => {
   }
   const ctx = document.createElement('canvas').getContext('2d')!
   ctx.font = `11px ${getComputedStyle(ui.html).fontFamily}`
-  const widest = labels.reduce((w, l) => Math.max(w, ctx.measureText(l.label).width), 0)
+  const widest = labels.reduce(
+    (w, l) => Math.max(w, ctx.measureText(l.label).width),
+    0,
+  )
   return Math.max(FIT_PADDING, Math.ceil(widest) + ROW_LABEL_CHROME_PX)
 })
 
