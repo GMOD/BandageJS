@@ -359,6 +359,26 @@ test('the row for nodes not shown counts the placeholders the labels leave witho
   expect(cell).toBe(sizer)
 })
 
+// alt leaves the reference for x, 300 bp the cut loaded, and comes back: the
+// force layout draws x long enough to hold its length
+const LOADED_LOOP = [
+  `S\tr1\t${'A'.repeat(2000)}`,
+  `S\tr2\t${'C'.repeat(2000)}`,
+  `S\tx\t${'G'.repeat(300)}`,
+  'L\tr1\t+\tr2\t+\t0M',
+  'L\tr1\t+\tx\t+\t0M',
+  'L\tx\t+\tr2\t+\t0M',
+  'W\tref\t0\tchr\t0\t4000\t>r1>r2',
+  'W\talt\t1\tchr\t0\t4300\t>r1>x>r2',
+].join('\n')
+
+test('a loop of loaded nodes writes its length along itself with node lengths off', async ({
+  page,
+}) => {
+  await openGfa(page, LOADED_LOOP, '3 nodes')
+  await expect(page.locator('#overlay-html .size-label')).toHaveText(['300 bp'])
+})
+
 // The view at the fit, as the address states it once the view is the user's
 async function fitView(page: Page) {
   await page.keyboard.press('+')

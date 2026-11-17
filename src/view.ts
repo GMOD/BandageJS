@@ -287,7 +287,7 @@ const sameBounds = (a: Bounds, b: Bounds) =>
 // The view the key keys, set REBUILD_DEBOUNCE_MS after the pane's view last
 // moved, on the layout it was set on, so the key, and the labels and fit that
 // wait on its size, hold still through a pan or zoom. Until one is set on the
-// layout drawn, the pane's view beside the key as it is.
+// layout drawn, the pane's view as it is, under the key included.
 let liveKeyView: Bounds | undefined
 let settledKeyView:
   | { view: Bounds; layout: LayoutResult | undefined }
@@ -298,7 +298,6 @@ function keyView() {
   const live = keyedView(state, axis(), {
     paneWidth: state.width,
     canvasHeight: state.height,
-    legendSize: state.legendSize,
   })
   if (!liveKeyView || !sameBounds(liveKeyView, live)) {
     liveKeyView = live
@@ -865,6 +864,7 @@ function drawOverlays() {
   const walkRamp = d.bars ? ramp : undefined
   const labelsNodeSizes = !layout?.tubeMap && !lift
   const labels = layoutLabels({
+    graph,
     paneWidth: state.width,
     canvasHeight: state.height,
     axisScale: axis(),

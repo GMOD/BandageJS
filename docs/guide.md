@@ -43,25 +43,30 @@ Haplotypes → **Bars under the graph** draws the walk rows beneath any layout
 except walk rows and the tube maps.
 
 View → **Node lengths** writes each node's bp on it, where there is room, in the
-layouts that draw nodes. It is off by default. A "nodes not shown" placeholder
-states its length either way, where its whole label fits on the pane;
-placeholders drawn too small to hold their length on one spot share one length,
-the longest. The key's "nodes not shown" row counts the placeholders left
-without a length, and hovering it gives their lengths.
+layouts that draw nodes. It is off by default. Two lengths are written either
+way. A "nodes not shown" placeholder states its length on its loop, or stacked
+off the loop's middle with a leader, longest first, where its whole label fits
+on the pane; placeholders whose middles lie closer together than a label is tall
+share one length, the longest. A loop of loaded nodes, what a walk steps on
+between two steps on the reference, writes its length along itself where it is
+drawn long enough to hold it; a loop sharing half its bp with a longer one is
+drawn over it, and the longer writes the span of both, such as `20.5–20.9 kb`.
+The key's "nodes not shown" row counts the placeholders left without a length,
+and hovering it gives their lengths.
 
 View → **Small sites** draws every node and skip at any zoom. It is off by
 default: a stretch off the reference or a skip drawn only a few pixels long at
 the current zoom, its own nodes and links with the reference between where it
 attaches, is left out and the reference runs straight through it. A stretch the
 cut did not load is measured by its bp at the reference's scale where that is
-shorter. The key's last line counts the nodes and skips left out and the bp they
-are under, and zooming in draws each site again. A site left out is neither
-hovered, selected nor labelled; finding a node there, or a link naming it, zooms
-in until it is drawn.
+shorter. The key's last line counts the nodes and skips left out where the pane
+shows and the bp they are under, and zooming in draws each site again. A site
+left out is neither hovered, selected nor labelled; finding a node there, or a
+link naming it, zooms in until it is drawn.
 
-The key lists only what the pane shows beside it: a mark, an exon or a node
-thickness off the pane is not keyed. It is read again once a pan or zoom comes
-to rest.
+The key lists what the pane shows, the drawing under the key included, and
+nothing else: a mark, an exon or a node thickness off the pane is not keyed. It
+is read again once a pan or zoom comes to rest.
 
 ### Layout settings
 

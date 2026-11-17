@@ -2,6 +2,7 @@ import {
   axisScaleOf,
   buildGeometry,
   deletionDrawing,
+  departureTable,
   deletionEdges,
   drawingBounds,
   drawnMarks,
@@ -13,11 +14,17 @@ import {
   walkLift,
 } from '@jbrowse/bandage-core'
 import { SHORT_SKIP_KEY } from '@jbrowse/bandage-core/deletionEdges'
+import { RUNS_ON_KEY } from '@jbrowse/bandage-core/graphKey'
 import { expect, test } from '@playwright/test'
 
 import { legendsHtml } from '../../src/overlays'
 
-import type { SmallSites, WalkLayer } from '@jbrowse/bandage-core'
+import type {
+  Graph,
+  LayoutResult,
+  SmallSites,
+  WalkLayer,
+} from '@jbrowse/bandage-core'
 
 // the reference walks 0, 1, 2; `a` skips 1 and takes the dashed link
 const SKIP = [
@@ -192,4 +199,98 @@ test("a walk lifted by pass keys its threads' heads with core's heads swatch", (
   expect(row).toBeDefined()
   expect(row).toContain('stroke="#ffffff"')
   expect(row!.match(/<path /g)).toHaveLength(2)
+})
+
+// t hangs off r1's end, stepped only by y, which leaves the reference 93 kb
+// before the cut starts: no drawn link meets t's far end
+const TAILED: Graph = {
+  name: 'tail',
+  nodes: [
+    {
+      id: 'r1+',
+      name: 'r1',
+      length: 1000,
+      depth: 2,
+      stable: { refName: 'chr', start: 0, rank: 0 },
+    },
+    {
+      id: 'r2+',
+      name: 'r2',
+      length: 1000,
+      depth: 2,
+      stable: { refName: 'chr', start: 1000, rank: 0 },
+    },
+    { id: 't+', name: 't', length: 40, depth: 1 },
+  ],
+  edges: [
+    { from: 'r1+', to: 'r2+' },
+    { from: 'r1+', to: 't+' },
+  ],
+  paths: [{ name: 'ref', nodeIds: ['r1+', 'r2+'] }],
+  departures: {
+    ...departureTable([
+      {
+        name: 'y#1#chr',
+        hapStart: 1000,
+        ownBp: 40,
+        missingBp: 0,
+        leavePos: -93_000,
+        leaveReversed: false,
+        leavePasses: 1,
+        rejoinPos: 1000,
+        rejoinReversed: false,
+        rejoinPasses: 1,
+        fromSteps: true,
+      },
+    ]),
+    offsets: Int32Array.of(0, 1),
+    steps: Int32Array.of(2),
+  },
+}
+
+test("a tail whose free end no drawn link meets is keyed with core's tab swatch and words", () => {
+  const layout: LayoutResult = {
+    nodePositions: {
+      'r1+': [
+        { x: 0, y: 0 },
+        { x: 1000, y: 0 },
+      ],
+      'r2+': [
+        { x: 1000, y: 0 },
+        { x: 2000, y: 0 },
+      ],
+      't+': [
+        { x: 1000, y: 200 },
+        { x: 1040, y: 200 },
+      ],
+    },
+  }
+  const batch = buildGeometry({
+    axis: { scaleX: 0.5, scaleY: 0.5 },
+    nodePositions: layout.nodePositions,
+    graph: TAILED,
+    nodeById: new Map(TAILED.nodes.map(n => [n.id, n])),
+    colorScheme: 'uniform',
+    contigThickness: 6,
+    connectorThickness: 2,
+    drawPaths: false,
+  })
+  const html = legendsHtml({
+    key: graphKey(TAILED, layout, {
+      marks: drawnMarks([batch]),
+      drawsNodes: true,
+    }),
+    at: () => undefined,
+    paths: [],
+    walkBars: undefined,
+    rowGenes: undefined,
+    walkRamp: undefined,
+  })
+  const row = html
+    .split('<div class="legend-row">')
+    .find(r => r.includes(`<span>${RUNS_ON_KEY}</span>`))
+  expect(row).toBeDefined()
+  expect(row).toContain(
+    '<path d="M0,6 L8,1 L8,11 Z M18,6 L10,1 L10,11 Z" fill="#18181c"/>',
+  )
 })
