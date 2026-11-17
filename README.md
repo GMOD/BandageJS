@@ -101,8 +101,16 @@ More in [the gallery](docs/gallery.md).
 - [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) (npm): reads them
 - [@jbrowse/bandage-core](https://github.com/GMOD/bandage-core) (npm): layout
   and drawing
+- [@jbrowse/graph-fmmm-layout](https://github.com/GMOD/graph-fmmm-layout) (npm):
+  Bandage's force-directed layout, as wasm
 - [@jbrowse/graph-stress-layout](https://github.com/GMOD/graph-stress-layout)
   (npm): stress layout
+
+Technical note: BandageJS runs the same JavaScript as ggbandage and the JBrowse
+graph genome viewer plugin. graph-fmmm-layout holds Bandage's own force-directed
+layout (FMMM), compiled from C++ to wasm. bandage-core bundles it for the
+browser, next to the reference-anchored layouts from bandage-core and
+graph-stress-layout.
 
 ## License
 
