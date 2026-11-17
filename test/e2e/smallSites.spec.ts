@@ -286,18 +286,23 @@ const LEFT_PLACEHOLDER = [
   'W\talt\t1\tchr\t0\t4400\t>r1>p>r2',
 ].join('\n')
 
-test('the key lists the marks the pane shows, read once a zoom has settled', async ({
-  page,
-}) => {
-  const url = 'https://gbz.test/left-placeholder.gfa'
+// `gfa` under the anchored layout, which lays the reference at its bp
+async function openAnchored(page: Page, gfa: string, nodes: string) {
+  const url = `https://gbz.test/anchored-${nodes.replace(' ', '-')}.gfa`
   await page.route(url, route =>
     route.fulfill({
-      body: LEFT_PLACEHOLDER,
+      body: gfa,
       headers: { 'access-control-allow-origin': '*' },
     }),
   )
   await openPage(page, `gfa=${encodeURIComponent(url)}&layout=auto`)
-  await waitForDrawing(page, /3 nodes.*Anchored/)
+  await waitForDrawing(page, new RegExp(`${nodes}.*Anchored`))
+}
+
+test('the key lists the marks the pane shows, read once a zoom has settled', async ({
+  page,
+}) => {
+  await openAnchored(page, LEFT_PLACEHOLDER, '3 nodes')
   const key = page.locator('#legends')
   await expect(key).toContainText('nodes not shown')
   // the view settles at the fit
@@ -316,6 +321,42 @@ test('the key lists the marks the pane shows, read once a zoom has settled', asy
   await expect(key).not.toContainText('nodes not shown')
   await page.keyboard.press('0')
   await expect(key).toContainText('nodes not shown')
+})
+
+// Three haplotypes leave the reference at one point for 300, 500 and 700 bp
+// the cut did not load. The anchored layout lays the three on one spot,
+// which takes one length, the longest's, and the key counts the other two
+const ONE_SPOT = [
+  `S\tr1\t${'A'.repeat(2000)}`,
+  `S\tr2\t${'C'.repeat(2000)}`,
+  'L\tr1\t+\tr2\t+\t0M',
+  'W\tref\t0\tchr\t0\t4000\t>r1>r2',
+  ...[300, 500, 700].flatMap((bp, i) => [
+    `S\tp${i}\t*\tLN:i:${bp}\tnl:i:1`,
+    `L\tr1\t+\tp${i}\t+\t0M`,
+    `L\tp${i}\t+\tr2\t+\t0M`,
+    `W\th${i}\t1\tchr\t0\t${4000 + bp}\t>r1>p${i}>r2`,
+  ]),
+].join('\n')
+
+test('the row for nodes not shown counts the placeholders the labels leave without a length, in room for all of them, their lengths its title', async ({
+  page,
+}) => {
+  await openAnchored(page, ONE_SPOT, '5 nodes')
+  await expect(page.locator('#overlay-html .size-label')).toHaveText(['700 bp'])
+  const row = page.locator('#legends .legend-row', {
+    hasText: 'nodes not shown',
+  })
+  await expect(row.locator('.count')).toHaveText('· 2 unlabelled')
+  await expect(row).toHaveAttribute(
+    'title',
+    '2 unlabelled, 500 bp or less each',
+  )
+  await expect(row.locator('.count-sizer')).toHaveText('· 3 unlabelled')
+  const [cell, sizer] = await row
+    .locator('.count-cell, .count-sizer')
+    .evaluateAll(els => els.map(e => e.getBoundingClientRect().width))
+  expect(cell).toBe(sizer)
 })
 
 // The view at the fit, as the address states it once the view is the user's

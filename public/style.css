@@ -834,6 +834,22 @@ main.faceted #back {
   font-style: italic;
 }
 
+.legend-row.unlabelled {
+  pointer-events: auto;
+}
+
+.count-cell {
+  display: grid;
+}
+
+.count-cell > * {
+  grid-area: 1 / 1;
+}
+
+.count-sizer {
+  visibility: hidden;
+}
+
 #back {
   position: absolute;
   left: 8px;

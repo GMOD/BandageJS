@@ -52,6 +52,7 @@ import {
   legendsHtml,
   overlayHtml,
   overlaySvg,
+  unlabelledCount,
   walkKeyHtml,
   walkRowsLayer,
 } from './overlays'
@@ -862,6 +863,7 @@ function drawOverlays() {
   )
   const ramp = rampInterval(d.ramp)
   const walkRamp = d.bars ? ramp : undefined
+  const labelsNodeSizes = !layout?.tubeMap && !lift
   const labels = layoutLabels({
     paneWidth: state.width,
     canvasHeight: state.height,
@@ -876,7 +878,7 @@ function drawOverlays() {
     liftedWalks: lift?.walks.map(w => w.name),
     poppedFrom: backLabel ? { label: backLabel } : undefined,
     nodePositions: layout?.nodePositions,
-    labelsNodeSizes: !layout?.tubeMap && !lift,
+    labelsNodeSizes,
     nodeLengths: labelledLengths(graph, settings.nodeLengthLabels),
     nodeById: f.nodeById,
     alleleDeletions: layout?.alleleDeletions ?? [],
@@ -942,7 +944,11 @@ function drawOverlays() {
             genePins: d.genePins,
             genesFrom: state.genesFrom,
             halos,
+            unlabelled: labelsNodeSizes ? 'reserved' : undefined,
           }),
+          unlabelled: labelsNodeSizes
+            ? unlabelledCount(labels.unlabelled, f.placeholders)
+            : undefined,
           at: hoveredOn,
           paths: drawPaths() && graph.paths ? pathLegend(graph.paths) : [],
           walkBars: d.bars,

@@ -86,6 +86,7 @@ export const graphFacts = memo((graph: Graph | undefined) => {
     allDeletions: deletions,
     walkChoices,
     walkLabels: walkLabelsOf(walkChoices),
+    placeholders: graph?.nodes.filter(n => n.placeholder).length ?? 0,
     drawable: new Set<string>(
       graph
         ? LAYOUT_MODES.filter(m => m.available(graph)).map(m => m.value)

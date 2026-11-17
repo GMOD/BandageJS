@@ -13,6 +13,7 @@ import {
   walkKeyEntry,
   el,
   serializeEl,
+  unlabelledText,
   walkRowsKey,
   walkRowsTree,
 } from '@jbrowse/bandage-core'
@@ -39,6 +40,7 @@ import type {
   LabelLayout,
   LiftedWalk,
   RowGene,
+  UnlabelledPlaceholders,
   WalkLift,
   WalkRows,
 } from '@jbrowse/bandage-core'
@@ -402,13 +404,52 @@ function swatchHtml(swatch: GraphKeySwatch) {
   }
 }
 
+// The placeholders the labels left without a length, counted after the
+// words of the row bandage-core keeps for them: `count`, '' where none is;
+// `sizer`, the count with every placeholder the drawing holds unlabelled,
+// which reserves its room unseen, so the key's width waits on no label; and
+// `title`, core's words for them with their lengths
+export interface UnlabelledCount {
+  count: string
+  sizer: string
+  title: string
+}
+
+const unlabelledWords = (count: number) =>
+  count > 0 ? `· ${count.toLocaleString('en-US')} unlabelled` : ''
+
+export function unlabelledCount(
+  unlabelled: UnlabelledPlaceholders | undefined,
+  placeholders: number,
+): UnlabelledCount {
+  return {
+    count: unlabelledWords(unlabelled?.count ?? 0),
+    sizer: unlabelledWords(placeholders),
+    title: unlabelledText(unlabelled),
+  }
+}
+
+function countHtml(c: UnlabelledCount) {
+  return `<span class="count-cell"><span class="count-sizer" aria-hidden="true">${esc(c.sizer)}</span><span class="count">${esc(c.count)}</span></span>`
+}
+
 // One entry of the key: its swatch, its bold name and words, and under them
-// the stretch its scale runs over, or `at` while it stands in
-function entryHtml(entry: GraphKeyEntry, hint?: string, at?: string) {
+// the stretch its scale runs over, or `at` while it stands in. The row core
+// keeps a line under for the unlabelled placeholders (under '') carries
+// their count after its words instead.
+function entryHtml(
+  entry: GraphKeyEntry,
+  hint?: string,
+  at?: string,
+  unlabelled?: UnlabelledCount,
+) {
   const title = [entry.hover, hint].filter(Boolean).join(' · ')
   const words = `${entry.strong ? `<strong>${esc(entry.strong)}</strong>` : ''}${esc(entry.text)}`
+  const counted = entry.under === '' ? unlabelled : undefined
   const row = entry.swatch
-    ? `<div class="legend-row">${swatchHtml(entry.swatch)}<span>${words}</span></div>`
+    ? counted
+      ? `<div class="legend-row unlabelled"${counted.title ? ` title="${esc(counted.title)}"` : ''}>${swatchHtml(entry.swatch)}<span>${words}</span>${countHtml(counted)}</div>`
+      : `<div class="legend-row">${swatchHtml(entry.swatch)}<span>${words}</span></div>`
     : `<div class="legend-note">${words}</div>`
   const under = at ?? entry.under
   return entry.walk || under
@@ -436,13 +477,19 @@ const HEADED = new Set(['Node thickness', 'Link thickness'])
 export function graphKeyHtml(
   key: readonly GraphKeySection[],
   at: (walk: LiftedWalk) => string | undefined,
+  unlabelled?: UnlabelledCount,
 ) {
   return key
     .map(
       ({ id, group, entries }) =>
         `<div class="legend key-${id}">${group && HEADED.has(group) ? `<div class="legend-title">${group}</div>` : ''}${entries
           .map(entry =>
-            entryHtml(entry, undefined, entry.walk && at(entry.walk)),
+            entryHtml(
+              entry,
+              undefined,
+              entry.walk && at(entry.walk),
+              unlabelled,
+            ),
           )
           .join('')}</div>`,
     )
@@ -479,6 +526,9 @@ export function walkRowsKeyHtml(entries: KeyEntry[]) {
 export function legendsHtml(o: {
   // bandage-core's graph key (graphKey)
   key: readonly GraphKeySection[]
+  // the placeholders the labels left without a length, where they label
+  // node lengths
+  unlabelled?: UnlabelledCount
   // where the hovered node sits on a lifted walk, while one is hovered
   at: (walk: LiftedWalk) => string | undefined
   paths: { name: string; label: string; color: string }[]
@@ -488,7 +538,7 @@ export function legendsHtml(o: {
   walkRamp: { start: number; end: number } | undefined
 }) {
   return [
-    graphKeyHtml(o.key, o.at),
+    graphKeyHtml(o.key, o.at, o.unlabelled),
     o.paths.length > 0
       ? `<div class="legend">${o.paths
           .map(
