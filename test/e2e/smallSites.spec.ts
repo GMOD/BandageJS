@@ -372,10 +372,7 @@ const TAGGED = [
   ...SNP.split('\n').filter(line => !line.startsWith('S\t')),
 ].join('\n')
 
-test('an exon is outlined only on nodes the drawing draws', async ({
-  page,
-}) => {
-  await openGfa(page, TAGGED, '7 nodes', '&smallsites=1')
+async function openXGene(page: Page) {
   await openMenu(page, 'File')
   const chooser = page.waitForEvent('filechooser')
   await page
@@ -389,12 +386,41 @@ test('an exon is outlined only on nodes the drawing draws', async ({
     mimeType: 'text/plain',
     buffer: Buffer.from('chr\t1990\t2010\tXGENE\t0\t+\n'),
   })
-  const exons = page.locator('#overlay-svg #exon-outline path[stroke="#000"]')
+}
+
+const exonOutlines = (page: Page) =>
+  page.locator('#overlay-svg #exon-outline path[stroke="#000"]')
+
+test('an exon is outlined only on nodes the drawing draws', async ({
+  page,
+}) => {
+  await openGfa(page, TAGGED, '7 nodes', '&smallsites=1')
+  await openXGene(page)
+  const exons = exonOutlines(page)
   await expect(exons).toHaveCount(4)
   await toggleSmallSites(page)
   await expect(page.locator('#legends')).toContainText('2 nodes under')
   await expect(exons).toHaveCount(3)
   await expect(page.locator('#overlay-svg .gene')).toContainText('XGENE')
+})
+
+// With a walk lifted across the folded site, the reference node m inside it
+// is drawn only by the lanes crossing it, and carries no outline of its own
+test('an exon is not outlined on a reference node that only the lanes across a folded site draw', async ({
+  page,
+}) => {
+  await openGfa(
+    page,
+    TAGGED,
+    '7 nodes',
+    `&smallsites=1&walk=${encodeURIComponent('ref#0#chr')}`,
+  )
+  await openXGene(page)
+  const exons = exonOutlines(page)
+  await expect(exons).toHaveCount(4)
+  await toggleSmallSites(page)
+  await expect(page.locator('#legends')).toContainText('2 nodes under')
+  await expect(exons).toHaveCount(2)
 })
 
 test('the fit leaves the key a column of its own down the right edge', async ({
