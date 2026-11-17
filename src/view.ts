@@ -865,6 +865,7 @@ function drawOverlays() {
   const labelsNodeSizes = !layout?.tubeMap && !lift
   const labels = layoutLabels({
     graph,
+    drawnInk: paneBatch,
     paneWidth: state.width,
     canvasHeight: state.height,
     axisScale: axis(),

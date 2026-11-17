@@ -153,7 +153,7 @@ test('the legend keys the node thickness ends and a lifted walk with what it fad
   const lifted = legendAt(1200, ['a#1#c'])
   expect(lifted).toContain('<div class="legend-title">Node thickness</div>')
   expect(lifted).toContain('<strong>a#1#c</strong>')
-  expect(lifted).toContain('only in other haplotypes')
+  expect(lifted).toContain('<span>other haplotypes</span>')
   expect(lifted).not.toMatch(/skips .+? sequence/)
 })
 
