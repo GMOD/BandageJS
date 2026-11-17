@@ -16,6 +16,7 @@ import {
   fitTransform,
   getDpr,
   graphKey,
+  keyedView,
   layoutGeometryInputs,
   layoutLabels,
   nodesNotDrawn,
@@ -83,6 +84,7 @@ import type { Region } from './jbrowse'
 import type { Pane } from './overlays'
 import type { Facet } from './settings'
 import type {
+  Bounds,
   FacetGrid,
   Graph,
   LayoutResult,
@@ -273,6 +275,41 @@ export function fitView() {
 const viewport = () => {
   const { width, height } = viewBox()
   return viewportOf(state, axis(), width, height)
+}
+
+const sameBounds = (a: Bounds, b: Bounds) =>
+  a.minX === b.minX &&
+  a.minY === b.minY &&
+  a.maxX === b.maxX &&
+  a.maxY === b.maxY
+
+// The view the key keys, set REBUILD_DEBOUNCE_MS after the pane's view last
+// moved, on the layout it was set on, so the key, and the labels and fit that
+// wait on its size, hold still through a pan or zoom. Until one is set on the
+// layout drawn, the pane's view beside the key as it is.
+let liveKeyView: Bounds | undefined
+let settledKeyView:
+  | { view: Bounds; layout: LayoutResult | undefined }
+  | undefined
+let keyViewTimer: ReturnType<typeof setTimeout> | undefined
+
+function keyView() {
+  const live = keyedView(state, axis(), {
+    paneWidth: state.width,
+    canvasHeight: state.height,
+    legendSize: state.legendSize,
+  })
+  if (!liveKeyView || !sameBounds(liveKeyView, live)) {
+    liveKeyView = live
+    clearTimeout(keyViewTimer)
+    keyViewTimer = setTimeout(() => {
+      settledKeyView = { view: live, layout: state.layout }
+      scheduleDraw()
+    }, REBUILD_DEBOUNCE_MS)
+  }
+  return settledKeyView && settledKeyView.layout === state.layout
+    ? settledKeyView.view
+    : live
 }
 
 interface FacetPanel {
@@ -901,7 +938,7 @@ function drawOverlays() {
             contigThickness: settings.nodeThickness,
             connectorThickness: CONNECTOR_THICKNESS,
             drawsNodes: !d.bars && !layout.tubeMap,
-            marks: drawnMarks([paneBatch]),
+            marks: drawnMarks([paneBatch], keyView()),
             genePins: d.genePins,
             genesFrom: state.genesFrom,
             halos,

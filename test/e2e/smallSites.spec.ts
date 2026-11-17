@@ -270,6 +270,54 @@ test('no bubble halo or tick lands on a site the drawing folds', async ({
   await expect(marks).toHaveCount(0)
 })
 
+// R walks r1, 200 bp, and r2, 3.8 kb; A leaves it after r1 for 400 bp the cut
+// did not load. The anchored layout lays the reference at its bp, so the
+// placeholder lies at the drawing's left end: zoomed 2.25 times about the
+// pane's centre, it is off the pane and still in the drawing built round it.
+const LEFT_PLACEHOLDER = [
+  `S\tr1\t${'A'.repeat(200)}`,
+  `S\tr2\t${'C'.repeat(3800)}`,
+  'S\tp\t*\tLN:i:400\tnl:i:1',
+  ...['r1 r2', 'r1 p', 'p r2'].map(pair => {
+    const [from, to] = pair.split(' ')
+    return `L\t${from}\t+\t${to}\t+\t0M`
+  }),
+  'W\tref\t0\tchr\t0\t4000\t>r1>r2',
+  'W\talt\t1\tchr\t0\t4400\t>r1>p>r2',
+].join('\n')
+
+test('the key lists the marks the pane shows, read once a zoom has settled', async ({
+  page,
+}) => {
+  const url = 'https://gbz.test/left-placeholder.gfa'
+  await page.route(url, route =>
+    route.fulfill({
+      body: LEFT_PLACEHOLDER,
+      headers: { 'access-control-allow-origin': '*' },
+    }),
+  )
+  await openPage(page, `gfa=${encodeURIComponent(url)}&layout=auto`)
+  await waitForDrawing(page, /3 nodes.*Anchored/)
+  const key = page.locator('#legends')
+  await expect(key).toContainText('nodes not shown')
+  // the view settles at the fit
+  await page.waitForTimeout(500)
+  const during = await page.evaluate(async () => {
+    for (let i = 0; i < 2; i++) {
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '+', bubbles: true }),
+      )
+    }
+    await new Promise(r => requestAnimationFrame(r))
+    await new Promise(r => requestAnimationFrame(r))
+    return document.getElementById('legends')!.textContent
+  })
+  expect(during).toContain('nodes not shown')
+  await expect(key).not.toContainText('nodes not shown')
+  await page.keyboard.press('0')
+  await expect(key).toContainText('nodes not shown')
+})
+
 // The view at the fit, as the address states it once the view is the user's
 async function fitView(page: Page) {
   await page.keyboard.press('+')
