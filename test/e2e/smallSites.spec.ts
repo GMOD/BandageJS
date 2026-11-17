@@ -122,19 +122,30 @@ async function toggleSmallSites(page: Page) {
 }
 
 // alt leaves the reference between r1 and r2 for eight 1 bp nodes, a loop
-// FMMM draws a few dozen px across, folded at the fit as 8 bp
+// FMMM draws a few dozen px across, which is drawn at the fit
 const CHAIN = Array.from({ length: 8 }, (_, i) => `a${i}`)
-const LOOP = [
-  `S\tr1\t${'A'.repeat(2000)}`,
-  `S\tr2\t${'C'.repeat(2000)}`,
-  ...CHAIN.map(a => `S\t${a}\tG`),
-  'L\tr1\t+\tr2\t+\t0M',
-  ...['r1', ...CHAIN].map(
-    (from, i) => `L\t${from}\t+\t${[...CHAIN, 'r2'][i]}\t+\t0M`,
-  ),
-  'W\tref\t0\tchr\t0\t4000\t>r1>r2',
-  `W\talt\t1\tchr\t0\t4008\t>r1${CHAIN.map(a => `>${a}`).join('')}>r2`,
-].join('\n')
+const loopOf = (segments: string[]) =>
+  [
+    `S\tr1\t${'A'.repeat(2000)}`,
+    `S\tr2\t${'C'.repeat(2000)}`,
+    ...segments,
+    'L\tr1\t+\tr2\t+\t0M',
+    ...['r1', ...CHAIN].map(
+      (from, i) => `L\t${from}\t+\t${[...CHAIN, 'r2'][i]}\t+\t0M`,
+    ),
+    'W\tref\t0\tchr\t0\t4000\t>r1>r2',
+    `W\talt\t1\tchr\t0\t4008\t>r1${CHAIN.map(a => `>${a}`).join('')}>r2`,
+  ].join('\n')
+const DRAWN_LOOP = loopOf(CHAIN.map(a => `S\t${a}\tG`))
+
+// The same loop with its last 1 bp the cut did not load. A not-loaded
+// stretch is drawn at the layout's least length whatever its bp, so a piece
+// holding one is measured by its bp at the reference's px a bp as well as
+// as drawn, and the smaller counts: the loop's 8 bp come to under
+// SMALL_SITE_PX at the fit, and it folds there.
+const LOOP = loopOf(
+  CHAIN.map(a => (a === 'a7' ? `S\t${a}\t*\tLN:i:1\tnl:i:1` : `S\t${a}\tG`)),
+)
 
 // alt leaves the reference for 5 bp the cut did not load, a placeholder
 const UNLOADED = [
@@ -165,6 +176,14 @@ const openLoop = (page: Page, query = '') =>
   openGfa(page, LOOP, '10 nodes', query)
 
 const ON_LOOP = /\ba\d\b/
+
+test('a loop the drawing lays a few dozen px across is drawn at the fit, however few its bp', async ({
+  page,
+}) => {
+  await openGfa(page, DRAWN_LOOP, '10 nodes')
+  await expect(page.locator('#legends')).toContainText('1 walk')
+  await expect(page.locator('#legends')).not.toContainText('not drawn')
+})
 
 test('a node or link the drawing folds is neither hovered nor selected, where drawn it would be', async ({
   page,
@@ -217,31 +236,35 @@ test('a placeholder the drawing folds carries no length label', async ({
   await expect(labels.filter({ hasText: /^5 bp$/ })).toHaveCount(0)
 })
 
-// ref steps m and alt x between 1 kb reference nodes, both 1 bp: a bubble
-// whose allele x folds at the fit, with the reference node m inside the site
+// ref steps m between 1 kb reference nodes, and alt x and then u, 1 bp the
+// cut did not load: a bubble whose allele folds at the fit, measured by its
+// 3 bp with m at the reference's px a bp, with the reference node m inside
+// the site
+const NOT_LOADED_U = 'S\tu\t*\tLN:i:1\tnl:i:1'
 const SNP = [
   ...['r0', 'r1', 'r2', 'r3'].map(r => `S\t${r}\t${'A'.repeat(1000)}`),
   'S\tm\tA',
   'S\tx\tC',
-  ...['r0 r1', 'r1 m', 'm r2', 'r1 x', 'x r2', 'r2 r3'].map(pair => {
+  NOT_LOADED_U,
+  ...['r0 r1', 'r1 m', 'm r2', 'r1 x', 'x u', 'u r2', 'r2 r3'].map(pair => {
     const [from, to] = pair.split(' ')
     return `L\t${from}\t+\t${to}\t+\t0M`
   }),
   'W\tref\t0\tchr\t0\t4001\t>r0>r1>m>r2>r3',
-  'W\talt\t1\tchr\t0\t4001\t>r0>r1>x>r2>r3',
+  'W\talt\t1\tchr\t0\t4002\t>r0>r1>x>u>r2>r3',
 ].join('\n')
 
 test('no bubble halo or tick lands on a site the drawing folds', async ({
   page,
 }) => {
-  await openGfa(page, SNP, '6 nodes', '&bubbles=1&smallsites=1')
+  await openGfa(page, SNP, '7 nodes', '&bubbles=1&smallsites=1')
   const marks = page.locator(
     '#overlay-svg [data-halo], #overlay-svg path[stroke-opacity]',
   )
   await expect(page.locator('#overlay-svg rect.tick')).toHaveCount(1)
   await toggleSmallSites(page)
   await expect(page.locator('#legends')).toContainText(
-    /1 node under \d+ bp not drawn/,
+    /2 nodes under \d+ bp not drawn/,
   )
   await expect(page.locator('#overlay-svg rect.tick')).toHaveCount(0)
   await expect(marks).toHaveCount(0)
@@ -317,10 +340,10 @@ test('a strip point on a folded node lights no ring in the drawing', async ({
 test('a reference node inside a folded site is ringed as wide as the stroke the drawing runs through it', async ({
   page,
 }) => {
-  await openGfa(page, SNP, '6 nodes')
+  await openGfa(page, SNP, '7 nodes')
   const view = await fitView(page)
   const ringPx = async (query: string, node: string) => {
-    await openGfa(page, SNP, '6 nodes', `${query}&node=${node}&view=${view}`)
+    await openGfa(page, SNP, '7 nodes', `${query}&node=${node}&view=${view}`)
     await expect(rings(page)).toHaveCount(1)
     return Number(await rings(page).getAttribute('stroke-width'))
   }
@@ -345,13 +368,14 @@ const TAGGED = [
   ),
   'S\tm\tA\tSN:Z:chr\tSO:i:2000\tSR:i:0',
   'S\tx\tC\tSN:Z:chr\tSO:i:2000\tSR:i:1',
+  NOT_LOADED_U,
   ...SNP.split('\n').filter(line => !line.startsWith('S\t')),
 ].join('\n')
 
 test('an exon is outlined only on nodes the drawing draws', async ({
   page,
 }) => {
-  await openGfa(page, TAGGED, '6 nodes', '&smallsites=1')
+  await openGfa(page, TAGGED, '7 nodes', '&smallsites=1')
   await openMenu(page, 'File')
   const chooser = page.waitForEvent('filechooser')
   await page
@@ -368,7 +392,7 @@ test('an exon is outlined only on nodes the drawing draws', async ({
   const exons = page.locator('#overlay-svg #exon-outline path[stroke="#000"]')
   await expect(exons).toHaveCount(4)
   await toggleSmallSites(page)
-  await expect(page.locator('#legends')).toContainText('1 node under')
+  await expect(page.locator('#legends')).toContainText('2 nodes under')
   await expect(exons).toHaveCount(3)
   await expect(page.locator('#overlay-svg .gene')).toContainText('XGENE')
 })

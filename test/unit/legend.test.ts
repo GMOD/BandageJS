@@ -73,12 +73,15 @@ const REPEAT = [
   'W\talt\t1\tchr\t0\t400\t>r1>a>b>a>b>r2',
 ].join('\n')
 
+// The legend of the ordered layout fit to `width`, drawn at `zoom` times the
+// fit's scale
 function legendAt(
   width: number,
   walks: (string | WalkLayer)[] = [],
   gfa = SKIP,
   reference = 'ref#0#chr',
   smallSites: SmallSites = 'hidden',
+  zoom = 1,
 ) {
   const graph = loadGraph(gfa, 'cut', { referencePath: reference })
   const layout = layoutModeByValue('ordered').run(graph, undefined)!
@@ -103,7 +106,7 @@ function legendAt(
     drawPaths: false,
     nodeWidth: 'depth',
     highlight: lift,
-    axis: axisScaleOf(fit.scale, false),
+    axis: axisScaleOf(fit.scale * zoom, false),
     smallSites,
   })
   return legendsHtml({
@@ -116,17 +119,27 @@ function legendAt(
   })
 }
 
+// The ordered layout gives every node room, so the skip as drawn, its own
+// link and the 10 bp node it skips with the reference's links there, is a
+// share of the drawing: its link alone spans 23 px at the 150 px fit, too
+// short for dashes and far from small, where the skip's bp at the
+// reference's 0.29 px a bp would come to 2.9 px. Zoomed out to a fortieth of
+// that fit, the whole skip as drawn is under SMALL_SITE_PX, and folds.
 test("the legend is bandage-core's graph key: each skip row only where its mark is drawn", () => {
   const wide = legendAt(1200)
   expect(wide).toContain('class="swatch dashes"')
   expect(wide).toMatch(/skips .+? sequence/)
   expect(wide).not.toContain(SHORT_SKIP_KEY)
-  const narrow = legendAt(150, [], SKIP, 'ref#0#chr', 'nodes')
+  const narrow = legendAt(150)
   expect(narrow).not.toMatch(/skips .+? sequence/)
   expect(narrow).toContain(`<span>${SHORT_SKIP_KEY}</span>`)
-  const folded = legendAt(150)
+  expect(narrow).not.toContain('not drawn')
+  const folded = legendAt(150, [], SKIP, 'ref#0#chr', 'hidden', 1 / 40)
   expect(folded).not.toContain(SHORT_SKIP_KEY)
   expect(folded).toMatch(/1 skip under \d+ bp not drawn/)
+  expect(legendAt(150, [], SKIP, 'ref#0#chr', 'nodes', 1 / 40)).toContain(
+    `<span>${SHORT_SKIP_KEY}</span>`,
+  )
 })
 
 test('the legend keys the node thickness ends and a lifted walk with what it fades', () => {
@@ -151,12 +164,19 @@ test('a lifted walk beside a skip it does not take keys the faded dashes', () =>
   expect(legendAt(1200, ['ref#0#chr'])).toMatch(/skips .+? sequence/)
 })
 
+// The 1 bp allele y as drawn, its node and links and the reference's x
+// between where they attach, is given room by the ordered layout and drawn
+// over SMALL_SITE_PX at the 1200 px fit; zoomed out to a hundredth of that
+// fit it is under it, and folds.
 test('the key ends with the nodes the drawing folds as too small to draw, and the bp they are under', () => {
-  const folded = legendAt(1200, [], SNP, 'ref')
+  expect(legendAt(1200, [], SNP, 'ref')).not.toContain('not drawn')
+  const folded = legendAt(1200, [], SNP, 'ref', 'hidden', 1 / 100)
   expect(folded).toMatch(
     /<div class="legend key-too-small"><div class="legend-note">1 node under \d+ bp not drawn<\/div><\/div>$/,
   )
-  expect(legendAt(1200, [], SNP, 'ref', 'nodes')).not.toContain('not drawn')
+  expect(legendAt(1200, [], SNP, 'ref', 'nodes', 1 / 100)).not.toContain(
+    'not drawn',
+  )
 })
 
 test("a walk lifted by pass keys its threads' heads with core's heads swatch", () => {
