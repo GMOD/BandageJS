@@ -60,10 +60,11 @@ message gives a window size that fits.
 
 ![The KIV-2 cut drawn force-directed, coloured by GRCh38 position](../img/tutorial/cut_graph.png)
 
-- Colour runs along the GRCh38 path, red to purple; grey nodes lie off it
+- Colour runs along the GRCh38 path, red to purple; dark grey nodes lie off it
 - Gold rings mark RefSeq exons, read for the reference genome BandageJS matched
-- Dashed edges skip a stretch of the reference; hovering one gives its length
-- The grey loops lie off the GRCh38 path: KIV-2 copies GRCh38 lacks
+- The dark grey loops lie off the GRCh38 path: KIV-2 copies GRCh38 lacks
+- Hollow loops are nodes not shown: a long walk's steps off the reference that
+  the cut did not load, each labelled with its length
 
 ## 6. Compare the haplotypes
 
@@ -75,7 +76,7 @@ haplotype's bp:
 - Coloured stretches follow the reference; dark stretches are sequence GRCh38
   lacks
 - The label after each bar gives the walk's length and its difference from the
-  reference: HG00133#1 runs about 117 kb longer than GRCh38's 33 kb
+  reference: HG00133#1 runs about 116 kb longer than GRCh38's 33 kb
 - A haplotype with no step in the window has no walk in the cut. The file's
   departure records name where it leaves the reference and where it rejoins, and
   BandageJS draws a hairline under that stretch of the reference's bar, read as

@@ -105,7 +105,7 @@ const FIGURES = {
       'facet=walk',
       'columns=3',
     ].join('&'),
-    size: [1400, 300],
+    size: [1400, 420],
   },
   mhc_stress: {
     query: 'gfa=examples/hprc_mhc_class2.gfa&layout=force&engine=stress',

@@ -8,8 +8,8 @@ menu lists more.
 
 The LPA gene in the HPRC human pangenome graph. Coloured nodes follow chr6 of
 GRCh38, the human reference genome, from red to purple, and gold rings mark
-LPA's exons. Dark grey nodes hold sequence that GRCh38 lacks, such as the 68.4
-kb loop of extra KIV-2 repeat copies.
+LPA's exons. Dark grey nodes hold sequence that GRCh38 lacks, such as the large
+loop of extra KIV-2 repeat copies.
 
 ## Genome graphs
 
