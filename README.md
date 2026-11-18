@@ -34,7 +34,7 @@ too large to load; see the next section.
 ## Opening a region of a whole-genome pangenome
 
 1. Index the GFA once with [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix)
-   4.0 or later. `--refs` names the genome whose coordinates you will search by:
+   5.0 or later. `--refs` names the genome whose coordinates you will search by:
 
    ```console
    gfa-to-tabix graph.gfa --walks --refs GRCh38 -o graph
