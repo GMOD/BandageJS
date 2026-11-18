@@ -23,11 +23,11 @@ CFHR3 and CFHR1. HG02055#1 takes the edge that skips them, and runs 85 kb short:
 
 ![GRCh38, HG00097#1 and HG02055#1 through CFH, one panel each](../img/cfh_facet.png)
 
-The amylase locus is drawn as walk rows for four HPRC samples. CAT's genes are
-boxed on every row and named above GRCh38's, and the longer walks box more gene
-copies, up to HG00097#2's 318 kb. Charcoal marks a stretch off GRCh38's path, a
-thin line a stretch the graph left out (19 kb in HG00097#1), and "partial walk"
-a walk that leaves the cut region:
+The amylase locus is drawn as walk rows for four HPRC samples, with CAT's genes
+boxed and named. The boxes count AMY1 copies: one at 146 kb, two at 168 kb,
+three at 240 kb (as in GRCh38) and four at 318 kb. Charcoal marks a stretch off
+GRCh38's path, a thin line a stretch the graph left out (19 kb in HG00097#1),
+and "partial walk" a walk that leaves the cut region:
 
 ![The amylase locus in four HPRC samples, as walk rows with their genes](../img/amy1_rows.png)
 
