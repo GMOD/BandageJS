@@ -687,12 +687,13 @@ function drawHover() {
 }
 
 // Each walk lifted by pass along its own length, under a drawing of nodes
-// on one canvas, as bandage-core's figure stacks it
+// on one canvas, as bandage-core's figure stacks it, but for a walk whose row
+// the strip draws
 function drawPassBars() {
   const { lift } = walks()
   const bars =
     facets.length === 0 && state.layout && !tube() && !current().bars
-      ? passBars(lift)
+      ? passBars(lift, stripRows())
       : []
   ui.passBars.hidden = bars.length === 0
   setHtml(

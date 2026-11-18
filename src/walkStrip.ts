@@ -10,10 +10,18 @@ import {
   walkStripLabelsTree,
 } from '@jbrowse/bandage-core'
 
-import { memo, rampInterval, stripKey, stripTree } from './derived'
+import { memo, rampInterval, rowInksOf, stripKey, stripTree } from './derived'
 import { svgDom } from './elDom'
 import { walkRowsKeyHtml } from './overlays'
-import { axis, current, facts, state, stripGenes, stripRows } from './state'
+import {
+  axis,
+  current,
+  facts,
+  state,
+  stripGenes,
+  stripRows,
+  walks,
+} from './state'
 import { ui } from './ui'
 import { drawnFold, onDraw, scheduleDraw } from './view'
 import { toggleWalk } from './walks'
@@ -23,6 +31,7 @@ import type {
   Graph,
   GraphNode,
   RowGene,
+  RowInk,
   StripFrame,
   WalkLayer,
   WalkRows,
@@ -46,7 +55,8 @@ const barsOf = memo(
     frame: StripFrame,
     ramp: Ramp,
     rowGenes: Map<string, RowGene[]> | undefined,
-  ) => svgDom(stripTree(bars, frame, rampInterval(ramp), rowGenes)),
+    inks: readonly RowInk[],
+  ) => svgDom(stripTree(bars, frame, rampInterval(ramp), rowGenes, inks)),
 )
 
 const marksOf = memo(
@@ -77,8 +87,13 @@ const labelsOf = memo(
 )
 
 const keyOf = memo(
-  (bars: WalkRows, ramp: Ramp, genes: GeneGaps | undefined) =>
-    walkRowsKeyHtml(stripKey(bars, rampInterval(ramp), genes)) +
+  (
+    bars: WalkRows,
+    ramp: Ramp,
+    genes: GeneGaps | undefined,
+    inks: readonly RowInk[],
+  ) =>
+    walkRowsKeyHtml(stripKey(bars, rampInterval(ramp), genes, inks)) +
     '<span>▮ ticks: where each walk passes the node under the pointer · click a bar to highlight its walk</span>',
 )
 
@@ -141,8 +156,9 @@ function drawStrip() {
   const ramp = current().ramp
   const id = state.hoveredNode ?? state.selectedNode
   const rowGenes = stripGenes(bars)
+  const inks = rowInksOf(walks())
   const next = {
-    bars: barsOf(bars, f, ramp, rowGenes),
+    bars: barsOf(bars, f, ramp, rowGenes, inks),
     marks: marksOf(
       bars,
       f,
@@ -150,7 +166,12 @@ function drawStrip() {
       id === null ? undefined : facts().nodeById.get(id),
     ),
     labels: labelsOf(bars, f, state.walkLayers),
-    key: keyOf(bars, ramp, stripGeneGaps(f, rowGenes, state.walkGeneNote)),
+    key: keyOf(
+      bars,
+      ramp,
+      stripGeneGaps(f, rowGenes, state.walkGeneNote),
+      inks,
+    ),
     locator,
   }
   ui.stripSvg.setAttribute('width', String(f.width))

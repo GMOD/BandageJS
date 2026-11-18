@@ -10,6 +10,7 @@ import {
   genePins,
   genesOnRow,
   labelledNodeLengths,
+  liftedRowInks,
   nodeInk,
   pathLegend,
   resolveColorScheme,
@@ -41,6 +42,7 @@ import type {
   NodeSegment,
   NodeWidth,
   RowGene,
+  RowInk,
   StripFrame,
   WalkLayer,
   WalkRows,
@@ -159,24 +161,28 @@ export const stripTree = (
   frame: StripFrame,
   ramp: { start: number; end: number } | undefined,
   rowGenes: Map<string, RowGene[]> | undefined,
+  inks: readonly RowInk[],
 ) =>
   walkRowsTree(bars, frame, {
     ramp,
     rowGenes,
     idPrefix: 'strip',
     markUnloaded: true,
+    inks,
   })
 
 export const stripKey = (
   bars: WalkRows,
   ramp: { start: number; end: number } | undefined,
   genes: GeneGaps | undefined,
+  inks: readonly RowInk[],
 ) =>
   walkRowsKey(bars, {
     ramp,
     rampCss: RAMP_GRADIENT_CSS,
     genes,
     markUnloaded: true,
+    inks,
   })
 
 // The halos along the nodes the drawing draws, and none for a bubble whose
@@ -285,4 +291,14 @@ export const walkView = memo(
           : undefined,
     }
   },
+)
+
+// The colours the lifted walks give the walk rows naming them, as their lanes
+// and threads are drawn: each panel's walk while they are side by side
+export const rowInksOf = memo((view: ReturnType<typeof walkView>) =>
+  liftedRowInks(
+    view.panels
+      ? view.panels.flatMap(panel => panel.walks.slice(0, 1))
+      : (view.lift?.walks ?? []),
+  ),
 )

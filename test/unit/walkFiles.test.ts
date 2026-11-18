@@ -186,10 +186,10 @@ test("the strip under a node layout draws an abridged walk's runs not loaded hol
     bars.rows.filter(r => r.runs.some(run => run.unloaded)).map(r => r.name),
   ).toEqual(['IAI39#1#chr', 'Sakai#1#chr'])
   expect(serializeEl(walkRowsTree(bars, frame))).not.toContain(NOT_LOADED_CSS)
-  expect(serializeEl(stripTree(bars, frame, undefined, undefined))).toContain(
-    NOT_LOADED_CSS,
-  )
-  expect(stripKey(bars, undefined, undefined).map(e => e.label)).toContain(
+  expect(
+    serializeEl(stripTree(bars, frame, undefined, undefined, [])),
+  ).toContain(NOT_LOADED_CSS)
+  expect(stripKey(bars, undefined, undefined, []).map(e => e.label)).toContain(
     NOT_LOADED_TEXT,
   )
 })

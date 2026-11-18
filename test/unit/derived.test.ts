@@ -1,7 +1,22 @@
-import { loadGraph } from '@jbrowse/bandage-core'
+import {
+  WALK_ON_PATH_STRIP_INK,
+  abgrHex,
+  loadGraph,
+  passBars,
+  serializeEl,
+  walkStripFrame,
+} from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
-import { memo, tooLargeText, walkView } from '../../src/derived'
+import {
+  memo,
+  rowInksOf,
+  rowsOf,
+  stripKey,
+  stripTree,
+  tooLargeText,
+  walkView,
+} from '../../src/derived'
 
 test('memo recomputes only when a key changes identity', () => {
   let calls = 0
@@ -62,4 +77,59 @@ test('the notice names the lifted walks a cut left abridged', () => {
   expect(tooLargeText(['IAI39', 'Sakai'])).toBe(
     'IAI39 and Sakai are too large to read in full here together, so they are drawn abridged',
   )
+})
+
+// hap steps the repeat r twice, so a lift by pass threads it in two colours
+const REPEAT = [
+  'S\ts1\t*\tLN:i:1000',
+  'S\ts2\t*\tLN:i:500',
+  'S\tr\t*\tLN:i:200',
+  'S\tu\t*\tLN:i:3000',
+  'S\ts5\t*\tLN:i:1000',
+  'L\ts1\t+\ts2\t+\t0M',
+  'L\ts2\t+\tr\t+\t0M',
+  'L\tr\t+\tr\t+\t0M',
+  'L\tr\t+\tu\t+\t0M',
+  'L\tu\t+\ts5\t+\t0M',
+  'P\tref#0#chr1\ts1+,s2+,r+,u+,s5+\t*',
+  'P\thap#1#ctg\ts1+,s2+,r+,r+,u+,s5+\t*',
+].join('\n')
+
+const stopColors = (svg: string) =>
+  [...svg.matchAll(/<stop offset="[^"]*" stop-color="([^"]+)"/g)].map(m => m[1])
+
+const barFills = (key: ReturnType<typeof stripKey>) =>
+  key.map(entry => entry.swatch.kind === 'bar' && entry.swatch.fill)
+
+test("a walk lifted by pass paints its strip row in its passes' colours, and loses its pass bar under the strip", () => {
+  const graph = loadGraph(REPEAT, 'repeat')
+  const view = walkView(
+    graph,
+    [{ walk: 'hap#1#ctg', color: { field: 'pass' } }],
+    undefined,
+    false,
+    '',
+  )
+  const drawn = view.lift!.walks[0]!.walkPasses!
+  const passColors = drawn.passes.map(pass => abgrHex(pass.ink))
+  expect(passColors).toHaveLength(2)
+  const bars = rowsOf(graph, undefined)!
+  const frame = walkStripFrame(bars, { width: 800 })
+  const inks = rowInksOf(view)
+  expect(
+    stopColors(serializeEl(stripTree(bars, frame, undefined, undefined, []))),
+  ).toEqual([])
+  expect(
+    stopColors(serializeEl(stripTree(bars, frame, undefined, undefined, inks))),
+  ).toEqual(expect.arrayContaining(passColors))
+  expect(barFills(stripKey(bars, undefined, undefined, []))).not.toContain(
+    WALK_ON_PATH_STRIP_INK,
+  )
+  expect(barFills(stripKey(bars, undefined, undefined, inks))).toContain(
+    WALK_ON_PATH_STRIP_INK,
+  )
+  expect(passBars(view.lift, undefined).map(bar => bar.walk)).toEqual([
+    'hap#1#ctg',
+  ])
+  expect(passBars(view.lift, bars)).toEqual([])
 })
