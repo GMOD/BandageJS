@@ -287,7 +287,12 @@ const LEFT_PLACEHOLDER = [
 ].join('\n')
 
 // `gfa` under the anchored layout, which lays the reference at its bp
-async function openAnchored(page: Page, gfa: string, nodes: string) {
+async function openAnchored(
+  page: Page,
+  gfa: string,
+  nodes: string,
+  query = '',
+) {
   const url = `https://gbz.test/anchored-${nodes.replace(' ', '-')}.gfa`
   await page.route(url, route =>
     route.fulfill({
@@ -295,7 +300,7 @@ async function openAnchored(page: Page, gfa: string, nodes: string) {
       headers: { 'access-control-allow-origin': '*' },
     }),
   )
-  await openPage(page, `gfa=${encodeURIComponent(url)}&layout=auto`)
+  await openPage(page, `gfa=${encodeURIComponent(url)}&layout=auto${query}`)
   await waitForDrawing(page, new RegExp(`${nodes}.*Anchored`))
 }
 
@@ -342,7 +347,7 @@ const ONE_SPOT = [
 test('the row for nodes not shown counts the placeholders the labels leave without a length, in room for all of them, their lengths its title', async ({
   page,
 }) => {
-  await openAnchored(page, ONE_SPOT, '5 nodes')
+  await openAnchored(page, ONE_SPOT, '5 nodes', '&lengths=0')
   await expect(page.locator('#overlay-html .size-label')).toHaveText(['700 bp'])
   const row = page.locator('#legends .legend-row', {
     hasText: 'nodes not shown',
@@ -375,7 +380,7 @@ const LOADED_LOOP = [
 test('a loop of loaded nodes writes its length along itself with node lengths off', async ({
   page,
 }) => {
-  await openGfa(page, LOADED_LOOP, '3 nodes')
+  await openGfa(page, LOADED_LOOP, '3 nodes', '&lengths=0')
   await expect(page.locator('#overlay-html .size-label')).toHaveText(['300 bp'])
 })
 

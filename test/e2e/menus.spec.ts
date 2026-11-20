@@ -1,3 +1,5 @@
+import { LABEL_DEFAULTS } from '@jbrowse/bandage-core/graphLabels'
+
 import {
   expect,
   menuButton,
@@ -121,18 +123,24 @@ test('a checkbox keeps the menu open so it can be toggled back', async ({
   await expect(bubbles).toHaveAttribute('aria-checked', before!)
 })
 
-test('node lengths are written only once View turns them on', async ({
+test("node lengths are written as core's label default has them, and View turns them over", async ({
   page,
 }) => {
   const lengths = page.locator('#overlay-html .size-label')
-  await expect(lengths).toHaveCount(0)
+  const byDefault = LABEL_DEFAULTS.nodeLengths
+  const written = async (on: boolean) => {
+    await (on
+      ? expect(lengths.first()).toBeVisible()
+      : expect(lengths).toHaveCount(0))
+  }
+  await written(byDefault)
   const popup = await viewMenu(page)
   const item = popup.getByRole('menuitemcheckbox', { name: 'Node lengths' })
-  await expect(item).toHaveAttribute('aria-checked', 'false')
+  await expect(item).toHaveAttribute('aria-checked', String(byDefault))
   await item.click()
-  await expect(lengths.first()).toBeVisible()
+  await written(!byDefault)
   await item.click()
-  await expect(lengths).toHaveCount(0)
+  await written(byDefault)
 })
 
 test('ArrowRight moves to the next menu', async ({ page }) => {

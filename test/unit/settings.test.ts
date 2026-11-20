@@ -1,3 +1,4 @@
+import { LABEL_DEFAULTS } from '@jbrowse/bandage-core/graphLabels'
 import { expect, test } from '@playwright/test'
 
 import {
@@ -175,15 +176,20 @@ test('every setting a link states comes back as it went', () => {
   expect(back).toEqual(s)
 })
 
-test('node lengths are written only where a save or a link turns them on', () => {
-  expect(DEFAULTS.nodeLengthLabels).toBe(false)
-  expect(settingsParams({ ...DEFAULTS, nodeLengthLabels: true })).toEqual([
-    ['layout', 'force'],
-    ['lengths', '1'],
-  ])
-  const s = { ...DEFAULTS }
-  readSettingsParams(new URLSearchParams('lengths=1'), s)
-  expect(s.nodeLengthLabels).toBe(true)
+test("node lengths follow core's label default, and a save or a link states only the other choice", () => {
+  const byDefault = LABEL_DEFAULTS.nodeLengths
+  expect(DEFAULTS.nodeLengthLabels).toBe(byDefault)
+  expect(settingsParams({ ...DEFAULTS, nodeLengthLabels: !byDefault })).toEqual(
+    [
+      ['layout', 'force'],
+      ['lengths', byDefault ? '0' : '1'],
+    ],
+  )
+  for (const on of [true, false]) {
+    const s = { ...DEFAULTS }
+    readSettingsParams(new URLSearchParams(`lengths=${on ? 1 : 0}`), s)
+    expect(s.nodeLengthLabels).toBe(on)
+  }
 })
 
 test('small sites are drawn only where a save or a link turns them on', () => {
