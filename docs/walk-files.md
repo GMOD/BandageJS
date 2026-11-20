@@ -119,4 +119,13 @@ to your own file holds its url.
 - `expand=` in the address lists the walks read in full. The budgets still
   apply, so a click that expands past them fails as a too-wide window does
 
+## Links drawn
+
+- A cut draws the links its shown haplotypes walk
+- Haplotypes → **Links drawn** → **Taken by any haplotype between the nodes
+  shown** cuts again and adds the links other haplotypes of the file take
+  between those nodes. With link thickness by walks they key as `0 walks`
+- `links=between` in the address holds the choice. The JBrowse graph plugin and
+  ggbandage have the same setting, with the same default
+
 [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) reads the files.

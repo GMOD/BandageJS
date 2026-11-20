@@ -14,10 +14,21 @@ import type { WalkFiles } from './walkFiles'
 // `<prefix>.<sample>.walks.gz` with its `.walks.gz.idx`, takes the
 // database's place in a cut: `walkFiles.ts` reads it.
 
+export type WalkLinks = 'walked' | 'between'
+
+export const WALK_LINKS: { value: WalkLinks; label: string }[] = [
+  { value: 'walked', label: 'Walked by the haplotypes shown' },
+  { value: 'between', label: 'Taken by any haplotype between the nodes shown' },
+]
+
 export interface GbzSource extends CoreGbzSource {
   // abridged walks a walk file cut reads in full (walkFiles.ts)
   expand?: string[]
+  // the links a walk file cut lists, graph-walks' default when unset
+  links?: WalkLinks
 }
+
+export const walkLinksOf = (src: { links?: WalkLinks }) => src.links ?? 'walked'
 
 export const HPRC: Omit<GbzSource, 'region'> = HPRC_GBZ
 

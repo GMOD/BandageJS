@@ -8,6 +8,7 @@ import {
 } from '@jbrowse/graph-walks'
 import { RemoteFile } from 'generic-filehandle2'
 
+import type { WalkLinks } from './gbz'
 import type { WalkFilehandle } from '@jbrowse/graph-walks'
 
 // A `gfa-to-tabix --walks` file, `<prefix>.<ref>.walks.gz` with its directory
@@ -36,6 +37,7 @@ export interface WalkCutSource {
   // walks to read in full where that keeps the cut under its budgets
   lifted?: string[]
   nodeLimit?: number
+  links?: WalkLinks
 }
 
 export const walkCutOptions = (src: WalkCutSource) => ({
@@ -44,6 +46,7 @@ export const walkCutOptions = (src: WalkCutSource) => ({
   referenceSample: src.referenceSample,
   context: src.context ?? CUT_PRESETS.browser.context,
   nodeLimit: src.nodeLimit ?? GBZ_CUT_DEFAULTS.limit,
+  links: src.links,
 })
 
 async function cutReading(
@@ -72,6 +75,8 @@ async function cutReading(
  * A window of a walk file set as graph tables, cut by the browser's rules:
  * the reference sample's path over the region with `context` bp either
  * side, and the walks of the haplotypes asked for, every one when none are.
+ * It lists the links those walks take, or with `links: 'between'` the links
+ * any haplotype of the file takes between their nodes.
  * `expanded` names the abridged walks the cut read in full. Where reading the
  * lifted walks in full takes the cut over a budget, it cuts again with them
  * abridged, and `tooLarge` names them.

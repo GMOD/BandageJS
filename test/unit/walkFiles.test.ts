@@ -100,6 +100,17 @@ test('a walk file cut takes a region named as the file names it', async () => {
   expect(walkNames(text)).toEqual(['GRCh38#0#chrM', 'HG00438#2#MT'])
 })
 
+test('a walk file cut lists the links its walks take, and with links between those any haplotype takes between its nodes', async () => {
+  const src = { region: 'chrM:0-16,569', haplotypes: ['HG00438'] }
+  const linksOf = async (links?: 'walked' | 'between') =>
+    lines((await cut({ ...src, links })).text, 'L').map(l => l.join('\t'))
+  const walked = await linksOf()
+  const between = await linksOf('between')
+  expect(await linksOf('walked')).toEqual(walked)
+  expect(between).toEqual(expect.arrayContaining(walked))
+  expect(between.length).toBeGreaterThan(walked.length)
+})
+
 test('a walk file cut names the sequences it holds for one it lacks', async () => {
   await expect(
     cutWalksRegion(walks(), { region: 'chr1:0-100' }),

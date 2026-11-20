@@ -82,6 +82,22 @@ test('a query without both a source and loc names no cut', () => {
   expect(gbzFromQuery(new URLSearchParams('loc=chr1:1-2'))).toBeUndefined()
 })
 
+test('a walk file cut keeps links between only where it was asked for them', () => {
+  const src = {
+    db: HPRC_WALKS,
+    region: 'chr6:160,614,798-160,647,758',
+    haplotypes: ['HG00133'],
+  }
+  expect(gbzQuery(src).links).toBeUndefined()
+  expect(gbzQuery({ ...src, links: 'walked' }).links).toBeUndefined()
+  expect(gbzQuery({ ...src, links: 'between' }).links).toBe('between')
+  expect(roundTrip({ ...src, links: 'between' })).toEqual({
+    ...src,
+    links: 'between',
+  })
+  expect(roundTrip(src)?.links).toBeUndefined()
+})
+
 test('a walk file cut keeps the abridged walks it reads in full', () => {
   const src = {
     db: HPRC_WALKS,

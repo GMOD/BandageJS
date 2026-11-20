@@ -150,6 +150,7 @@ it differs from the default.
 | `gfa`                                                       | GFA url                                                                              |
 | `walks`, `loc`, `ref`, `haps`                               | Cut: walk file url (or `hprc`), region, reference sample, comma-separated haplotypes |
 | `expand`                                                    | Abridged walks the cut reads in full, comma-separated `sample#haplotype#contig`      |
+| `links`                                                     | `between` also draws the links any haplotype takes between the nodes shown           |
 | `hub`, `assembly`, `contigs`                                | Genes: JBrowse configs, assembly, `graph:assembly` contig names                      |
 | `layout`                                                    | `force`, `anchored`, `ordered`, `samplerows`, `walkrows`, `tubemap` or `tubemapref`  |
 | `along`                                                     | Walk that a walk-anchored graph draws along                                          |

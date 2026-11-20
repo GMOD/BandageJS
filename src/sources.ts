@@ -11,7 +11,7 @@ import {
   progress,
   report,
 } from './feedback'
-import { HPRC_WALKS, cutGbz } from './gbz'
+import { HPRC_WALKS, cutGbz, walkLinksOf } from './gbz'
 import { loadGenes, stopGenes } from './genes'
 import { relayout, stopLayout } from './layout'
 import { askView } from './linkView'
@@ -45,7 +45,7 @@ import { rebuild, showCaption } from './view'
 import { askWalks, askedWalks, takeAskedWalks, walkParams } from './walks'
 
 import type { Work } from './feedback'
-import type { GbzSource } from './gbz'
+import type { GbzSource, WalkLinks } from './gbz'
 import type { Region } from './jbrowse'
 import type { Declaration } from './reference'
 import type { Source } from './state'
@@ -419,6 +419,25 @@ function recutAbridged(
     undefined,
     keptOf(source),
   )
+}
+
+// Cuts the region on screen again with the links `links` names. Not inside a
+// popped bubble, which the cut would close.
+export function setWalkLinks(links: WalkLinks) {
+  const source = state.source
+  if (
+    source?.gbz &&
+    state.stack.length === 0 &&
+    walkLinksOf(source.gbz) !== links
+  ) {
+    void openGbz(
+      { ...source.gbz, links },
+      source.description,
+      false,
+      undefined,
+      keptOf(source),
+    )
+  }
 }
 
 // Reads the walks named in full, or fails as a too-wide window does

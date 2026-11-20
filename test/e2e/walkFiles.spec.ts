@@ -1,6 +1,7 @@
 import {
   CHRM_WALKS,
   expect,
+  haplotypesMenu,
   menuButton,
   openPage,
   test,
@@ -46,4 +47,33 @@ test('a pasted walk file url fills the cut dialog with its reference samples', a
   await page.locator('#gbz-dialog').getByRole('button', { name: 'Cut' }).click()
   await waitForDrawing(page, /2 paths/)
   expect(new URL(page.url()).searchParams.get('haps')).toBe('HG00438')
+})
+
+test('Links drawn cuts again with the links any haplotype takes between the nodes shown, and the address keeps the choice', async ({
+  page,
+}) => {
+  const edges = async () =>
+    Number(
+      /([\d,]+) edges/
+        .exec((await page.locator('#stats').textContent()) ?? '')?.[1]
+        ?.replaceAll(',', ''),
+    )
+  const choose = async (name: string) => {
+    const popup = await haplotypesMenu(page, 'Links drawn')
+    await popup.getByRole('menuitemradio', { name }).click()
+  }
+  const linksInAddress = () => new URL(page.url()).searchParams.get('links')
+  await openPage(
+    page,
+    `walks=${encodeURIComponent(CHRM_WALKS)}&loc=chrM:1-16,569&haps=HG00438&layout=force`,
+  )
+  await waitForDrawing(page, /2 paths/)
+  const walked = await edges()
+  expect(linksInAddress()).toBeNull()
+  await choose('Taken by any haplotype between the nodes shown')
+  await expect.poll(linksInAddress).toBe('between')
+  await expect.poll(edges).toBeGreaterThan(walked)
+  await choose('Walked by the haplotypes shown')
+  await expect.poll(linksInAddress).toBeNull()
+  await expect.poll(edges).toBe(walked)
 })

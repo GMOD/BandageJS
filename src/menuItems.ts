@@ -11,6 +11,7 @@ import { linkable } from './address'
 import { layoutName } from './describe'
 import { showAbout, showGuide, showOpenDialog } from './dialogs'
 import { exportBlocked, exportSvg } from './figure'
+import { WALK_LINKS, isWalksUrl, walkLinksOf } from './gbz'
 import { loadGenes, noGenesReason, openGenes } from './genes'
 import { jbrowseItems } from './jbrowseItems'
 import { showHighlightDialog } from './highlightDialog'
@@ -19,7 +20,14 @@ import { applySettings, showLayoutDialog } from './layoutDialog'
 import { copyLink } from './linkView'
 import { backboneOf, binding, referenceAssembly } from './reference'
 import { choiceLabel, showReferenceDialog } from './referenceDialog'
-import { examples, expandWalks, openExample, recut, reparse } from './sources'
+import {
+  examples,
+  expandWalks,
+  openExample,
+  recut,
+  reparse,
+  setWalkLinks,
+} from './sources'
 import {
   abridged as abridgedWalks,
   drawnMode,
@@ -307,6 +315,7 @@ export function haplotypeItems(): MenuItem[] {
   const paths = graph?.paths?.length ?? 0
   const mode = drawnMode()
   const fragments = fragmentsOf(graph)
+  const cut = state.source?.gbz
   const others = [
     ...(!tube() && pathColorsLegible(paths)
       ? [toggle('Colour every haplotype', 'drawPaths')]
@@ -348,7 +357,24 @@ export function haplotypeItems(): MenuItem[] {
         ]
       : []),
   ]
-  return [tube() ? [] : highlightItems(), abridgedItems(), others]
+  const links =
+    cut && isWalksUrl(cut.db) && state.stack.length === 0
+      ? [
+          {
+            label: 'Links drawn',
+            submenu: () =>
+              WALK_LINKS.map(({ value, label }): MenuItem => ({
+                label,
+                radio: true,
+                checked: walkLinksOf(cut) === value,
+                onClick: () => {
+                  setWalkLinks(value)
+                },
+              })),
+          },
+        ]
+      : []
+  return [tube() ? [] : highlightItems(), abridgedItems(), others, links]
     .filter(group => group.length > 0)
     .flatMap((group, i) => (i ? [{ divider: true } as const, ...group] : group))
 }
