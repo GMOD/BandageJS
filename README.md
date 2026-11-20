@@ -79,7 +79,7 @@ database (`.gbz.db`) the same way.
 <td><a href="docs/gallery.md"><img src="img/cfh_force.png" width="260" alt="CFH with genes and a deletion"></a><br>CFH with genes and a deletion</td>
 </tr>
 <tr>
-<td><a href="docs/gallery.md"><img src="img/mhc_stress.png" width="260" alt="MHC class II, stress layout"></a><br>MHC class II, stress layout</td>
+<td><a href="docs/gallery.md"><img src="img/mhc_force.png" width="260" alt="MHC class II with the DRB genes"></a><br>MHC class II with the DRB genes</td>
 <td><a href="docs/gallery.md"><img src="img/ecoli_genes.png" width="260" alt="E. coli with K-12 genes"></a><br>E. coli with K-12 genes</td>
 <td><a href="docs/gallery.md"><img src="img/assembly_graph.png" width="260" alt="A de novo assembly graph"></a><br>A de novo assembly graph</td>
 </tr>

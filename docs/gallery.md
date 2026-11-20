@@ -31,11 +31,11 @@ and "partial walk" a walk that leaves the cut region:
 
 ![The amylase locus in four HPRC samples, as walk rows with their genes](../img/amy1_rows.png)
 
-The stress layout draws HLA-DRB5, DRB6 and DRB1 from a slice of an HPRC rGFA.
-The long dashed edge skips a stretch of GRCh38, and the large loop is sequence
-that GRCh38 lacks:
+A slice of an HPRC rGFA draws HLA-DRB5, DRB6 and DRB1 force-directed. The dashed
+edge skips a stretch of GRCh38, and the large loop is sequence that GRCh38
+lacks:
 
-![The MHC class II DRB region, stress layout](../img/mhc_stress.png)
+![The MHC class II DRB region, force-directed](../img/mhc_force.png)
 
 A slice of an E. coli minigraph is anchored on K-12 and labelled with K-12's
 genes:

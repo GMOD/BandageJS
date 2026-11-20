@@ -107,8 +107,8 @@ const FIGURES = {
     ].join('&'),
     size: [1400, 420],
   },
-  mhc_stress: {
-    query: 'gfa=examples/hprc_mhc_class2.gfa&layout=force&engine=stress',
+  mhc_force: {
+    query: 'gfa=examples/hprc_mhc_class2.gfa&layout=force',
     size: [1400, 800],
   },
   ecoli_genes: {
