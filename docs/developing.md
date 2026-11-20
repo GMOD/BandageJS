@@ -59,7 +59,8 @@ including the plugin's 46-sample `micb-kir3dl1.gbz.db` at `https://gbz.test/`.
 - `pnpm shoot:tutorial` reshoots `img/tutorial/` for [walk files](walk-files.md)
   by driving the Open and cut dialogs
 - `img/jbrowse_kiv2.png` and `img/jbrowse_kiv2_facet.png` are screenshots of the
-  JBrowse plugin, copied from its `img/`. This script does not shoot them
+  JBrowse plugin, copied from its `img/force_kiv2_bubbles.png` and
+  `img/force_kiv2_facet.png`. This script does not shoot them
 
 ## Updating the core
 
