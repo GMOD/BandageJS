@@ -10,6 +10,7 @@ import {
   exonStretches,
   geneLeader,
   passLeader,
+  sizeLeader,
   walkKeyEntry,
   el,
   serializeEl,
@@ -299,6 +300,21 @@ export function walkRowsLayer(p: Pane) {
     : undefined
 }
 
+// The leader from each length stood off its node to the point it names, as
+// the plugin and a figure draw it
+function sizeLeaders(p: Pane) {
+  return p.labels.sizes
+    .flatMap(label => {
+      const leader = sizeLeader(label)
+      return leader
+        ? [
+            `<line class="size-leader" x1="${leader.x1}" x2="${leader.x2}" y1="${leader.y1}" y2="${leader.y2}" stroke="${GENE_INK}" stroke-width="0.8" stroke-opacity="0.6"/>`,
+          ]
+        : []
+    })
+    .join('')
+}
+
 // Halos, then exon outlines and rings round nodes, then labels
 export function overlaySvg(p: Pane) {
   return (
@@ -306,6 +322,7 @@ export function overlaySvg(p: Pane) {
     exonOutlines(p) +
     alongNodes(p, rings(p)) +
     ticks(p) +
+    sizeLeaders(p) +
     chips(p)
   )
 }
