@@ -966,7 +966,7 @@ function drawOverlays() {
     }
     if (state.owner === 'fit' && layoutFit().width !== column) {
       fit()
-      viewportMoved()
+      rebuild()
     } else {
       scheduleDraw()
     }

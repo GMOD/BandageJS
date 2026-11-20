@@ -51,6 +51,14 @@ test('hovering a node describes it beside the pointer and clicking opens its det
   await expect(details).toBeHidden()
 })
 
+test('the drawing holds still once its overlays show', async ({ page }) => {
+  const drawing = () =>
+    page.locator('#graph').evaluate((c: HTMLCanvasElement) => c.toDataURL())
+  const shown = await drawing()
+  await page.waitForTimeout(500)
+  expect(await drawing()).toBe(shown)
+})
+
 // The hover lights its node on a layer of its own, so the drawing's canvas is
 // not painted again for it
 test('hovering paints the hover layer, not the drawing', async ({ page }) => {
