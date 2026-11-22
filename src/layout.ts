@@ -8,7 +8,7 @@ import { cancelLayout, isSuperseded, workerEngine } from './engine'
 import { done, fail, progress } from './feedback'
 import { takeAskedView } from './linkView'
 import { effectiveMode, layoutFit, settings, state } from './state'
-import { fit, rebuild } from './view'
+import { fitBesideKey, rebuild } from './view'
 
 import type { Work } from './feedback'
 import type { Graph } from '@jbrowse/bandage-core'
@@ -59,7 +59,7 @@ export async function relayout() {
       state.layoutMs = duration
       state.owner = 'fit'
       state.positionsVersion++
-      fit()
+      fitBesideKey()
       rebuild()
       if (takeAskedView()) {
         rebuild()

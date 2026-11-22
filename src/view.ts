@@ -14,6 +14,7 @@ import {
   facetCells,
   facetGrid,
   fitTransform,
+  geometryFold,
   getDpr,
   graphKey,
   keyedView,
@@ -92,6 +93,7 @@ import type {
   LiftedWalk,
   MinigraphBubble,
   PaneTransform,
+  UnlabelledPlaceholders,
   WalkLift,
   WalkRows,
 } from '@jbrowse/bandage-core'
@@ -452,6 +454,34 @@ function walkReference(lift: WalkLift | undefined) {
   return domain && { ...domain, name: referenceName() }
 }
 
+// What the drawing is built from, over `viewportBounds` at the scale as it is
+function buildOptions(
+  graph: Graph,
+  layout: LayoutResult,
+  viewportBounds: Bounds,
+  highlight: WalkLift | undefined,
+  paths: boolean,
+) {
+  const d = current()
+  return {
+    // walk rows draw every row, the reference's too, as an overlay
+    ...layoutGeometryInputs(layout, d.drawing, { drawsRows: !!d.bars }),
+    graph,
+    nodeById: facts().nodeById,
+    colorScheme: resolveColorScheme(settings.colorScheme, graph),
+    contigThickness: settings.nodeThickness,
+    connectorThickness: CONNECTOR_THICKNESS,
+    drawPaths: paths,
+    nodeWidth: settings.nodeWidth,
+    highlight,
+    axis: axis(),
+    viewportBounds,
+    referenceRamp: d.ramp,
+    version: state.positionsVersion,
+    smallSites: smallSites(),
+  }
+}
+
 export function rebuild() {
   const { graph, layout } = state
   renderer.resize(state.width, state.height)
@@ -468,27 +498,10 @@ export function rebuild() {
     draw()
     return
   }
-  const d = current()
   const start = performance.now()
   const viewportBounds = padded(viewport(), 1)
   const build = (highlight: WalkLift | undefined, paths: boolean) =>
-    buildGeometry({
-      // walk rows draw every row, the reference's too, as an overlay
-      ...layoutGeometryInputs(layout, d.drawing, { drawsRows: !!d.bars }),
-      graph,
-      nodeById: facts().nodeById,
-      colorScheme: resolveColorScheme(settings.colorScheme, graph),
-      contigThickness: settings.nodeThickness,
-      connectorThickness: CONNECTOR_THICKNESS,
-      drawPaths: paths,
-      nodeWidth: settings.nodeWidth,
-      highlight,
-      axis: axis(),
-      viewportBounds,
-      referenceRamp: d.ramp,
-      version: state.positionsVersion,
-      smallSites: smallSites(),
-    })
+    buildGeometry(buildOptions(graph, layout, viewportBounds, highlight, paths))
   const g = grid()
   uploadPane(g ? EMPTY_BATCH : build(walks().lift, drawPaths()))
   for (const f of facets) {
@@ -498,6 +511,7 @@ export function rebuild() {
     f.renderer.uploadGeometry(f.batch)
   }
   state.geometryMs = performance.now() - start
+  performance.mark('geometry')
   state.built = { scale: state.scale, bounds: viewportBounds }
   draw()
 }
@@ -843,6 +857,107 @@ function drawWalkRows(p: Pane | undefined) {
   }
 }
 
+// The key over `batch`'s marks
+function legendsOf(
+  layout: LayoutResult | undefined,
+  halos: ReturnType<typeof drawnHalos>,
+  unlabelled: UnlabelledPlaceholders | undefined,
+  batch: KeyedBatch,
+) {
+  const { graph } = state
+  const f = facts()
+  const d = current()
+  const { lift } = walks()
+  const labelsNodeSizes = !layout?.tubeMap && !lift
+  return layout && graph
+    ? legendsHtml({
+        key: graphKey(graph, layout, {
+          region: state.region,
+          referenceName: referenceName() ?? referenceAssembly(),
+          referenceRamp: d.ramp,
+          lift,
+          walkLabel: name => f.walkLabels.get(name) ?? name,
+          nodeWidth: settings.nodeWidth,
+          contigThickness: settings.nodeThickness,
+          connectorThickness: CONNECTOR_THICKNESS,
+          drawsNodes: !d.bars && !layout.tubeMap,
+          marks: drawnMarks([batch], keyView()),
+          genePins: d.genePins,
+          genesFrom: state.genesFrom,
+          halos,
+          unlabelled: labelsNodeSizes ? 'reserved' : undefined,
+        }),
+        unlabelled: labelsNodeSizes
+          ? unlabelledCount(unlabelled, f.placeholders)
+          : undefined,
+        at: hoveredOn,
+        paths: drawPaths() && graph.paths ? pathLegend(graph.paths) : [],
+        walkBars: d.bars,
+        rowGenes: d.rowGenes?.size ? state.walkGeneNote : undefined,
+        walkRamp: d.bars ? rampInterval(d.ramp) : undefined,
+      })
+    : ''
+}
+
+// Writes the key and measures it, true when it changed
+function showLegends(html: string) {
+  const changed = setHtml(ui.legends, html)
+  if (changed) {
+    state.legendSize = {
+      width: ui.legends.offsetWidth,
+      height: ui.legends.offsetHeight,
+    }
+  }
+  return changed
+}
+
+type KeyedBatch = Parameters<typeof drawnMarks>[0][number]
+
+// how often a new layout's fit is made again for a key whose column moved
+const KEY_FITS = 3
+
+// Fits a new layout beside the key it will draw. The key names what the
+// build folds at the fit's scale and its column moves the fit, so it is
+// written from that fold alone and the fit made again until the column
+// holds: the drawing is then built once, at the scale its key was measured at
+export function fitBesideKey() {
+  const { graph, layout } = state
+  fit()
+  if (graph && layout && !layout.tubeMap && facets.length === 0) {
+    let moved = true
+    for (let tries = 0; moved && tries < KEY_FITS; tries++) {
+      const column = layoutFit().width
+      const collapsed = geometryFold(
+        buildOptions(
+          graph,
+          layout,
+          padded(viewport(), 1),
+          walks().lift,
+          drawPaths(),
+        ),
+      )
+      const halos = drawnHalos(
+        current().halos,
+        graph,
+        layout.nodePositions,
+        state.positionsVersion,
+        collapsed,
+      )
+      showLegends(
+        legendsOf(layout, halos, undefined, {
+          edgeCurves: [],
+          nodeStrokes: [],
+          collapsed,
+        }),
+      )
+      moved = layoutFit().width !== column
+      if (moved) {
+        fit()
+      }
+    }
+  }
+}
+
 function drawOverlays() {
   const { graph } = state
   // faceted, each panel's title is its walk's key and nothing else is drawn
@@ -929,41 +1044,8 @@ function drawOverlays() {
   setHtml(ui.html, layout ? overlayHtml(pane) : '')
   overlayBubbles = halos.map(h => h.bubble)
 
-  const legends =
-    layout && graph
-      ? legendsHtml({
-          key: graphKey(graph, layout, {
-            region: state.region,
-            referenceName: referenceName() ?? referenceAssembly(),
-            referenceRamp: d.ramp,
-            lift,
-            walkLabel: name => f.walkLabels.get(name) ?? name,
-            nodeWidth: settings.nodeWidth,
-            contigThickness: settings.nodeThickness,
-            connectorThickness: CONNECTOR_THICKNESS,
-            drawsNodes: !d.bars && !layout.tubeMap,
-            marks: drawnMarks([paneBatch], keyView()),
-            genePins: d.genePins,
-            genesFrom: state.genesFrom,
-            halos,
-            unlabelled: labelsNodeSizes ? 'reserved' : undefined,
-          }),
-          unlabelled: labelsNodeSizes
-            ? unlabelledCount(labels.unlabelled, f.placeholders)
-            : undefined,
-          at: hoveredOn,
-          paths: drawPaths() && graph.paths ? pathLegend(graph.paths) : [],
-          walkBars: d.bars,
-          rowGenes: d.rowGenes?.size ? state.walkGeneNote : undefined,
-          walkRamp,
-        })
-      : ''
-  if (setHtml(ui.legends, legends)) {
-    const column = layoutFit().width
-    state.legendSize = {
-      width: ui.legends.offsetWidth,
-      height: ui.legends.offsetHeight,
-    }
+  const column = layoutFit().width
+  if (showLegends(legendsOf(layout, halos, labels.unlabelled, paneBatch))) {
     if (state.owner === 'fit' && layoutFit().width !== column) {
       fit()
       rebuild()
