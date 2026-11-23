@@ -189,7 +189,7 @@ test("a haplotype's links open the gene track the hub's overlay chose", () => {
     gapBp: 0,
     complete: true,
     runs: [],
-    axis: { contig: 'chr1', start: 5000, reversed: false },
+    axis: { contig: 'chr1', start: 5000 },
   }
   expect(tracksIn(nodeLink(node, t))).toEqual(['chosen'])
   expect(tracksIn(rowLink(row, false, t))).toEqual(['chosen'])

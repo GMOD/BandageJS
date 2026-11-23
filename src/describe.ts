@@ -6,6 +6,7 @@ import {
   placeholderHoverText,
   rowSpan,
   walkRowReadout,
+  walkedBp,
 } from '@jbrowse/bandage-core'
 
 import { HPRC, HPRC_WALKS } from './gbz'
@@ -140,17 +141,18 @@ export function geneText(gene: GeneModel, covered = 1) {
   }`
 }
 
-// A walk row's bar: its haplotype, length and the span of its own contig, or
-// for a row with no step in the cut its departures, in the words of the bar's
-// readout. A departure whose place the writer chose says so.
+// A walk row's bar: its haplotype, the bp it walks, not those it spends away
+// from the window, and the span of its own contig, or for a row with no step
+// in the cut its departures, in the words of the bar's readout. A departure
+// whose place the writer chose says so.
 export function rowHtml(row: WalkRow, reference: WalkRow | undefined) {
   const span = row.axis && rowSpan(row.axis, row.bp)
   const length = row.stepless
     ? walkRowReadout(row, reference)
-    : `${formatBp(row.bp)}${row.placementChoice ? ` · ${PLACEMENT_CHOICE_TEXT}` : ''}`
+    : `${formatBp(walkedBp(row))}${row.placementChoice ? ` · ${PLACEMENT_CHOICE_TEXT}` : ''}`
   return `<strong>${esc(row.label)}</strong> ${esc(length)}${
     span && row.axis
-      ? `<br>${esc(row.axis.contig)}:${(span.start + 1).toLocaleString()}-${span.end.toLocaleString()}${row.axis.reversed ? ', walked in reverse' : ''}`
+      ? `<br>${esc(row.axis.contig)}:${(span.start + 1).toLocaleString()}-${span.end.toLocaleString()}`
       : ''
   }`
 }

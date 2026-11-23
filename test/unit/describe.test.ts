@@ -129,7 +129,7 @@ test('nodeHtml lists three genes over a node and counts the rest', () => {
   expect(html).toContain('+2 more genes')
 })
 
-test('rowHtml gives a walk row its length and contig span, and says where a departure is a placement choice', () => {
+test('rowHtml gives a walk row the bp it walks and its contig span, and says where a departure is a placement choice', () => {
   const row: WalkRow = {
     name: 'HG00097#1#CM1',
     label: 'HG00097#1',
@@ -141,13 +141,29 @@ test('rowHtml gives a walk row its length and contig span, and says where a depa
     complete: true,
     runs: [],
   }
-  const on = (start: number, reversed: boolean) =>
-    rowHtml({ ...row, axis: { contig: 'CM1', start, reversed } }, undefined)
-  expect(on(100_000, false)).toBe(
+  expect(
+    rowHtml({ ...row, axis: { contig: 'CM1', start: 100_000 } }, undefined),
+  ).toBe(
     `<strong>HG00097#1</strong> 12.3 kb<br>CM1:${(100_001).toLocaleString()}-${(112_300).toLocaleString()}`,
   )
-  expect(on(20_000, true)).toBe(
-    `<strong>HG00097#1</strong> 12.3 kb<br>CM1:${(7701).toLocaleString()}-${(20_000).toLocaleString()}, walked in reverse`,
+  // 4.2 kb of the bar are spent away from the window, drawn as a break
+  const away = {
+    ...row,
+    runs: [
+      { start: 0, bp: 8100, onReference: true },
+      {
+        start: 8100,
+        bp: 120,
+        onReference: false,
+        gap: true as const,
+        cause: 'away' as const,
+        heldBp: 4200,
+      },
+    ],
+    axis: { contig: 'CM1', start: 20_000 },
+  }
+  expect(rowHtml(away, undefined)).toBe(
+    `<strong>HG00097#1</strong> 8.1 kb<br>CM1:${(20_001).toLocaleString()}-${(32_300).toLocaleString()}`,
   )
   expect(rowHtml({ ...row, placementChoice: true }, undefined)).toBe(
     '<strong>HG00097#1</strong> 12.3 kb · placement choice',

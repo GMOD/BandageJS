@@ -292,7 +292,7 @@ test('a haplotype with no step in the window draws its departure under the refer
     ])
   }
   expect(rowHtml(row('JUMP#1'), bars.reference)).toBe(
-    '<strong>JUMP#1</strong> no step on REF across 4 kb · 0 bp of its own',
+    '<strong>JUMP#1</strong> no step on REF across 4 kb',
   )
   expect(rowHtml(row('OWN#1'), bars.reference)).toBe(
     '<strong>OWN#1</strong> no step on REF across 1 kb · 400 bp of its own',
@@ -312,7 +312,7 @@ test('a walk whose steps in the cut are the flanks of its departure reads as a s
     expect(gfa.walks.names).toContain('OWN#1#chr1')
     expect(gfa.walks.names).not.toContain('JUMP#1#chr1')
     expect(rowHtml(row('JUMP#1'), bars.reference)).toBe(
-      '<strong>JUMP#1</strong> no step on REF across 4 kb · 0 bp of its own',
+      '<strong>JUMP#1</strong> no step on REF across 4 kb',
     )
     expect(rowHtml(row('OWN#1'), bars.reference)).toBe(
       '<strong>OWN#1</strong> 400 bp<br>chr1:3,001-3,400',
