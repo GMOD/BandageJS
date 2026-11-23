@@ -39,7 +39,7 @@ test('validSettings replaces each unknown value with its default', () => {
     validSettings({
       mode: 'bogus',
       colorScheme: 7,
-      nodeWidth: 'depth',
+      nodeWidth: 'by-depth',
       engine: 'ogdf',
       quality: 9,
       bubbleSpread: null,

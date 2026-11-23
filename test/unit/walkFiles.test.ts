@@ -176,7 +176,7 @@ test("a walk file cut takes the browser preset, with this viewer's node limit", 
   expect(walkCutOptions({ region: K12, context: 0 }).context).toBe(0)
 })
 
-test("a placeholder's length is labelled with node lengths off, and every node's with them on", async () => {
+test("a placeholder's length is labelled with node lengths off, and every node's but the reference's with them on", async () => {
   const { gfa } = await cut({ region: K12 }, ABRIDGED)
   const graph = loadGraph(gfa, 'cut')
   const placeholders = graph.nodes.filter(n => n.placeholder)
@@ -184,8 +184,13 @@ test("a placeholder's length is labelled with node lengths off, and every node's
   expect(labelledLengths(graph, false)).toEqual(
     new Map(placeholders.map(n => [n.id, n.length])),
   )
+  // every length but the reference's, which the ruler and the ramp place
   expect(labelledLengths(graph, true)).toEqual(
-    new Map(graph.nodes.map(n => [n.id, n.length])),
+    new Map(
+      graph.nodes
+        .filter(n => n.placeholder === true || n.stable?.rank !== 0)
+        .map(n => [n.id, n.length]),
+    ),
   )
 })
 

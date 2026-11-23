@@ -74,7 +74,7 @@ export type Facet = FacetSetting['field']
 
 // links share the nodes' scale where nodes are drawn by walks
 export const linkWidthOf = ({ nodeWidth }: Pick<Settings, 'nodeWidth'>) =>
-  nodeWidth === 'walks' ? 'walks' : 'uniform'
+  nodeWidth === 'walks' ? ('walks' as const) : ('uniform' as const)
 
 export const SPACINGS = [
   { value: 0.5, label: 'Compact' },
@@ -237,6 +237,7 @@ const FORMAT = 2
 const WAS_DEFAULT: Partial<Record<string, unknown>> = {
   showDeletionEdges: false,
   showBubbles: true,
+  nodeWidth: 'depth',
 }
 
 const isRecord = (raw: unknown): raw is Record<string, unknown> =>
