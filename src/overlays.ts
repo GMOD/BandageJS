@@ -18,6 +18,7 @@ import {
   walkRowsKey,
   walkRowsTree,
 } from '@jbrowse/bandage-core'
+import { elOf } from '@jbrowse/bandage-core/el'
 import { arrowheadOutline } from '@jbrowse/bandage-core/renderer/Canvas2DRenderer'
 import {
   LANE_HEAD_HALO_PX,
@@ -521,7 +522,7 @@ export function graphKeyHtml(
 // The chevrons walk rows draw along a stretch walked against the reference,
 // over a key swatch
 function chevronSwatch() {
-  return el(
+  return elOf(
     'svg',
     {
       viewBox: '0 0 18 8',
@@ -529,7 +530,7 @@ function chevronSwatch() {
       height: '100%',
       preserveAspectRatio: 'none',
     },
-    ...chevronPoints(0, 18, 4, 8).flatMap(points => [
+    chevronPoints(0, 18, 4, 8).flatMap(points => [
       el('polyline', {
         points,
         fill: 'none',
