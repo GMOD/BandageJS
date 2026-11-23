@@ -73,7 +73,7 @@ const force = ui.layoutDialog.querySelector<HTMLElement>('#force-settings')!
 const hint = ui.layoutDialog.querySelector<HTMLElement>('#force-hint')!
 
 nodes.innerHTML = `${sliderHtml(THICKNESS)}
-  <label class="check"><input type="checkbox" id="depth-width" /> Width by walks <small id="depth-note">· every node has one depth</small></label>`
+  <label class="check"><input type="checkbox" id="depth-width" /> Width by walks <small id="depth-note">· every node would draw one width</small></label>`
 force.insertAdjacentHTML(
   'beforeend',
   `<label>Engine <select id="layout-engine">${LAYOUT_ENGINES.map(

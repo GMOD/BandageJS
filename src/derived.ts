@@ -99,7 +99,7 @@ export const graphFacts = memo((graph: Graph | undefined) => {
 })
 
 export const labelledLengths = memo((graph: Graph | undefined, on: boolean) =>
-  labelledNodeLengths(graph?.nodes ?? [], on),
+  labelledNodeLengths(graph, on),
 )
 
 // The bubbles of the graph on screen, `span` the one it was popped out of
