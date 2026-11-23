@@ -17,7 +17,7 @@ import { SHORT_SKIP_KEY } from '@jbrowse/bandage-core/deletionEdges'
 import { RUNS_ON_KEY } from '@jbrowse/bandage-core/graphKey'
 import { expect, test } from '@playwright/test'
 
-import { legendsHtml } from '../../src/overlays'
+import { legendsHtml, walkRowsKeyHtml } from '../../src/overlays'
 
 import type {
   Graph,
@@ -293,4 +293,17 @@ test("a tail whose free end no drawn link meets is keyed with core's tab swatch 
   expect(row).toContain(
     '<path d="M0,6 L8,1 L8,11 Z M18,6 L10,1 L10,11 Z" fill="#18181c"/>',
   )
+})
+
+test("the walk rows key draws the rows' chevrons on the swatch for a stretch walked against the reference", () => {
+  const html = walkRowsKeyHtml([
+    {
+      swatch: { kind: 'bar', fill: '#9e9e9e', chevrons: true },
+      label: "walked against GRCh38#0's direction",
+    },
+    { swatch: { kind: 'bar', fill: '#3c4148' }, label: 'off the path' },
+  ])
+  expect(html.match(/<polyline /g)?.length).toBeGreaterThan(0)
+  expect(html.split('off the path')[0]).toContain('<polyline ')
+  expect(html.split('walked against')[1]).not.toContain('<polyline ')
 })

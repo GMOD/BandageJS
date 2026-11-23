@@ -26,6 +26,11 @@ import {
   laneHeadInk,
 } from '@jbrowse/bandage-core/renderer/laneHeads'
 import { THREAD_PX } from '@jbrowse/bandage-core/renderer/walkLanes'
+import {
+  CHEVRON_HALO,
+  CHEVRON_INK,
+  chevronPoints,
+} from '@jbrowse/bandage-core/layout/walkRowDraw'
 
 import { geneText } from './describe'
 
@@ -513,6 +518,34 @@ export function graphKeyHtml(
     .join('')
 }
 
+// The chevrons walk rows draw along a stretch walked against the reference,
+// over a key swatch
+function chevronSwatch() {
+  return el(
+    'svg',
+    {
+      viewBox: '0 0 18 8',
+      width: '100%',
+      height: '100%',
+      preserveAspectRatio: 'none',
+    },
+    ...chevronPoints(0, 18, 4, 8).flatMap(points => [
+      el('polyline', {
+        points,
+        fill: 'none',
+        stroke: CHEVRON_HALO,
+        'stroke-width': 1.5,
+      }),
+      el('polyline', {
+        points,
+        fill: 'none',
+        stroke: CHEVRON_INK,
+        'stroke-width': 0.8,
+      }),
+    ]),
+  )
+}
+
 export function walkRowsKeyHtml(entries: KeyEntry[]) {
   return serializeEl(
     el(
@@ -524,15 +557,21 @@ export function walkRowsKeyHtml(entries: KeyEntry[]) {
           : el(
               'div',
               { class: 'legend-row' },
-              el('div', {
-                class: `swatch bar${e.swatch.kind === 'gene' ? ' gene-box' : ''}${e.swatch.kind === 'gap' ? ' gap' : ''}`,
-                style:
-                  e.swatch.kind === 'gene'
-                    ? undefined
-                    : e.swatch.kind === 'gap'
-                      ? `background:${e.swatch.fill};height:${e.swatch.px}px`
-                      : `background:${e.swatch.fill}`,
-              }),
+              el(
+                'div',
+                {
+                  class: `swatch bar${e.swatch.kind === 'gene' ? ' gene-box' : ''}${e.swatch.kind === 'gap' ? ' gap' : ''}`,
+                  style:
+                    e.swatch.kind === 'gene'
+                      ? undefined
+                      : e.swatch.kind === 'gap'
+                        ? `background:${e.swatch.fill};height:${e.swatch.px}px`
+                        : `background:${e.swatch.fill}`,
+                },
+                e.swatch.kind === 'bar' && e.swatch.chevrons
+                  ? chevronSwatch()
+                  : undefined,
+              ),
               el('span', {}, e.label),
             ),
       ),
