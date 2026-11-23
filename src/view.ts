@@ -124,15 +124,21 @@ export function onDraw(fn: () => void) {
   afterDraw.push(fn)
 }
 
+// `widthPx` is the room right of the row labels the bars and their readouts
+// fit in
 function measure(
   layout: LayoutResult | undefined,
   region: Region | undefined,
   bars: WalkRows | undefined,
+  widthPx: number,
 ) {
   return layout
     ? drawingBounds(layout, {
         region,
-        extent: bars && layout.extent ? walkRowsExtent(bars) : undefined,
+        extent:
+          bars && layout.extent
+            ? walkRowsExtent(bars, undefined, { widthPx })
+            : undefined,
       })
     : undefined
 }
@@ -143,8 +149,9 @@ const boundsOf = memo(
     layout: LayoutResult | undefined,
     region: Region | undefined,
     bars: WalkRows | undefined,
+    widthPx: number,
     _positionsVersion: number,
-  ) => measure(layout, region, bars),
+  ) => measure(layout, region, bars, widthPx),
 )
 
 const boundsKeys = () =>
@@ -152,6 +159,7 @@ const boundsKeys = () =>
     state.layout,
     state.stack.length === 0 ? state.region : undefined,
     current().bars,
+    layoutFit().width - labelGutterOf(current().rowLabels) - FIT_PADDING,
   ] as const
 
 // The drawing as dragged, which the fit frames
