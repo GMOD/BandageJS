@@ -54,14 +54,14 @@ test('View › Small sites draws every node at any zoom, kept in the address, an
   await item.click()
   await expect(item).toHaveAttribute('aria-checked', 'true')
   await page.keyboard.press('Escape')
-  await expect(page.locator('#legends')).not.toContainText('not drawn')
+  await expect(page.locator('#legends')).not.toContainText(/bp not drawn/)
   await expect(page).toHaveURL(/[?&]smallsites=1(&|$)/)
   expect(await drawing()).not.toBe(folded)
-  expect(await svgExport(page)).not.toContain('not drawn')
+  expect(await svgExport(page)).not.toMatch(/bp not drawn/)
   await openPage(page, `${CHRM}&smallsites=1`)
   await waitForDrawing(page, /44 paths/)
   await expect(page.locator('#legends > .legend').last()).toBeVisible()
-  await expect(page.locator('#legends')).not.toContainText('not drawn')
+  await expect(page.locator('#legends')).not.toContainText(/bp not drawn/)
 })
 
 // Every canvas point, at `step` px, the drawing inks: not left white
@@ -177,12 +177,13 @@ const openLoop = (page: Page, query = '') =>
 
 const ON_LOOP = /\ba\d\b/
 
-test('a loop the drawing lays a few dozen px across is drawn at the fit, however few its bp', async ({
+test('a loop the drawing lays a few dozen px across folds by its few bp at the fit', async ({
   page,
 }) => {
   await openGfa(page, DRAWN_LOOP, '10 nodes')
-  await expect(page.locator('#legends')).toContainText('1 walk')
-  await expect(page.locator('#legends')).not.toContainText('not drawn')
+  await expect(page.locator('#legends > .legend').last()).toHaveText(
+    /^8 nodes under \d+ bp not drawn$/,
+  )
 })
 
 test('a node or link the drawing folds is neither hovered nor selected, where drawn it would be', async ({
@@ -197,7 +198,7 @@ test('a node or link the drawing folds is neither hovered nor selected, where dr
   await page.waitForTimeout(500)
   const folded = new Set(await inked(page, 1))
   await toggleSmallSites(page)
-  await expect(page.locator('#legends')).not.toContainText('not drawn')
+  await expect(page.locator('#legends')).not.toContainText(/bp not drawn/)
   await page.waitForTimeout(300)
   const loop = (await inked(page, 1))
     .filter(p => !folded.has(p))
@@ -451,13 +452,31 @@ test('a strip point on a folded node lights no ring in the drawing', async ({
   }
 })
 
+// SNP with its alt loaded whole, so thickness by walks is drawn
+const SNP_LOADED = [
+  ...['r0', 'r1', 'r2', 'r3'].map(r => `S\t${r}\t${'A'.repeat(1000)}`),
+  'S\tm\tA',
+  'S\tx\tC',
+  ...['r0 r1', 'r1 m', 'm r2', 'r1 x', 'x r2', 'r2 r3'].map(pair => {
+    const [from, to] = pair.split(' ')
+    return `L\t${from}\t+\t${to}\t+\t0M`
+  }),
+  'W\tref\t0\tchr\t0\t4001\t>r0>r1>m>r2>r3',
+  'W\talt\t1\tchr\t0\t4001\t>r0>r1>x>r2>r3',
+].join('\n')
+
 test('a reference node inside a folded site is ringed as wide as the stroke the drawing runs through it', async ({
   page,
 }) => {
-  await openGfa(page, SNP, '7 nodes')
+  await openGfa(page, SNP_LOADED, '6 nodes')
   const view = await fitView(page)
   const ringPx = async (query: string, node: string) => {
-    await openGfa(page, SNP, '7 nodes', `${query}&node=${node}&view=${view}`)
+    await openGfa(
+      page,
+      SNP_LOADED,
+      '6 nodes',
+      `${query}&node=${node}&view=${view}`,
+    )
     await expect(rings(page)).toHaveCount(1)
     return Number(await rings(page).getAttribute('stroke-width'))
   }
@@ -588,11 +607,11 @@ test('Find zooms until the folded node it names is drawn, and so does a link nam
   await page.locator('#find').fill('a3')
   await page.locator('#find').press('Enter')
   await expect(page.locator('#details h2')).toHaveText('a3')
-  await expect(key).not.toContainText('not drawn')
+  await expect(key).not.toContainText(/bp not drawn/)
   await expect(rings(page)).toHaveCount(1)
   await openGfa(page, LONG_LOOP, '10 nodes', '&node=a5')
   await expect(page.locator('#details h2')).toHaveText('a5')
-  await expect(key).not.toContainText('not drawn')
+  await expect(key).not.toContainText(/bp not drawn/)
   await expect(rings(page)).toHaveCount(1)
 })
 
@@ -741,7 +760,7 @@ test('side by side, the key line under the panels ends with what the panels leav
     /^8 nodes under \d+ bp not drawn$/,
   )
   await toggleSmallSites(page)
-  await expect(key).not.toContainText('not drawn')
+  await expect(key).not.toContainText(/bp not drawn/)
   // six panels of the loop down a wide pane fill its height, and leave the
   // line its room
   await page.setViewportSize({ width: 3000, height: 720 })
