@@ -18,6 +18,7 @@ import type {
   GeneModel,
   GraphEdge,
   GraphNode,
+  PaddedFoot,
   WalkRow,
 } from '@jbrowse/bandage-core'
 
@@ -120,13 +121,13 @@ export function nodeText(node: GraphNode) {
 // the key does, and no event
 export function edgeHtml(
   edge: GraphEdge,
-  skip: DeletionEdge | undefined,
+  skip: DeletionEdge | PaddedFoot | undefined,
   nameOf: (id: string) => string,
   reference: string | undefined,
 ) {
   const text = edgeHoverText(edge, skip, nameOf)
   return text.deletion
-    ? `${esc(`skips ${text.deletion.bp} of ${reference ?? 'the reference'} sequence`)}<br>${esc(text.deletion.where)}`
+    ? `${esc(`skips ${text.deletion.bp} of ${reference ?? 'the reference'} sequence${text.deletion.replacedBy ? `, replaced by ${text.deletion.replacedBy}` : ''}`)}<br>${esc(text.deletion.where)}`
     : `Edge: ${esc(text.ends)}`
 }
 

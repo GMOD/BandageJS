@@ -3,6 +3,7 @@ import {
   loadGraph,
   placeholderHoverText,
   referenceLabel,
+  skipAt,
 } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
@@ -207,4 +208,40 @@ test('a link skipping reference sequence says the bp it skips of the named refer
     'skips 50 bp of GRCh38 chr1 sequence<br>GRCh38#0#chr1:101-150',
   )
   expect(html).not.toMatch(/deletion/i)
+})
+
+// SV-rep-1k-10k: HG01109's 2 bp in place of 1,839 bp of GRCh38, whose routed
+// feet draw in a skip's ink, hovered as "Edge: r1 → x"
+test("a padded foot a force layout routed says what its walk's run skips and what replaces it, as the plugin does", () => {
+  const graph = loadGraph(
+    [
+      `S\tr1\t${'A'.repeat(2000)}`,
+      `S\tr2\t${'C'.repeat(1839)}`,
+      `S\tr3\t${'G'.repeat(2000)}`,
+      'S\tx\tTT',
+      'L\tr1\t+\tr2\t+\t0M',
+      'L\tr2\t+\tr3\t+\t0M',
+      'L\tr1\t+\tx\t+\t0M',
+      'L\tx\t+\tr3\t+\t0M',
+      'W\tGRCh38\t0\tchr5\t0\t5839\t>r1>r2>r3',
+      'W\tHG01109\t1\tc\t0\t4002\t>r1>x>r3',
+    ].join('\n'),
+    'replacement',
+    { referencePath: 'GRCh38#0#chr5' },
+  )
+  const id = (name: string) => graph.nodes.find(n => n.name === name)!.id
+  const foot = graph.edges.findIndex(
+    e => e.from === id('r1') && e.to === id('x'),
+  )
+  const html = (routes: Record<number, { x: number; y: number }[]>) =>
+    edgeHtml(
+      graph.edges[foot]!,
+      skipAt(graph, foot, deletionEdges(graph), routes),
+      name => name,
+      referenceLabel(graph),
+    )
+  expect(html({ [foot]: [{ x: 0, y: 0 }] })).toBe(
+    'skips 1,839 bp of GRCh38 chr5 sequence, replaced by 2 bp<br>GRCh38#0#chr5:2,001-3,839',
+  )
+  expect(html({})).toMatch(/^Edge: /)
 })

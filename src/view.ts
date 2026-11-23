@@ -29,6 +29,7 @@ import {
   pathLegend,
   resolveColorScheme,
   serializeEl,
+  skipAt,
   tubeMapFrame,
   viewportOf,
   walkKey,
@@ -1128,10 +1129,15 @@ function drawInfo() {
   let interactive = false
   if (hovered && (state.pointer || state.stripHover)) {
     html = nodeHtml(hovered, shownGenes())
-  } else if (edge) {
+  } else if (edge && state.graph && state.hoveredEdge !== null) {
     html = edgeHtml(
       edge,
-      current().deletions.find(x => x.edgeIndex === state.hoveredEdge),
+      skipAt(
+        state.graph,
+        state.hoveredEdge,
+        current().deletions,
+        state.layout?.deletionRoutes,
+      ),
       id => f.nodeById.get(id)?.name ?? id,
       referenceName() ?? referenceAssembly(),
     )
