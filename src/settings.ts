@@ -52,7 +52,7 @@ export interface Settings {
 export const DEFAULTS: Settings = {
   mode: 'force',
   colorScheme: 'auto',
-  nodeWidth: 'depth',
+  nodeWidth: 'walks',
   engine: 'fmmm',
   quality: 2,
   bubbleSpread: 'auto',
@@ -71,6 +71,10 @@ export const DEFAULTS: Settings = {
 }
 
 export type Facet = FacetSetting['field']
+
+// links share the nodes' scale where nodes are drawn by walks
+export const linkWidthOf = ({ nodeWidth }: Pick<Settings, 'nodeWidth'>) =>
+  nodeWidth === 'walks' ? 'walks' : 'uniform'
 
 export const SPACINGS = [
   { value: 0.5, label: 'Compact' },

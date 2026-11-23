@@ -494,7 +494,7 @@ export function walkKeyHtml(
   return entryHtml(walkKeyEntry(walk, label, reference), hint, at)
 }
 
-const HEADED = new Set(['Node thickness', 'Link thickness'])
+const HEADED = new Set(['Thickness', 'Node thickness', 'Link thickness'])
 
 // bandage-core's graph key, a box per section
 export function graphKeyHtml(

@@ -63,6 +63,7 @@ import {
   referenceWindow,
   targetOf,
 } from './reference'
+import { linkWidthOf } from './settings'
 import { expandWalks } from './sources'
 import {
   abridged as abridgedWalks,
@@ -481,6 +482,7 @@ function buildOptions(
     connectorThickness: CONNECTOR_THICKNESS,
     drawPaths: paths,
     nodeWidth: settings.nodeWidth,
+    edgeWidth: linkWidthOf(settings),
     highlight,
     axis: axis(),
     viewportBounds,
@@ -886,6 +888,7 @@ function legendsOf(
           lift,
           walkLabel: name => f.walkLabels.get(name) ?? name,
           nodeWidth: settings.nodeWidth,
+          edgeWidth: linkWidthOf(settings),
           contigThickness: settings.nodeThickness,
           connectorThickness: CONNECTOR_THICKNESS,
           drawsNodes: !d.bars && !layout.tubeMap,

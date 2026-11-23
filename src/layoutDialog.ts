@@ -73,7 +73,7 @@ const force = ui.layoutDialog.querySelector<HTMLElement>('#force-settings')!
 const hint = ui.layoutDialog.querySelector<HTMLElement>('#force-hint')!
 
 nodes.innerHTML = `${sliderHtml(THICKNESS)}
-  <label class="check"><input type="checkbox" id="depth-width" /> Width by depth <small id="depth-note">· every node has one depth</small></label>`
+  <label class="check"><input type="checkbox" id="depth-width" /> Width by walks <small id="depth-note">· every node has one depth</small></label>`
 force.insertAdjacentHTML(
   'beforeend',
   `<label>Engine <select id="layout-engine">${LAYOUT_ENGINES.map(
@@ -107,7 +107,7 @@ function draw() {
     inputOf(s).value = String(i)
     outputOf(s).textContent = s.choices[i]!.label
   }
-  depth.checked = settings.nodeWidth === 'depth'
+  depth.checked = settings.nodeWidth !== 'uniform'
   spread.value = settings.bubbleSpread
   engineSelect.value = settings.engine
   const graph = state.graph
@@ -138,7 +138,7 @@ for (const s of sliders) {
 }
 
 depth.addEventListener('change', () => {
-  settings.nodeWidth = depth.checked ? 'depth' : 'uniform'
+  settings.nodeWidth = depth.checked ? DEFAULTS.nodeWidth : 'uniform'
   applySettings('geometry')
 })
 

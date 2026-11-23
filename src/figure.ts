@@ -1,6 +1,7 @@
 import { figureSvg } from '@jbrowse/bandage-core'
 
 import { referenceName } from './reference'
+import { linkWidthOf } from './settings'
 import {
   current,
   settings,
@@ -40,6 +41,7 @@ export function exportSvg() {
     facet: facetInput(),
     colorScheme: settings.colorScheme,
     nodeWidth: settings.nodeWidth,
+    edgeWidth: linkWidthOf(settings),
     contigThickness: settings.nodeThickness,
     referenceName: referenceName(),
     showDeletionEdges: settings.showDeletionEdges,
