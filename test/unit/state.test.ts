@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import {
   clearInteraction,
   cutsWholeWalks,
+  keyMovesFit,
   layoutFit,
   settings,
   state,
@@ -50,5 +51,30 @@ test('the fit and a force layout take the pane less the key column', () => {
   expect(layoutFit()).toEqual({ width: 900, height: 640 })
   state.legendSize = { width: 150, height: 300 }
   expect(layoutFit()).toEqual({ width: 900 - 150 - 2 * 6, height: 640 })
+  Object.assign(state, was)
+})
+
+// chrM:8,000-8,300 once drew a skip at one fit and counted it at the next,
+// and a key column that followed the key re-fitted until the stack overflowed
+test('a key drawn after a fit moves the fit only when it grew, and only while the view is fitted', () => {
+  const was = {
+    width: state.width,
+    height: state.height,
+    legendSize: state.legendSize,
+    owner: state.owner,
+  }
+  Object.assign(state, {
+    width: 900,
+    height: 640,
+    legendSize: { width: 150, height: 300 },
+    owner: 'fit',
+  })
+  const room = layoutFit().width
+  state.legendSize = { width: 120, height: 300 }
+  expect(keyMovesFit(room)).toBe(false)
+  state.legendSize = { width: 180, height: 300 }
+  expect(keyMovesFit(room)).toBe(true)
+  state.owner = 'user'
+  expect(keyMovesFit(room)).toBe(false)
   Object.assign(state, was)
 })

@@ -140,6 +140,12 @@ export function layoutFit() {
   })
 }
 
+// Whether a key drawn since the fit left `room` beside it moves the fit: only
+// one that grew, since a mark the scale brings in or out would otherwise move
+// the column back and forth without end
+export const keyMovesFit = (room: number) =>
+  state.owner === 'fit' && layoutFit().width < room
+
 export function effectiveMode() {
   return state.modeOverride ?? settings.mode
 }
