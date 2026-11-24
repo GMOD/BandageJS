@@ -127,7 +127,7 @@ export function edgeHtml(
 ) {
   const text = edgeHoverText(edge, skip, nameOf)
   return text.deletion
-    ? `${esc(`skips ${text.deletion.bp} of ${reference ?? 'the reference'} sequence${text.deletion.replacedBy ? `, replaced by ${text.deletion.replacedBy}` : ''}`)}<br>${esc(text.deletion.where)}`
+    ? `${esc(`skips ${text.deletion.bp} of ${reference ?? 'the reference'} sequence`)}<br>${esc(text.deletion.where)}`
     : `Edge: ${esc(text.ends)}`
 }
 
