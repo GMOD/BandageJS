@@ -19,6 +19,7 @@ export const ui = {
   stripLabels: el<SVGGElement>('strip-labels'),
   stripTip: el<HTMLDivElement>('strip-tip'),
   stripKey: el<HTMLDivElement>('strip-key'),
+  stripKeyReserve: el<HTMLDivElement>('strip-key-reserve'),
   html: el<HTMLDivElement>('overlay-html'),
   facets: el<HTMLDivElement>('facets'),
   legends: el<HTMLDivElement>('legends'),

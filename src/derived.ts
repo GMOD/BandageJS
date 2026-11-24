@@ -37,6 +37,7 @@ import type {
   Graph,
   GraphNode,
   GraphTables,
+  KeyEntry,
   LayoutResult,
   MinigraphBubble,
   NodeSegment,
@@ -184,6 +185,39 @@ export const stripKey = (
     markUnloaded: true,
     inks,
   })
+
+function keyUnion(a: KeyEntry[], b: KeyEntry[]) {
+  const inA = new Set(a.map(e => e.label))
+  const after = new Map<string | undefined, KeyEntry[]>()
+  let anchor: string | undefined
+  for (const e of b) {
+    if (inA.has(e.label)) {
+      anchor = e.label
+    } else {
+      after.set(anchor, [...(after.get(anchor) ?? []), e])
+    }
+  }
+  const following = (label: string | undefined) => after.get(label) ?? []
+  return [
+    ...following(undefined),
+    ...a.flatMap(e => [e, ...following(e.label)]),
+  ]
+}
+
+export const stripKeyReserve = (
+  bars: WalkRows,
+  ramp: { start: number; end: number } | undefined,
+  genes: GeneGaps | undefined,
+) =>
+  keyUnion(
+    stripKey(bars, ramp, genes, []),
+    stripKey(
+      bars,
+      ramp,
+      genes,
+      bars.rows.map(row => ({ walk: row.name, stops: [] })),
+    ),
+  )
 
 // The halos along the nodes the drawing draws, and none for a bubble whose
 // every drawn node lies inside a site the drawing folds

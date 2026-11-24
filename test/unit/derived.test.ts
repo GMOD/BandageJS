@@ -13,6 +13,7 @@ import {
   rowInksOf,
   rowsOf,
   stripKey,
+  stripKeyReserve,
   stripTree,
   tooLargeText,
   walkView,
@@ -132,4 +133,23 @@ test("a walk lifted by pass paints its strip row in its passes' colours, and los
     'hap#1#ctg',
   ])
   expect(passBars(view.lift, bars)).toEqual([])
+})
+
+const ink = (walk: string) => ({ walk, stops: [] })
+
+test('the strip key reserve holds every key a highlight can make, in its order', () => {
+  const bars = rowsOf(loadGraph(REPEAT, 'repeat'), undefined)!
+  const reserve = stripKeyReserve(bars, undefined, undefined).map(e => e.label)
+  for (const inks of [
+    [],
+    [ink('hap#1#ctg')],
+    [ink('ref#0#chr1')],
+    [ink('ref#0#chr1'), ink('hap#1#ctg')],
+  ]) {
+    const labels = stripKey(bars, undefined, undefined, inks).map(e => e.label)
+    expect(reserve.filter(label => labels.includes(label))).toEqual(labels)
+  }
+  expect(barFills(stripKeyReserve(bars, undefined, undefined))).toEqual(
+    expect.arrayContaining([WALK_ON_PATH_STRIP_INK]),
+  )
 })

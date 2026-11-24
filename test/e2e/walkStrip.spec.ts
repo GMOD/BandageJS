@@ -99,6 +99,10 @@ test('a click on a bar highlights its walk and selects its row; a second drops i
   await waitForDrawing(page, /nodes/)
   await showStrip(page)
   const at = await onRow(page, 1)
+  const reference = page.locator(
+    '#strip-bars [data-testid="graph-walk-reference"]',
+  )
+  const referenceBefore = await reference.boundingBox()
   await page.mouse.click(at.x, at.y)
   await expect(
     (await haplotypesMenu(page)).getByRole('menuitem', {
@@ -106,6 +110,7 @@ test('a click on a bar highlights its walk and selects its row; a second drops i
     }),
   ).toBeEnabled()
   await page.keyboard.press('Escape')
+  expect(await reference.boundingBox()).toEqual(referenceBefore)
   // the hover's node shows over the selection until the pointer leaves
   await page.locator('#strip-key').hover()
   await expect(page.locator('#info')).toContainText('chr:1,189,697-1,190,158')

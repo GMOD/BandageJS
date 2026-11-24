@@ -10,7 +10,14 @@ import {
   walkStripLabelsTree,
 } from '@jbrowse/bandage-core'
 
-import { memo, rampInterval, rowInksOf, stripKey, stripTree } from './derived'
+import {
+  memo,
+  rampInterval,
+  rowInksOf,
+  stripKey,
+  stripKeyReserve,
+  stripTree,
+} from './derived'
 import { svgDom } from './elDom'
 import { walkRowsKeyHtml } from './overlays'
 import {
@@ -86,6 +93,9 @@ const labelsOf = memo(
       : undefined,
 )
 
+const TICKS_KEY =
+  '<span>▮ ticks: where each walk passes the node under the pointer · click a bar to highlight its walk</span>'
+
 const keyOf = memo(
   (
     bars: WalkRows,
@@ -94,7 +104,13 @@ const keyOf = memo(
     inks: readonly RowInk[],
   ) =>
     walkRowsKeyHtml(stripKey(bars, rampInterval(ramp), genes, inks)) +
-    '<span>▮ ticks: where each walk passes the node under the pointer · click a bar to highlight its walk</span>',
+    TICKS_KEY,
+)
+
+const keyReserveOf = memo(
+  (bars: WalkRows, ramp: Ramp, genes: GeneGaps | undefined) =>
+    walkRowsKeyHtml(stripKeyReserve(bars, rampInterval(ramp), genes)) +
+    TICKS_KEY,
 )
 
 function frameFor(bars: WalkRows) {
@@ -137,6 +153,7 @@ let shown: {
   marks?: Node
   labels?: Node
   key?: string
+  keyReserve?: string
   locator?: string
 } = {}
 
@@ -157,6 +174,7 @@ function drawStrip() {
   const id = state.hoveredNode ?? state.selectedNode
   const rowGenes = stripGenes(bars)
   const inks = rowInksOf(walks())
+  const genes = stripGeneGaps(f, rowGenes, state.walkGeneNote)
   const next = {
     bars: barsOf(bars, f, ramp, rowGenes, inks),
     marks: marksOf(
@@ -166,12 +184,8 @@ function drawStrip() {
       id === null ? undefined : facts().nodeById.get(id),
     ),
     labels: labelsOf(bars, f, state.walkLayers),
-    key: keyOf(
-      bars,
-      ramp,
-      stripGeneGaps(f, rowGenes, state.walkGeneNote),
-      inks,
-    ),
+    key: keyOf(bars, ramp, genes, inks),
+    keyReserve: keyReserveOf(bars, ramp, genes),
     locator,
   }
   ui.stripSvg.setAttribute('width', String(f.width))
@@ -187,6 +201,9 @@ function drawStrip() {
   }
   if (shown.key !== next.key) {
     ui.stripKey.innerHTML = next.key
+  }
+  if (shown.keyReserve !== next.keyReserve) {
+    ui.stripKeyReserve.innerHTML = next.keyReserve
   }
   shown = next
 }

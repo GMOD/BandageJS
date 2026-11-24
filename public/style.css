@@ -891,22 +891,34 @@ main.faceted #back {
   white-space: nowrap;
 }
 
-#strip-key {
+#strip-key-cell {
+  display: grid;
+}
+
+#strip-key,
+#strip-key-reserve {
+  grid-area: 1 / 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  align-content: flex-start;
   gap: 2px 14px;
   padding: 0 8px 6px;
   font-size: 11px;
   color: #333;
 }
 
-#strip-key .legend {
+#strip-key .legend,
+#strip-key-reserve .legend {
   display: flex;
   flex-wrap: wrap;
   gap: 2px 14px;
   padding: 0;
   background: none;
+}
+
+#strip-key-reserve {
+  visibility: hidden;
 }
 
 #back[hidden],
