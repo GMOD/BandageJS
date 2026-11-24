@@ -34,6 +34,23 @@ for (const [layout, engine, drawn] of [
   })
 }
 
+// chrM:8,000-8,300 drew a skip at one fit and counted it too short on screen
+// at the next, and its key moved the column back and forth until the stack
+// overflowed: only a key that grows moves the fit
+test('a key whose marks come and go with the scale settles in a few builds', async ({
+  page,
+  consoleErrors,
+}) => {
+  await openPage(
+    page,
+    `walks=${encodeURIComponent(CHRM_WALKS)}&loc=chrM:8,000-8,300&layout=force`,
+  )
+  await waitForDrawing(page, /44 paths/)
+  await settled(page)
+  expect(consoleErrors).toEqual([])
+  expect(await builds(page)).toBeLessThanOrEqual(3)
+})
+
 test('a layout switch builds the geometry once', async ({ page }) => {
   await openPage(page, `${CUT}&layout=ordered`)
   await waitForDrawing(page, /Ordered/)
