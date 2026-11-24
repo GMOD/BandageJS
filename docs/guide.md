@@ -54,15 +54,16 @@ drawn over it, and the longer writes the span of both, such as `20.5–20.9 kb`.
 The key's "nodes not shown" row counts the placeholders left without a length,
 and hovering it gives their lengths.
 
-View → **Small sites** draws every node and skip at any zoom. It is off by
-default: a stretch off the reference or a skip drawn only a few pixels long at
-the current zoom, its own nodes and links with the reference between where it
-attaches, is left out and the reference runs straight through it. A stretch the
-cut did not load is measured by its bp at the reference's scale where that is
-shorter. The key's last line counts the nodes and skips left out where the pane
-shows and the bp they are under, and zooming in draws each site again. A site
-left out is neither hovered, selected nor labelled; finding a node there, or a
-link naming it, zooms in until it is drawn.
+View → **Small sites** draws every node at any zoom. It is off by default: a
+stretch off the reference or a skip drawn only a few pixels long at the current
+zoom, its own nodes and links with the reference between where it attaches, is
+left out and the reference runs straight through it. A stretch the cut did not
+load is measured by its bp at the reference's scale where that is shorter. The
+key's last line counts the nodes and skips left out where the pane shows and the
+bp they are under, and zooming in draws each site again. Either way, a skip too
+short on screen to arch is drawn as its plain link and counted on that line. A
+site left out is neither hovered, selected nor labelled; finding a node there,
+or a link naming it, zooms in until it is drawn.
 
 The key lists what the pane shows, the drawing under the key included, and
 nothing else: a mark, an exon or a node thickness off the pane is not keyed. It

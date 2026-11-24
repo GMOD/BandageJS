@@ -19,6 +19,8 @@ const CHRM = `walks=${encodeURIComponent(CHRM_WALKS)}&loc=chrM:2,001-6,000&layou
 const NOT_DRAWN =
   /^[\d,]+ nodes?( and [\d,]+ skips?)? under [\d,]+ bp not drawn$/
 
+const SKIPS_NOT_DRAWN = /^[\d,]+ skips? under [\d,]+ bp not drawn$/
+
 test('the key ends with the nodes and skips the drawing leaves out as too small to draw', async ({
   page,
 }) => {
@@ -37,7 +39,7 @@ async function svgExport(page: Page) {
   return (await (await (await download).createReadStream()).toArray()).join('')
 }
 
-test('View › Small sites draws every node at any zoom, kept in the address, and the key and the SVG follow', async ({
+test('View › Small sites draws every node at any zoom, kept in the address, and the key and the SVG then count only the skips too short to arch', async ({
   page,
 }) => {
   await openPage(page, CHRM)
@@ -54,14 +56,17 @@ test('View › Small sites draws every node at any zoom, kept in the address, an
   await item.click()
   await expect(item).toHaveAttribute('aria-checked', 'true')
   await page.keyboard.press('Escape')
-  await expect(page.locator('#legends')).not.toContainText(/bp not drawn/)
+  await expect(key).toHaveText(SKIPS_NOT_DRAWN)
   await expect(page).toHaveURL(/[?&]smallsites=1(&|$)/)
   expect(await drawing()).not.toBe(folded)
-  expect(await svgExport(page)).not.toMatch(/bp not drawn/)
+  const svg = await svgExport(page)
+  expect(svg).toMatch(/[\d,]+ skips? under [\d,]+ bp not drawn/)
+  expect(svg).not.toMatch(/nodes? (and [\d,]+ skips? )?under/)
   await openPage(page, `${CHRM}&smallsites=1`)
   await waitForDrawing(page, /44 paths/)
-  await expect(page.locator('#legends > .legend').last()).toBeVisible()
-  await expect(page.locator('#legends')).not.toContainText(/bp not drawn/)
+  await expect(page.locator('#legends > .legend').last()).toHaveText(
+    SKIPS_NOT_DRAWN,
+  )
 })
 
 // Every canvas point, at `step` px, the drawing inks: not left white
