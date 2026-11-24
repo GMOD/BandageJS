@@ -245,3 +245,41 @@ test("a padded foot a force layout routed says what its walk's run skips, as the
   )
   expect(html({})).toMatch(/^Edge: /)
 })
+
+// walks >r1>x>r3 and >r1>x>y>r4 share r1→x but skip different stretches
+test('a padded foot whose walks skip different stretches says only that it skips reference sequence, as the plugin does', () => {
+  const graph = loadGraph(
+    [
+      `S\tr1\t${'A'.repeat(2000)}`,
+      `S\tr2\t${'C'.repeat(1839)}`,
+      `S\tr3\t${'G'.repeat(2000)}`,
+      `S\tr4\t${'G'.repeat(2000)}`,
+      'S\tx\tTT',
+      `S\ty\t${'T'.repeat(500)}`,
+      'L\tr1\t+\tr2\t+\t0M',
+      'L\tr2\t+\tr3\t+\t0M',
+      'L\tr3\t+\tr4\t+\t0M',
+      'L\tr1\t+\tx\t+\t0M',
+      'L\tx\t+\tr3\t+\t0M',
+      'L\tx\t+\ty\t+\t0M',
+      'L\ty\t+\tr4\t+\t0M',
+      'W\tGRCh38\t0\tchr5\t0\t7839\t>r1>r2>r3>r4',
+      'W\tHG01109\t1\tc\t0\t6002\t>r1>x>r3>r4',
+      'W\tHG002\t1\tc\t0\t4502\t>r1>x>y>r4',
+    ].join('\n'),
+    'replacements',
+    { referencePath: 'GRCh38#0#chr5' },
+  )
+  const id = (name: string) => graph.nodes.find(n => n.name === name)!.id
+  const foot = graph.edges.findIndex(
+    e => e.from === id('r1') && e.to === id('x'),
+  )
+  expect(
+    edgeHtml(
+      graph.edges[foot]!,
+      skipAt(graph, foot, deletionEdges(graph), { [foot]: [{ x: 0, y: 0 }] }),
+      name => name,
+      referenceLabel(graph),
+    ),
+  ).toBe('skips GRCh38 chr5 sequence')
+})
