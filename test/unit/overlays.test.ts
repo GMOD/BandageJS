@@ -54,27 +54,28 @@ test('a length stood off its node draws its leader to the point it names, and on
   expect(leaders).toEqual([[x1, x2, y1, y2]])
 })
 
+const walkRow = (name: string, reversed: boolean): WalkRow => ({
+  name: `${name}#1#c`,
+  label: `${name}#1`,
+  sample: name,
+  bp: 2000,
+  offReferenceBp: 0,
+  gapBp: 0,
+  complete: true,
+  runs: [
+    {
+      start: 0,
+      bp: 2000,
+      onReference: true,
+      referenceStart: 1000,
+      ...(reversed ? { reversed: true as const } : {}),
+    },
+  ],
+})
+
 // bandage-core from dd9eed7 drew no chevron where a host painted the bars
 // itself, while its key and readouts said "reversed"
 test('walk rows draw chevrons over a stretch walked against the reference, after its bar, and none on a forward row', () => {
-  const row = (name: string, reversed: boolean): WalkRow => ({
-    name: `${name}#1#c`,
-    label: `${name}#1`,
-    sample: name,
-    bp: 2000,
-    offReferenceBp: 0,
-    gapBp: 0,
-    complete: true,
-    runs: [
-      {
-        start: 0,
-        bp: 2000,
-        onReference: true,
-        referenceStart: 1000,
-        ...(reversed ? { reversed: true as const } : {}),
-      },
-    ],
-  })
   const drawn = (rows: WalkRow[]) =>
     serializeEl(
       walkRowsLayer({
@@ -82,14 +83,14 @@ test('walk rows draw chevrons over a stretch walked against the reference, after
         scaleX: 0.2,
         translateX: -180,
         translateY: 20,
-        walkBars: { origin: 1000, reference: row('GRCh38', false), rows },
+        walkBars: { origin: 1000, reference: walkRow('GRCh38', false), rows },
       })!,
     )
-  const svg = drawn([row('R', true)])
+  const svg = drawn([walkRow('R', true)])
   const rowSvg = svg.slice(svg.lastIndexOf('data-testid="graph-walk-row"'))
   expect(rowSvg.match(/<polyline /g)?.length ?? 0).toBeGreaterThan(0)
   expect(rowSvg.indexOf('<polyline ')).toBeGreaterThan(
     rowSvg.lastIndexOf('<rect'),
   )
-  expect(drawn([row('F', false)])).not.toContain('<polyline ')
+  expect(drawn([walkRow('F', false)])).not.toContain('<polyline ')
 })
