@@ -927,6 +927,10 @@ type KeyedBatch = Parameters<typeof drawnMarks>[0][number]
 
 // how often a new layout's fit is made again for a key whose column moved
 const KEY_FITS = 3
+// the builds a drawn key's moved column is making again, at most KEY_FITS:
+// a mark the scale brings in or out, as a skip too short on screen to draw,
+// can move the column back and forth
+let keyRefits = 0
 
 // Fits a new layout beside the key it will draw. The key names what the
 // build folds at the fit's scale and its column moves the fit, so it is
@@ -1058,9 +1062,15 @@ function drawOverlays() {
 
   const column = layoutFit().width
   if (showLegends(legendsOf(layout, halos, labels.unlabelled, paneBatch))) {
-    if (state.owner === 'fit' && layoutFit().width !== column) {
+    if (
+      state.owner === 'fit' &&
+      layoutFit().width !== column &&
+      keyRefits < KEY_FITS
+    ) {
+      keyRefits++
       fit()
       rebuild()
+      keyRefits--
     } else {
       scheduleDraw()
     }
