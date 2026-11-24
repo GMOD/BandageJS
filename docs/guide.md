@@ -54,15 +54,15 @@ drawn over it, and the longer writes the span of both, such as `20.5–20.9 kb`.
 The key's "nodes not shown" row counts the placeholders left without a length,
 and hovering it gives their lengths.
 
-View → **Small sites** draws every node and skip at any zoom. It is off by
-default: a stretch off the reference or a skip drawn only a few pixels long at
-the current zoom, its own nodes and links with the reference between where it
-attaches, is left out and the reference runs straight through it. A stretch the
-cut did not load is measured by its bp at the reference's scale where that is
-shorter. The key's last line counts the nodes and skips left out where the pane
-shows and the bp they are under, and zooming in draws each site again. A site
-left out is neither hovered, selected nor labelled; finding a node there, or a
-link naming it, zooms in until it is drawn.
+View → **Small sites** draws every node, and every skip long enough on screen to
+arch, at any zoom. It is off by default: a stretch off the reference or a skip
+drawn only a few pixels long at the current zoom, its own nodes and links with
+the reference between where it attaches, is left out and the reference runs
+straight through it. A stretch the cut did not load is measured by its bp at the
+reference's scale where that is shorter. The key's last line counts the nodes
+and skips left out where the pane shows and the bp they are under, and zooming
+in draws each site again. A site left out is neither hovered, selected nor
+labelled; finding a node there, or a link naming it, zooms in until it is drawn.
 
 The key lists what the pane shows, the drawing under the key included, and
 nothing else: a mark, an exon or a node thickness off the pane is not keyed. It
@@ -160,7 +160,7 @@ it differs from the default.
 | `view`                                                      | `x,y,scale` at the pane's centre; absent when fitted                                 |
 | `color`, `width`, `thickness`                               | Colour scheme, `depth` or `uniform` width, node width in px                          |
 | `bubbles`, `deletions`, `genes`, `lengths`, `paths`, `bars` | `1` or `0` for each drawn element                                                    |
-| `smallsites`                                                | `1` draws every node and skip at any zoom                                            |
+| `smallsites`                                                | `1` draws every node, and every skip long enough to arch, at any zoom                |
 | `engine`, `quality`, `spacing`, `separation`, `spread`      | Force layout settings                                                                |
 | `gbz`, `index`                                              | Older links: a gbz-base `.gbz.db` cut and its haplotype index                        |
 

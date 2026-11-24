@@ -28,8 +28,9 @@ export interface Settings {
   bubbleSpread: BubbleSpread
   showBubbles: boolean
   showDeletionEdges: boolean
-  // every node and skip at any zoom, where off a site too small to see at
-  // the zoom is left out, counted in the key and drawn again on zooming in
+  // every node, and every skip long enough on screen to arch, at any zoom,
+  // where off a site too small to see at the zoom is left out, counted in the
+  // key and drawn again on zooming in
   showSmallSites: boolean
   drawPaths: boolean
   showGenes: boolean
