@@ -1058,9 +1058,8 @@ function drawOverlays() {
 
   const column = layoutFit().width
   if (showLegends(legendsOf(layout, halos, labels.unlabelled, paneBatch))) {
-    // only a key that grew moves the fit: a mark the scale brings in or out,
-    // as a skip too short on screen to draw, would otherwise move the column
-    // back and forth without end
+    // only a key that grew moves the fit: a mark the scale brings in or out
+    // would otherwise move the column back and forth without end
     if (state.owner === 'fit' && layoutFit().width < column) {
       fit()
       rebuild()
