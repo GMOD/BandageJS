@@ -1,9 +1,9 @@
-import { sizeLeader } from '@jbrowse/bandage-core'
+import { serializeEl, sizeLeader } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
-import { overlaySvg } from '../../src/overlays'
+import { overlaySvg, walkRowsLayer } from '../../src/overlays'
 
-import type { LabelLayout } from '@jbrowse/bandage-core'
+import type { LabelLayout, WalkRow } from '@jbrowse/bandage-core'
 
 const pane = (sizes: LabelLayout['sizes']) => ({
   width: 800,
@@ -52,4 +52,44 @@ test('a length stood off its node draws its leader to the point it names, and on
   ].map(m => m.slice(1).map(Number))
   const { x1, x2, y1, y2 } = sizeLeader(stood)!
   expect(leaders).toEqual([[x1, x2, y1, y2]])
+})
+
+// bandage-core from dd9eed7 drew no chevron where a host painted the bars
+// itself, while its key and readouts said "reversed"
+test('walk rows draw chevrons over a stretch walked against the reference, after its bar, and none on a forward row', () => {
+  const row = (name: string, reversed: boolean): WalkRow => ({
+    name: `${name}#1#c`,
+    label: `${name}#1`,
+    sample: name,
+    bp: 2000,
+    offReferenceBp: 0,
+    gapBp: 0,
+    complete: true,
+    runs: [
+      {
+        start: 0,
+        bp: 2000,
+        onReference: true,
+        referenceStart: 1000,
+        ...(reversed ? { reversed: true as const } : {}),
+      },
+    ],
+  })
+  const drawn = (rows: WalkRow[]) =>
+    serializeEl(
+      walkRowsLayer({
+        ...pane([]),
+        scaleX: 0.2,
+        translateX: -180,
+        translateY: 20,
+        walkBars: { origin: 1000, reference: row('GRCh38', false), rows },
+      })!,
+    )
+  const svg = drawn([row('R', true)])
+  const rowSvg = svg.slice(svg.lastIndexOf('data-testid="graph-walk-row"'))
+  expect(rowSvg.match(/<polyline /g)?.length ?? 0).toBeGreaterThan(0)
+  expect(rowSvg.indexOf('<polyline ')).toBeGreaterThan(
+    rowSvg.lastIndexOf('<rect'),
+  )
+  expect(drawn([row('F', false)])).not.toContain('<polyline ')
 })
