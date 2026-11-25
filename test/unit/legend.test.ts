@@ -25,7 +25,7 @@ import type {
   WalkLayer,
 } from '@jbrowse/bandage-core'
 
-// the reference walks 0, 1, 2; `a` skips 1 and takes the dashed link
+// the reference walks 0, 1, 2; `a` skips 1 and takes the arched link
 const SKIP = [
   ...[100, 10, 100].map((n, id) => `S\t${id}\t${'A'.repeat(n)}`),
   'P\tref#0#chr\t0+,1+,2+\t*',
@@ -127,11 +127,12 @@ function legendAt(
 
 // At the 150 px fit the skip's 10 bp come to 2.9 px at the reference's px a
 // bp, so it folds however long the ordered layout draws its link, and the
-// key counts it; drawn as nodes it is one dashed skip, which a short span
+// key counts it; drawn as nodes it is one solid arch, which a short span
 // once keyed apart as "short skip"
-test("the legend is bandage-core's graph key: each skip row only where its mark is drawn", () => {
+test("the legend is bandage-core's graph key: each skip row only where its mark is drawn, an arch with walks", () => {
   const wide = legendAt(1200)
-  expect(wide).toContain('class="swatch dashes"')
+  expect(wide).toContain('<path d="M2,10 Q9,-2 16,10" fill="none"')
+  expect(wide).not.toContain('class="swatch dashes"')
   expect(wide).toMatch(/skips .+? sequence/)
   const narrow = legendAt(150)
   expect(narrow).not.toMatch(/skips .+? sequence/)
@@ -159,7 +160,7 @@ test('the legend keys nodes not shown only where a hollow node is drawn', () => 
   )
 })
 
-test('a lifted walk beside a skip it does not take keys the faded dashes', () => {
+test('a lifted walk beside a skip it does not take keys the faded arch', () => {
   expect(legendAt(1200, ['ref#0#chr'])).toMatch(/skips .+? sequence/)
 })
 

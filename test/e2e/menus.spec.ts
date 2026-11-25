@@ -165,7 +165,7 @@ test('Help holds the user guide and About', async ({ page }) => {
   const popup = page.locator('#menu-popup')
   await expect(popup.getByRole('menuitem')).toHaveText(['User guide', 'About'])
   await popup.getByRole('menuitem', { name: 'User guide' }).click()
-  await expect(page.locator('#guide-dialog')).toContainText('Dashed links')
+  await expect(page.locator('#guide-dialog')).toContainText('Arched links')
   await page.keyboard.press('Escape')
   await menuButton(page, 'Help').click()
   await popup.getByRole('menuitem', { name: 'About' }).click()

@@ -396,11 +396,15 @@ function swatchHtml(swatch: GraphKeySwatch) {
         `<rect x="1" y="2" width="16" height="8" rx="4" fill="${css(swatch.ink)}" stroke="${css(swatch.rim)}" stroke-width="${swatch.rimPx}"/>`,
       )
     case 'line':
-      return swatch.dashed
-        ? `<div class="swatch dashes" style="color:${css(swatch.ink)}"></div>`
-        : svgSwatch(
-            `<line x1="5" x2="13" y1="6" y2="6" stroke="${css(swatch.ink)}" stroke-width="1.5"/>`,
+      return swatch.arch
+        ? svgSwatch(
+            `<path d="M2,10 Q9,-2 16,10" fill="none" stroke="${css(swatch.ink)}" stroke-width="1.5"/>`,
           )
+        : swatch.dashed
+          ? `<div class="swatch dashes" style="color:${css(swatch.ink)}"></div>`
+          : svgSwatch(
+              `<line x1="5" x2="13" y1="6" y2="6" stroke="${css(swatch.ink)}" stroke-width="1.5"/>`,
+            )
     case 'outline':
       return svgSwatch(
         `<rect x="1" y="1" width="16" height="10" rx="4" fill="none" stroke="${css(swatch.ink)}" stroke-width="2"/>`,
