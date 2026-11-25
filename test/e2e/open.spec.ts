@@ -105,7 +105,14 @@ test('a url from the Open dialog loads and goes into the address', async ({
 test('a pasted gbz-base url fills the cut dialog, which probes the database', async ({
   page,
 }) => {
+  const index = MICB_DB.replace(/\.gbz\.db$/, '.haplotype-index.db')
+  const { promise: indexHeld, resolve: releaseIndex } =
+    Promise.withResolvers<void>()
   await openPage(page)
+  await page.route(index, async route => {
+    await indexHeld
+    await route.fallback()
+  })
   await waitForDrawing(page, '58 nodes')
   await menuButton(page, 'File').click()
   await page
@@ -118,9 +125,8 @@ test('a pasted gbz-base url fills the cut dialog, which probes the database', as
   await expect(dialog).toBeVisible()
   await expect(page.locator('#gbz-db')).toHaveValue(MICB_DB)
   await expect(page.locator('#gbz-index')).toBeVisible()
-  await expect(page.locator('#gbz-index')).toHaveValue(
-    MICB_DB.replace(/\.gbz\.db$/, '.haplotype-index.db'),
-  )
+  await expect(page.locator('#gbz-index')).toHaveValue(index)
+  releaseIndex()
   await expect(page.locator('#gbz-region')).toHaveValue('')
   // no index is served beside the test database, so the probe drops it
   const status = page.locator('#gbz-status')
