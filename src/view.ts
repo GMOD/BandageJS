@@ -33,7 +33,6 @@ import {
   tubeMapFrame,
   viewportOf,
   walkKey,
-  walkPosition,
   walkRowsExtent,
 } from '@jbrowse/bandage-core'
 import { abridgedText } from '@gmod/gfa-tabix'
@@ -55,6 +54,7 @@ import {
   overlayHtml,
   overlaySvg,
   unlabelledCount,
+  walkAt,
   walkKeyHtml,
   walkRowsLayer,
 } from './overlays'
@@ -412,9 +412,7 @@ function hoveredOn(walk: LiftedWalk) {
   const node = state.hoveredNode
     ? facts().nodeById.get(state.hoveredNode)
     : undefined
-  return node
-    ? (walkPosition(walk, node.id, node.length) ?? 'not on this walk')
-    : undefined
+  return node && walkAt(walk, node)
 }
 
 const FACET_KEY_SECTIONS = new Set(['walks', 'skips', 'too-small'])

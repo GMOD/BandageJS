@@ -14,9 +14,10 @@ import {
   walkLift,
 } from '@jbrowse/bandage-core'
 import { RUNS_ON_KEY } from '@jbrowse/bandage-core/graphKey'
+import { foldThreads } from '@jbrowse/bandage-core/threadFold'
 import { expect, test } from '@playwright/test'
 
-import { legendsHtml, walkRowsKeyHtml } from '../../src/overlays'
+import { legendsHtml, walkAt, walkRowsKeyHtml } from '../../src/overlays'
 
 import type {
   Graph,
@@ -298,4 +299,19 @@ test("the walk rows key draws the rows' chevrons on the swatch for a stretch wal
   expect(html.match(/<polyline /g)?.length).toBeGreaterThan(0)
   expect(html.split('off the path')[0]).toContain('<polyline ')
   expect(html.split('walked against')[1]).not.toContain('<polyline ')
+})
+
+test("a hovered node on a lifted walk reads as its stretch of the walk's contig, one off the walk as not on it, and one on a thread of a folded graph as nothing", () => {
+  const graph = loadGraph(SNP, 'snp', { referencePath: 'ref#0#chr' })
+  const nodeNamed = (name: string) =>
+    graph.nodes.find(node => node.name === name)!
+  const alt = walkLift(graph, [{ walk: 'alt#1#chr' }])!.walks[0]!
+  expect(walkAt(alt, nodeNamed('y'))).toBe('chr:1,001-1,001')
+  expect(walkAt(alt, nodeNamed('x'))).toBe('not on this walk')
+  const fold = foldThreads(graph, 50)
+  const folded = fold.folded ? fold.graph : graph
+  const thread = walkLift(folded, [{ walk: folded.paths![0]!.name }])!.walks[0]!
+  expect(thread.members).toEqual(['ref#0#chr'])
+  const on = folded.nodes.find(node => thread.nodeIds.has(node.id))!
+  expect(walkAt(thread, on)).toBeUndefined()
 })

@@ -12,6 +12,7 @@ import {
   passLeader,
   sizeLeader,
   walkKeyEntry,
+  walkPosition,
   el,
   serializeEl,
   unlabelledText,
@@ -618,4 +619,11 @@ export function legendsHtml(o: {
         )
       : '',
   ].join('')
+}
+
+// Where a hovered node lies on a lifted walk's contig, where the walk states
+// it, or that the walk does not visit it
+export function walkAt(walk: LiftedWalk, node: { id: string; length: number }) {
+  const position = walkPosition(walk, node.id, node.length)
+  return position.onWalk ? position.at : 'not on this walk'
 }
