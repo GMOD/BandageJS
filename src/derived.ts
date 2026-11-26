@@ -23,7 +23,7 @@ import {
   walkRowsTree,
   placeRowGenes,
 } from '@jbrowse/bandage-core'
-import { abridgedWalks } from '@jbrowse/graph-walks'
+import { abridgedWalks } from '@gmod/gfa-tabix'
 
 import type { Region } from './jbrowse'
 import type { Facet } from './settings'
@@ -48,7 +48,7 @@ import type {
   WalkLayer,
   WalkRows,
 } from '@jbrowse/bandage-core'
-import type { AbridgedWalk } from '@jbrowse/graph-walks'
+import type { AbridgedWalk } from '@gmod/gfa-tabix'
 
 // The last value of `fn`, recomputed when any of `keys` changes identity.
 export function memo<K extends unknown[], T>(fn: (...keys: K) => T) {

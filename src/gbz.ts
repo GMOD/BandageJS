@@ -24,7 +24,7 @@ export const WALK_LINKS: { value: WalkLinks; label: string }[] = [
 export interface GbzSource extends CoreGbzSource {
   // abridged walks a walk file cut reads in full (walkFiles.ts)
   expand?: string[]
-  // the links a walk file cut lists, graph-walks' default when unset
+  // the links a walk file cut lists, gfa-tabix's default when unset
   links?: WalkLinks
 }
 
@@ -64,7 +64,7 @@ function openWalks(url: string) {
   return readOnce(walkSets, url, () =>
     import('./walkFiles').then(async ({ openWalkFiles }) => {
       const files = openWalkFiles(url)
-      await files.header()
+      await files.getHeader()
       return files
     }),
   )
@@ -73,7 +73,7 @@ function openWalks(url: string) {
 // The reference samples a database or walk file set can be cut along
 export async function referenceSamplesAt(db: string, index?: string) {
   return isWalksUrl(db)
-    ? (await (await openWalks(db)).header()).references
+    ? (await (await openWalks(db)).getHeader()).references
     : (await openDb(db, index)).referenceSamples
 }
 

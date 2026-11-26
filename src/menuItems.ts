@@ -5,7 +5,7 @@ import {
   pathColorsLegible,
   resolveColorScheme,
 } from '@jbrowse/bandage-core'
-import { abridgedText } from '@jbrowse/graph-walks'
+import { abridgedText } from '@gmod/gfa-tabix'
 
 import { linkable } from './address'
 import { layoutName } from './describe'

@@ -109,7 +109,7 @@ to your own file holds its url.
   steps off the reference as one placeholder of the run's bp, which a node
   layout draws hollow
 - The Haplotypes menu lists each as a block that gives the bp its placeholders
-  stand for as `off the reference not loaded`, in the words graph-walks'
+  stand for as `off the reference not loaded`, in the words gfa-tabix's
   `abridgedText` gives every reader
 - Clicking the block, or **Load its steps** on a selected walk row, cuts again
   with the walk read in full
@@ -128,4 +128,4 @@ to your own file holds its url.
 - `links=between` in the address holds the choice. The JBrowse graph plugin and
   ggbandage have the same setting, with the same default
 
-[@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) reads the files.
+[@gmod/gfa-tabix](https://github.com/GMOD/gfa-tabix-js) reads the files.

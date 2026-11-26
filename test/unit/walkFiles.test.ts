@@ -3,8 +3,9 @@ import { expect, test } from '@playwright/test'
 import {
   CUT_PRESETS,
   RegionTooLargeError,
+  WalkFile,
   abridgedText,
-} from '@jbrowse/graph-walks'
+} from '@gmod/gfa-tabix'
 import { LocalFile } from 'generic-filehandle2'
 
 import {
@@ -27,17 +28,13 @@ import {
 } from '../../src/derived'
 import { rowHtml } from '../../src/describe'
 import { coreRegion, parseRegion } from '../../src/region'
-import {
-  cutWalksRegion,
-  openWalkFiles,
-  walkCutOptions,
-} from '../../src/walkFiles'
+import { cutWalksRegion, walkCutOptions } from '../../src/walkFiles'
 
 import type { WalkCutSource } from '../../src/walkFiles'
 
 const DATA = 'test/e2e/data'
 const walks = (file = 'hprc-chrM.GRCh38.walks.gz') =>
-  openWalkFiles(`${DATA}/${file}`, path => new LocalFile(path))
+  new WalkFile({ walksPath: `${DATA}/${file}` })
 
 async function cut(src: WalkCutSource, file?: string) {
   const { gfa, ...rest } = await cutWalksRegion(walks(file), src)
@@ -156,7 +153,7 @@ test('a walk file cut gives an abridged walk a placeholder for each run off the 
   ])
 })
 
-test("an abridged walk's not-loaded text is graph-walks' wording", async () => {
+test("an abridged walk's not-loaded text is gfa-tabix's wording", async () => {
   const { gfa } = await cut({ region: K12 }, ABRIDGED)
   expect(
     Array.from(abridgedOf(gfa).values(), walk => abridgedText(walk)),

@@ -6,7 +6,7 @@ minimumReleaseAgeExclude:
   - '@jbrowse/tubemap-core@0.2.1 || 0.2.4 || 1.0.0 || 1.1.0 || 2.0.0 || 2.1.0 ||
     2.1.1'
   - '@jbrowse/graph-stress-layout@0.1.1 || 1.0.0 || 1.1.0'
-  - '@jbrowse/graph-walks'
+  - '@gmod/gfa-tabix'
   - '@jbrowse/graph-fold'
   - '@jbrowse/graph-fmmm-layout@1.0.2'
   - '@gmod/tabix@3.13.1'

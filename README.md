@@ -98,7 +98,7 @@ More in [the gallery](docs/gallery.md).
 ## Libraries
 
 - [gfa-to-tabix](https://github.com/GMOD/gfa-to-tabix): writes walk files
-- [@jbrowse/graph-walks](https://github.com/GMOD/graph-walks) (npm): reads them
+- [@gmod/gfa-tabix](https://github.com/GMOD/gfa-tabix-js) (npm): reads them
 - [@jbrowse/bandage-core](https://github.com/GMOD/bandage-core) (npm): layout
   and drawing
 - [@jbrowse/graph-fmmm-layout](https://github.com/GMOD/graph-fmmm-layout) (npm):

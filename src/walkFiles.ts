@@ -3,28 +3,21 @@ import { GBZ_CUT_DEFAULTS } from '@jbrowse/bandage-core/gbzWindow'
 import {
   CUT_PRESETS,
   RegionTooLargeError,
-  WalkReader,
+  WalkFile,
   abridgedWalks,
-} from '@jbrowse/graph-walks'
-import { RemoteFile } from 'generic-filehandle2'
+} from '@gmod/gfa-tabix'
 
 import type { WalkLinks } from './gbz'
-import type { WalkFilehandle } from '@jbrowse/graph-walks'
 
 // A `gfa-to-tabix --walks` file, `<prefix>.<ref>.walks.gz` with its directory
 // `.walks.gz.idx` beside it, read by range requests and cut by
-// @jbrowse/graph-walks, the reader the JBrowse graph plugin uses.
+// @gmod/gfa-tabix, the reader the JBrowse graph plugin uses.
 // `gbz.ts` imports this module on first use, so the walk reader stays out of
 // the page's first download.
 
-export type WalkFiles = WalkReader
+export type WalkFiles = WalkFile
 
-export function openWalkFiles(
-  url: string,
-  open: (url: string) => WalkFilehandle = u => new RemoteFile(u),
-): WalkFiles {
-  return WalkReader.open(url, open)
-}
+export const openWalkFiles = (url: string) => new WalkFile({ walksUrl: url })
 
 export interface WalkCutSource {
   region: string
@@ -58,16 +51,21 @@ async function cutReading(
   const region = parseRegion(src.region)
   const wanted = new Set(expand)
   const expanded = new Set<string>()
-  const { tables, sample } = await walks.cutRegion(region, {
-    ...walkCutOptions(src),
-    signal,
-    expand: name => {
-      if (wanted.has(name)) {
-        expanded.add(name)
-      }
-      return wanted.has(name)
+  const { tables, sample } = await walks.getGraphForRange(
+    region.refName,
+    region.start,
+    region.end,
+    {
+      ...walkCutOptions(src),
+      signal,
+      expand: name => {
+        if (wanted.has(name)) {
+          expanded.add(name)
+        }
+        return wanted.has(name)
+      },
     },
-  })
+  )
   return { gfa: tables, region, sample, expanded: [...expanded] }
 }
 
