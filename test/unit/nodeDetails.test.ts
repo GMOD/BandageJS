@@ -73,9 +73,10 @@ test('placedWalks places a node on each walk’s own contig', () => {
         name: 'x#1#chr',
         nodeIds: ['a', 'b', 'c', 'b'],
         start: 100,
+        end: 115,
         contig: 'chr',
       },
-      { name: 'y#1#ctg:10-22', nodeIds: ['c', 'b'], start: 10 },
+      { name: 'y#1#ctg:10-17', nodeIds: ['c', 'b'], start: 10, end: 17 },
       { name: 'z', nodeIds: ['a', 'c'] },
     ],
   }
@@ -97,7 +98,7 @@ test('placedWalks places a node on each walk’s own contig', () => {
       strand: '-',
     },
     {
-      name: 'y#1#ctg:10-22',
+      name: 'y#1#ctg:10-17',
       visits: 1,
       at: { contig: 'y#1#ctg', start: 14, end: 17 },
       strand: '+',
@@ -139,5 +140,38 @@ test('placedWalks lists a walk that reaches a node only through a departure, whe
       at: { contig: 'y#1#ctg', start: 40, end: 43 },
       strand: '+',
     },
+  ])
+})
+
+test('placedWalks places a node on no walk whose record states no start, or a span its own steps do not fill', () => {
+  const graph: Graph = {
+    name: 'g',
+    nodes: [node('a', 5), node('b', 3)],
+    edges: [],
+    paths: [
+      { name: 'x#1#chr', nodeIds: ['a', 'b'], start: 0, contig: 'chr' },
+      {
+        name: 'y#1#ctg',
+        nodeIds: ['a', 'b'],
+        start: 0,
+        end: 500,
+        contig: 'ctg',
+      },
+      {
+        name: 'w#1#chr',
+        nodeIds: ['a', 'b'],
+        start: 7,
+        end: 15,
+        contig: 'chr',
+      },
+    ],
+  }
+  const length = (id: string) => graph.nodes.find(n => n.id === id)!.length
+  expect(
+    placedWalks(graph, graph.nodes[1]!, length).map(w => [w.name, w.at]),
+  ).toEqual([
+    ['x#1#chr', undefined],
+    ['y#1#ctg', undefined],
+    ['w#1#chr', { contig: 'chr', start: 12, end: 15 }],
   ])
 })

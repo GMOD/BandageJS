@@ -97,7 +97,9 @@ test('the details step to a neighbour and lift a walk through the node', async (
     details.getByRole('heading', { level: 2, name: '3', exact: true }),
   ).toBeVisible()
   await expect(details).toContainText('Walks through it 3 of 5')
-  await expect(details).toContainText('Sakai#1#chr:1,133,999')
+  await expect(details.locator('li', { hasText: 'Sakai' })).toContainText(
+    'chr:1,133,999',
+  )
   await details.getByRole('checkbox', { name: 'K12' }).check()
   await expect(page.locator('#legends .walk-key')).toHaveCount(1)
   await expect(details.getByRole('checkbox', { name: 'K12' })).toBeChecked()
@@ -113,8 +115,8 @@ test('the details step to a neighbour and lift a walk through the node', async (
   await expect(five).toBeFocused()
   await expect(page.locator('#announce')).toHaveText(/^Selected 5,/)
   await expect(details).toContainText('3+ → 5+')
-  await expect(details).toContainText(
-    'IAI39#1#chr:2,249,835-2,249,846, − strand',
+  await expect(details.locator('li', { hasText: 'IAI39' })).toContainText(
+    'chr:2,249,835-2,249,846, − strand',
   )
   await expect(details.getByRole('button', { name: /SNP/ })).toHaveCount(0)
   await details.getByRole('button', { name: '3', exact: true }).click()

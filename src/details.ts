@@ -108,7 +108,7 @@ function walksHtml(node: GraphNode) {
   const rows = shown.map(w => {
     const label = esc(labels.get(w.name) ?? w.name)
     const at = [
-      span(w.at.contig, w.at.start, w.at.end),
+      ...(w.at ? [span(w.at.contig, w.at.start, w.at.end)] : []),
       ...(w.strand ? [`${minus(w.strand)} strand`] : []),
       ...(w.visits > 1 ? [`${w.visits} times`] : []),
     ].join(', ')

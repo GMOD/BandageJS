@@ -15,8 +15,9 @@ export interface NodeLink {
 export interface WalkThrough {
   name: string
   visits: number
-  // the first visit's stretch of the walk's own contig, 0-based half-open
-  at: { contig: string; start: number; end: number }
+  // the first visit's stretch of the walk's own contig, 0-based half-open;
+  // none where the walk states no span its own steps agree with
+  at?: { contig: string; start: number; end: number }
   // the strand the first visit reads the segment on, where the file says
   strand?: '+' | '-'
 }
@@ -96,16 +97,25 @@ function fragmentPlace(
   for (let i = 0; i < first; i++) {
     offset += lengthOf(path.nodeIds[i]!)
   }
+  const own = path.nodeIds.reduce((bp, id) => bp + lengthOf(id), 0)
+  const stated =
+    path.start !== undefined &&
+    path.end !== undefined &&
+    path.end - path.start === own
   const named = path.name.replace(RANGE_SUFFIX, '')
   const visit = graph.pathVisits
     ?.get(node.name)
     ?.find(v => v.start === offset && v.path === named)
   return {
-    at: {
-      contig: path.contig ?? named,
-      start: offset,
-      end: offset + node.length,
-    },
+    ...(stated
+      ? {
+          at: {
+            contig: path.contig ?? named,
+            start: offset,
+            end: offset + node.length,
+          },
+        }
+      : {}),
     strand: visit?.strand,
   }
 }
