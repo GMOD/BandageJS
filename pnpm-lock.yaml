@@ -14,10 +14,9 @@ importers:
       '@gmod/tabix':
         specifier: ^3.13.1
         version: 3.13.1
-      # PLACEHOLDER: regenerate with `pnpm install` once @jbrowse/bandage-core 14.11.0 (the release fills in its number) is published
       '@jbrowse/bandage-core':
-        specifier: ^14.11.0
-        version: 14.11.0
+        specifier: ^15.0.0
+        version: 15.0.0
       '@playwright/test':
         specifier: ^1.64.0
         version: 1.64.0
@@ -221,9 +220,8 @@ packages:
   '@gmod/tabix@3.13.1':
     resolution: {integrity: sha512-usyBxD1EQ/wfIzeT/wQsqJBT6aGZwgaIFG94lBYFhWdK+csHjQU7t9i/iIjDSCIcZFTFiQ1TFp3McCMf4aH/4A==}
 
-  # PLACEHOLDER: the published tarball's integrity, once @jbrowse/bandage-core 14.11.0 is published
-  '@jbrowse/bandage-core@14.11.0':
-    resolution: {integrity: PLACEHOLDER-bandage-core-14.11.0}
+  '@jbrowse/bandage-core@15.0.0':
+    resolution: {integrity: sha512-XJQxSkfaXW3j2tHHKSOqjBoyXnt5Moq7OSf6u9JCJ3BuWjKQ3ELoTJwvVtstVbvEJGaIbQpxv3do1pf/p7K4vg==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -942,7 +940,7 @@ snapshots:
       '@jbrowse/quick-lru': 8.0.0
       generic-filehandle2: 2.5.1
 
-  '@jbrowse/bandage-core@14.11.0':
+  '@jbrowse/bandage-core@15.0.0':
     dependencies:
       '@gmod/gbz-base': 7.4.1
       '@gmod/tabix': 3.13.1

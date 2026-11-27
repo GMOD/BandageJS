@@ -21,7 +21,7 @@
   "devDependencies": {
     "@gmod/gfa-tabix": "^10.0.0",
     "@gmod/tabix": "^3.13.1",
-    "@jbrowse/bandage-core": "^14.11.0",
+    "@jbrowse/bandage-core": "^15.0.0",
     "@playwright/test": "^1.64.0",
     "@types/node": "^26.6.5",
     "esbuild": "^0.28.2",
