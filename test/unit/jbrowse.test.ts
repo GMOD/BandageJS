@@ -1,5 +1,8 @@
+import { loadGraph } from '@jbrowse/bandage-core'
 import { expect, test } from '@playwright/test'
 
+import { rowGenesOf, rowsOf } from '../../src/derived'
+import { rowHtml } from '../../src/describe'
 import { hubFrom, withOverlay } from '../../src/hubConfig'
 import {
   cutTrack,
@@ -193,4 +196,70 @@ test("a haplotype's links open the gene track the hub's overlay chose", () => {
   }
   expect(tracksIn(nodeLink(node, t))).toEqual(['chosen'])
   expect(tracksIn(rowLink(row, false, t))).toEqual(['chosen'])
+})
+
+const STARRED = [
+  'S\ta\t*\tLN:i:1000',
+  'S\tc\t*\tLN:i:1000',
+  'S\ti\t*\tLN:i:100',
+  'L\ta\t+\tc\t+\t0M',
+  'L\ta\t+\ti\t+\t0M',
+  'L\ti\t+\tc\t+\t0M',
+  'W\tref\t0\tchr\t0\t2000\t>a>c',
+  'W\tHG00097\t1\tctg2\t*\t*\t>a>i>c',
+  'W\tHG00098\t1\tctg3\t700\t*\t>a>i>c',
+].join('\n')
+
+const gene = (refName: string) => ({
+  name: `on ${refName}`,
+  refName,
+  start: 0,
+  end: 5000,
+  strand: 1,
+  exons: [],
+})
+
+test('a walk row whose W line states no start has no position to hover, place genes by or open, and one stating its start keeps all three', () => {
+  const hub = hubFrom(
+    {
+      assemblies: [
+        { name: 'hg38' },
+        { name: 'HG00097#1' },
+        { name: 'HG00098#1' },
+      ],
+      tracks: [
+        geneTrack('genes97'),
+        { ...geneTrack('genes98'), assemblyNames: ['HG00098#1'] },
+      ],
+    },
+    'https://example.org/config.json',
+  )
+  const t = {
+    host: 'https://jbrowse.example/',
+    hub,
+    assembly: hub.assemblies[0]!,
+  }
+  const bars = rowsOf(
+    loadGraph(STARRED, 'starred', { referencePath: 'ref#0#chr' }),
+    undefined,
+  )!
+  const row = (sample: string) => bars.rows.find(r => r.sample === sample)!
+  const placed = rowGenesOf(
+    bars,
+    undefined,
+    new Map([
+      [row('HG00097').name, [gene('ctg2')]],
+      [row('HG00098').name, [gene('ctg3')]],
+    ]),
+  )!
+
+  expect.soft(rowHtml(row('HG00097'), bars.reference)).not.toContain('<br>')
+  expect.soft(placed.has(row('HG00097').name)).toBe(false)
+  expect.soft(rowLink(row('HG00097'), false, t)).toBeUndefined()
+
+  expect(rowHtml(row('HG00098'), bars.reference)).toContain(
+    `<br>ctg3:701-${(2800).toLocaleString()}`,
+  )
+  expect(placed.get(row('HG00098').name)?.map(g => g.name)).toEqual(['on ctg3'])
+  expect(tracksIn(rowLink(row('HG00098'), false, t))).toEqual(['genes98'])
 })

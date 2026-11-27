@@ -1,4 +1,4 @@
-import { walksThrough } from '@jbrowse/bandage-core'
+import { spanStated, walksThrough } from '@jbrowse/bandage-core'
 
 import type { Graph, GraphEdge, GraphNode } from '@jbrowse/bandage-core'
 import type { GraphPath, PathVisit } from '@jbrowse/bandage-core/types'
@@ -97,11 +97,10 @@ function fragmentPlace(
   for (let i = 0; i < first; i++) {
     offset += lengthOf(path.nodeIds[i]!)
   }
-  const own = path.nodeIds.reduce((bp, id) => bp + lengthOf(id), 0)
-  const stated =
-    path.start !== undefined &&
-    path.end !== undefined &&
-    path.end - path.start === own
+  const stated = spanStated(
+    path,
+    path.nodeIds.reduce((bp, id) => bp + lengthOf(id), 0),
+  )
   const named = path.name.replace(RANGE_SUFFIX, '')
   const visit = graph.pathVisits
     ?.get(node.name)
